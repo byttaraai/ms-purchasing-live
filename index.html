@@ -811,7 +811,7 @@ function supplierQuestData(){
  }
  return[...groups.values()].sort((a,b)=>b.rank-a.rank||b.order-a.order||b.low-a.low);
 }
-function stableQuestIdfunction stableQuestId(type,target,codes=[]){return[type,target||'',state.upload?.id||state.upload?.snapshot_date||'no-upload'].join('|');}
+function stableQuestId(type,target,codes=[]){return[type,target||'',state.upload?.id||state.upload?.snapshot_date||'no-upload'].join('|');}
 function estimateScoreGain(model,codes,{supplierClose=false}={}){let gain=0;const unique=[...new Set(codes)];for(const code of unique){const r=state.rows.find(x=>x.product_code===code);if(!r||isScoreExcluded(code))continue;if(C.finite(r.stock_ratio)&&r.stock_ratio>=10&&r.stock_ratio<50)gain+=.55*.50*(100/model.meta.totalProducts);else if(C.finite(r.stock_ratio)&&r.stock_ratio<10)gain+=.55*.20*(100/model.meta.totalProducts);if(shortageNeedsOrder(r))gain+=.25*(100/model.meta.totalProducts);if(r.needs_review)gain+=.05*(100/model.meta.eligibleCount);const d=shortageAge(code),af=d<10?0:d<20?.25:d<30?.6:1;if(shortageNeedsOrder(r))gain+=.55*.30*(100/model.meta.shortageCount)*af;}if(supplierClose)gain+=.15*(100/model.meta.supplierCount);return Math.max(.1,Math.min(20,gain));}
 function rewardForImpact(model,impact,eventMatch){const perScore=pointStepForScore(model.score)/5;return Math.max(50,Math.round(impact*perScore*(eventMatch?GAME_CONFIG.eventMultiplier:1)));}
 function codeStillFocus(code,focus){const r=state.rows.find(x=>x.product_code===code);if(!r)return false;if(focus==='shortage_mid')return!isScoreExcluded(code)&&C.finite(r.stock_ratio)&&r.stock_ratio>=10&&r.stock_ratio<50;if(focus==='shortage_low')return!isScoreExcluded(code)&&C.finite(r.stock_ratio)&&r.stock_ratio<10;if(focus==='aging30')return!isScoreExcluded(code)&&shortageAge(code)>=30&&shortageCycleFor(code)?.active;if(focus==='aging20')return!isScoreExcluded(code)&&shortageAge(code)>=20&&shortageCycleFor(code)?.active;if(focus==='profit_recovery')return!isScoreExcluded(code)&&C.finite(r.stock_ratio)&&r.stock_ratio>=10&&r.stock_ratio<80&&['super','high'].includes(String(r.profitability_class||'').trim().toLowerCase());if(focus==='data')return r.needs_review;return false;}
@@ -920,7 +920,7 @@ function buildPriorityTasks(model){
  }
  return selected;
 }
-function taskStillOpenfunction taskStillOpen(t){
+function taskStillOpen(t){
  if(t.focus==='suppliers'){
   const codes=Array.isArray(t.codes)?t.codes:[],remaining=codes.filter(code=>{const r=state.rows.find(x=>x.product_code===code);return r&&shortageNeedsOrder(r);}).length;
   return remaining>0;
