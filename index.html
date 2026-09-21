@@ -222,8 +222,27 @@ body.modal-open{overflow:hidden}.validation{margin-top:18px}.summary-numbers{gri
 .tasks-freshness-compact{margin-top:0}
 @media(max-width:1180px){.account-identity{display:none}.tasks-overview-strip{grid-template-columns:1fr 1fr 1.5fr}.tasks-overview-badges{grid-column:span 1}.tasks-overview-rank{grid-column:span 1}}
 @media(max-width:760px){.tasks-overview-strip{grid-template-columns:1fr 1fr}.tasks-overview-badges{grid-column:1/-1}.tasks-overview-rank{grid-column:span 1}}
+
+.tasks-overview-strip.v2{grid-template-columns:1.05fr 1.65fr .95fr;gap:12px}
+.tasks-overview-strip.v2>div{min-height:126px;padding:13px 15px}
+.tasks-overview-performance{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:13px}
+.tasks-score-ring.compact{width:72px;height:72px;position:relative}.tasks-score-ring.compact:after{inset:7px}.tasks-score-ring.compact strong{font-size:24px}.tasks-score-ring.compact em{position:absolute;z-index:2;bottom:14px;font-style:normal;font-size:7px;font-weight:800;color:#8d98ac}
+.performance-copy{min-width:0}.performance-copy>small{margin-bottom:3px}.performance-title{display:flex;align-items:center;gap:7px}.performance-title>strong{font-size:13px;color:#18294f}.level-badge{display:inline-flex!important;align-items:center;gap:1px;background:#f0edff;color:#5b34fc!important;border-radius:7px;padding:3px 6px;font-size:9px!important;font-weight:900}
+.performance-level{display:flex;align-items:baseline;gap:7px;margin-top:3px;min-width:0}.performance-level b{font-size:11px;color:#25365b;white-space:nowrap}.performance-level span{font-size:8.5px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.level-progress-track{height:5px;border-radius:999px;background:#eceff5;margin-top:8px;overflow:hidden}.level-progress-track>span{display:block;height:100%;width:0;background:linear-gradient(90deg,#714dff,#5030f5);border-radius:inherit;transition:width .35s ease}.level-progress-copy{font-size:8px;color:#7d879c;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.tasks-overview-achievements{display:flex;flex-direction:column;justify-content:center}.tasks-overview-achievements .overview-head{align-items:center}.tasks-overview-achievements .overview-head>div>small{margin-bottom:2px}.tasks-overview-achievements .overview-head>div>span{font-size:8.5px!important}.open-task-counter{border:0;background:#f2efff;color:#5b34fc;border-radius:10px;padding:6px 9px;min-width:68px;display:flex;flex-direction:column;align-items:center;line-height:1.05}.open-task-counter b{font-size:17px}.open-task-counter span{font-size:7.5px!important;color:#6b55d8!important;margin-top:2px}.open-task-counter:hover{background:#eae5ff}
+.badge-shelf-icons{gap:7px;margin-top:8px;align-items:flex-start}.badge-medal{display:flex;flex-direction:column;align-items:center;gap:3px;width:56px;min-width:0}.badge-medal-icon{width:27px;height:27px;border-radius:50%;display:grid;place-items:center;font-size:10px;font-weight:900;border:1px solid #d7dce7;background:#f1f3f7;color:#a3abbb}.badge-medal-name{font-size:7.5px!important;line-height:1.1!important;text-align:center;color:#9aa3b4!important;max-width:56px;white-space:normal!important;overflow:hidden;display:-webkit-box!important;-webkit-line-clamp:2;-webkit-box-orient:vertical}.badge-medal.earned .badge-medal-icon{background:linear-gradient(145deg,#724cff,#4f2cf3);border-color:#5b34fc;color:#fff;box-shadow:0 4px 10px #5b34fc2b}.badge-medal.earned .badge-medal-name{color:#4f3e9a!important;font-weight:800}.badge-medal.pending .badge-medal-icon:after{content:"•";position:absolute}.badge-medal-icon{position:relative}.badge-medal.pending .badge-medal-icon{border-style:dashed}.badge-medal.more .badge-medal-icon{background:#eef1f7;color:#61708d}.badge-shelf-empty{font-size:8.5px;color:#9aa3b4;padding:6px 0}
+.tasks-overview-achievements .badge-legend{margin-top:5px}
+
+.rank-reel-card{display:flex;flex-direction:column;justify-content:center;overflow:hidden}.rank-card-head{display:flex;align-items:center;justify-content:space-between;gap:8px}.rank-card-head small{margin:0}.rank-card-head>span{font-size:7.5px!important;text-align:right}
+.rank-reel{position:relative;height:82px;margin-top:5px;overflow:hidden;border-radius:10px;background:linear-gradient(180deg,#f8f9fc 0,#fff 25%,#fff 75%,#f8f9fc 100%);border:1px solid #eef0f5}.rank-reel:before,.rank-reel:after{content:"";position:absolute;left:0;right:0;height:20px;z-index:3;pointer-events:none}.rank-reel:before{top:0;background:linear-gradient(#fff,rgba(255,255,255,0))}.rank-reel:after{bottom:0;background:linear-gradient(rgba(255,255,255,0),#fff)}
+.rank-reel-item{position:absolute;left:9px;right:9px;display:flex;align-items:center;justify-content:space-between;gap:8px;transition:all .25s ease}.rank-reel-item span{font-size:7px!important;text-transform:uppercase;letter-spacing:.35px}.rank-reel-item strong{font-size:11px;color:#5f6b82}
+.rank-next{top:-1px;opacity:.48;transform:scale(.92)}.rank-current{top:27px;background:#f0edff;border:1px solid #d9d0ff;border-radius:8px;padding:6px 8px;z-index:2}.rank-current span{color:#6b51e8!important}.rank-current strong{font-size:17px;color:#31206f}.rank-prev{bottom:-2px;opacity:.45;transform:scale(.92)}.rank-prev strong:before{content:"✓ ";color:#56a36e}
+@media(max-width:1100px){.tasks-overview-strip.v2{grid-template-columns:1fr 1.35fr}.rank-reel-card{grid-column:1/-1}.rank-reel{max-width:420px}}
+@media(max-width:720px){.tasks-overview-strip.v2{grid-template-columns:1fr}.rank-reel-card{grid-column:auto}.badge-shelf-icons{flex-wrap:wrap}}
 </style></head><body>
-<div class="auth" id="auth"><form class="auth-card" id="authForm"><div class="brand"><div class="logo"><svg aria-hidden="true" viewbox="0 0 24 24"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l3 14h12l3-10H6M8 15l-1 3h14"></path></svg></div><div><h1>MS Purchasing</h1><p>One purchase unit. Traceable calculations.</p></div></div><p class="muted">Sign in with your approved purchasing account.</p><div class="field"><label for="authEmail">Email</label><input autocomplete="username" id="authEmail" placeholder="name@company.com" required="" type="email"/></div><div class="field"><label for="authPassword">Password</label><input autocomplete="current-password" id="authPassword" required="" type="password"/></div><button class="btn primary" id="signInBtn" type="submit">Sign In</button><button class="btn" id="signUpBtn" type="button">Create Account</button><button class="btn hidden" id="openLocalBtn" type="button">Open local test data</button><p class="auth-error" id="authError" role="alert"></p><p class="sub">Create Account is enabled for the approved purchasing email. Choose your own password, then sign in.</p><span class="build-tag">Dashboard + BOs + Tasks Assistant - Live Build 13</span></form></div>
+<div class="auth" id="auth"><form class="auth-card" id="authForm"><div class="brand"><div class="logo"><svg aria-hidden="true" viewbox="0 0 24 24"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l3 14h12l3-10H6M8 15l-1 3h14"></path></svg></div><div><h1>MS Purchasing</h1><p>One purchase unit. Traceable calculations.</p></div></div><p class="muted">Sign in with your approved purchasing account.</p><div class="field"><label for="authEmail">Email</label><input autocomplete="username" id="authEmail" placeholder="name@company.com" required="" type="email"/></div><div class="field"><label for="authPassword">Password</label><input autocomplete="current-password" id="authPassword" required="" type="password"/></div><button class="btn primary" id="signInBtn" type="submit">Sign In</button><button class="btn" id="signUpBtn" type="button">Create Account</button><button class="btn hidden" id="openLocalBtn" type="button">Open local test data</button><p class="auth-error" id="authError" role="alert"></p><p class="sub">Create Account is enabled for the approved purchasing email. Choose your own password, then sign in.</p><span class="build-tag">Dashboard + BOs + Tasks Assistant - Live Build 14</span></form></div>
 <div class="hidden" id="app"><header class="topbar"><div class="brand"><div class="logo"><svg aria-hidden="true" viewbox="0 0 24 24"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l3 14h12l3-10H6M8 15l-1 3h14"></path></svg></div><div><h1>MS Purchasing</h1><p>Smarter Purchasing. Healthier Stock.</p></div></div><nav><button class="active" data-tab="daily-tasks"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M4 20V10m6 10V4m6 16v-7m4 7V7"></path></svg> Dashboard</button><button class="" data-tab="recommendations"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="m3 10 9-7 9 7v11h-6v-7H9v7H3z"></path></svg> BOs Assistant</button><button class="" data-tab="tasks-assistant"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M9 11l2 2 4-4M5 4h14v16H5zM8 17h8"></path></svg> Tasks Assistant</button></nav><div class="actions"><button class="btn primary upload-inventory-top" id="openInventoryModalTop" title="Upload inventory" type="button"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M12 16V3m-5 5 5-5 5 5M4 15v6h16v-6"></path></svg><span class="label">Upload Inventory</span></button><button class="btn" id="refreshBtn" title="Reload data"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M20 7a8 8 0 1 0 1 8M20 3v5h-5"></path></svg><span class="label">Refresh</span></button><span class="avatar">MS</span><div class="account-identity"><strong id="accountName"></strong><span class="account" id="accountEmail"></span></div><button class="btn" id="logoutBtn" title="Sign out"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M10 4H3v16h7m4-12 4 4-4 4M8 12h10"></path></svg></button></div></header>
 <main class="page"><div class="banner hidden" id="demoBanner"><div><strong>LOCAL TEST - NOT LIVE</strong>  Your original reorder-point numbers are retained. Unit conversions only. Changes here never update Supabase. Do not publish this test file: it contains your data.</div></div><div class="error-panel hidden" id="globalError" role="alert"></div>
 <section class="hidden" data-panel="recommendations"><div class="banner error hidden" id="recommendationFreshnessBanner"><div><strong>Inventory refresh required</strong>  Inventory is older than the recommended refresh window. Review the snapshot date before ordering.</div></div>
@@ -266,29 +285,35 @@ body.modal-open{overflow:hidden}.validation{margin-top:18px}.summary-numbers{gri
       <button class="btn primary" id="tasksOpenInventory" type="button">Upload Inventory</button>
     </div>
 
-    <div class="tasks-overview-strip">
-      <div class="tasks-overview-score">
-        <div class="tasks-score-ring compact" id="tasksScoreRing"><strong id="tasksScore">-</strong></div>
-        <div><small>BO SCORE</small><strong id="tasksScoreTitle">BO Performance Score</strong><span id="tasksScoreText">Calculating current purchasing health...</span></div>
+    <div class="tasks-overview-strip v2">
+      <div class="tasks-overview-performance">
+        <div class="tasks-score-ring compact" id="tasksScoreRing"><strong id="tasksScore">-</strong><em>/100</em></div>
+        <div class="performance-copy">
+          <small>BO PERFORMANCE</small>
+          <div class="performance-title"><strong id="tasksScoreTitle">BO Score</strong><span class="level-badge">L<span id="tasksLevelNumber">-</span></span></div>
+          <div class="performance-level"><b id="tasksLevelName">-</b><span id="tasksLevelRange">Score-based level</span></div>
+          <div class="level-progress-track"><span id="tasksLevelProgress"></span></div>
+          <div class="level-progress-copy" id="tasksNextLevelText">Calculating next level...</div>
+          <span class="screen-reader" id="tasksScoreText"></span>
+        </div>
       </div>
-      <div class="tasks-overview-level">
-        <small>BO LEVEL</small>
-        <div class="level-inline"><strong class="level-number" id="tasksLevelNumber">-</strong><div><b id="tasksLevelName">-</b><span id="tasksLevelRange">Score-based level</span></div></div>
-      </div>
-      <div class="tasks-overview-badges">
-        <div class="overview-head"><small>BADGES</small><span><b id="tasksBadgeTotal">0</b> earned</span></div>
-        <div class="badge-shelf" id="tasksRecentBadges"></div>
+
+      <div class="tasks-overview-achievements">
+        <div class="overview-head">
+          <div><small>TASK ACHIEVEMENTS</small><span><b id="tasksBadgeTotal">0</b> badges earned</span></div>
+          <button class="open-task-counter" id="tasksOpenJump" type="button" title="Jump to priority tasks"><b id="tasksOpenCount">0</b><span>Open Tasks</span></button>
+        </div>
+        <div class="badge-shelf badge-shelf-icons" id="tasksRecentBadges"></div>
         <div class="badge-legend"><span class="earned-dot"></span>Earned <span class="pending-dot"></span>Available from open tasks</div>
       </div>
-      <div class="tasks-overview-open">
-        <small>OPEN TASKS</small>
-        <strong id="tasksOpenCount">0</strong>
-        <span>Current stock cycle</span>
-      </div>
-      <div class="tasks-overview-rank">
-        <small>PROFESSIONAL RANK</small>
-        <strong id="tasksProfessionalRank">Builder</strong>
-        <span id="tasksRankHint">90-day consistency & improvement</span>
+
+      <div class="tasks-overview-rank rank-reel-card">
+        <div class="rank-card-head"><small>PROFESSIONAL RANK</small><span id="tasksRankHint">Performance history</span></div>
+        <div class="rank-reel" aria-label="Professional rank progression">
+          <div class="rank-reel-item rank-next"><span>Next</span><strong id="tasksRankNext">Controller</strong></div>
+          <div class="rank-reel-item rank-current"><span>Current</span><strong id="tasksProfessionalRank">Builder</strong></div>
+          <div class="rank-reel-item rank-prev"><span id="tasksRankPrevState">Start</span><strong id="tasksRankPrev">Starting point</strong></div>
+        </div>
       </div>
     </div>
 
@@ -988,18 +1013,31 @@ function tasksRequestItems(model,freshness){
 function renderTasksAssistant(data,model){
  const freshness=renderTasksInventoryFreshness(),score=Math.round(model.score),lv=scoreLevelForScore(score);
  $('tasksScore').textContent=score;$('tasksScoreRing').style.setProperty('--score',score);
- $('tasksScoreTitle').textContent='BO Performance Score · '+(score>=85?'Strong':score>=70?'Improving':score>=55?'Controlled':score>=40?'Needs Attention':'Recovery Needed');
- $('tasksScoreText').textContent='Business health score. It moves with stock coverage, order backlog, supplier backlog and master-data quality.';
- $('tasksLevelNumber').textContent=lv.n;$('tasksLevelName').textContent='Level '+lv.n+' · '+lv.name;$('tasksLevelRange').textContent=tasksLevelRange(lv.n);
+ const scoreState=score>=85?'Strong':score>=70?'Improving':score>=55?'Controlled':score>=40?'Needs Attention':'Recovery Needed';
+ $('tasksScoreTitle').textContent='BO Score · '+scoreState;
+ $('tasksScoreText').textContent='Business health score based on stock coverage, order backlog, supplier backlog and master-data quality.';
+ $('tasksLevelNumber').textContent=lv.n;$('tasksLevelName').textContent=lv.name;$('tasksLevelRange').textContent=tasksLevelRange(lv.n);
+ const currentMin=lv.n<=0?0:40+(lv.n-1)*5,nextMin=lv.n>=12?100:(lv.n<=0?40:40+lv.n*5);
+ const span=Math.max(1,nextMin-currentMin),levelProgress=lv.n>=12?100:Math.max(0,Math.min(100,((score-currentMin)/span)*100));
+ $('tasksLevelProgress').style.width=levelProgress+'%';
+ $('tasksNextLevelText').textContent=lv.n>=12?'Highest BO Level achieved':'Next: Level '+(lv.n+1)+' at '+nextMin+' · '+Math.max(0,nextMin-score)+' score point'+(Math.max(0,nextMin-score)===1?'':'s')+' to go';
  const tasks=Array.isArray(data?.tasks)?data.tasks:[],open=tasks.filter(t=>t.status==='open').length;
- $('tasksOpenCount').textContent=open;$('tasksBadgeTotal').textContent=data?.badge_total??0;$('tasksProfessionalRank').textContent=data?.professional_rank||'Builder';
- const rm=data?.rank_metrics||{};$('tasksRankHint').textContent=(rm.history_count||0)+' stock snapshots · '+(rm.improvement_rate??50)+'% improvement ratio';
+ $('tasksOpenCount').textContent=open;$('tasksBadgeTotal').textContent=data?.badge_total??0;
+ const professionalRanks=['Builder','Controller','Optimizer','Strategist','Vanguard'];
+ const currentRank=data?.professional_rank||'Builder',rankIndex=Math.max(0,professionalRanks.indexOf(currentRank));
+ $('tasksProfessionalRank').textContent=currentRank;
+ $('tasksRankNext').textContent=rankIndex>=professionalRanks.length-1?'Highest Rank':professionalRanks[rankIndex+1];
+ $('tasksRankPrev').textContent=rankIndex<=0?'Starting point':professionalRanks[rankIndex-1];
+ $('tasksRankPrevState').textContent=rankIndex<=0?'Start':'Passed';
+ const rm=data?.rank_metrics||{},historyCount=Number(rm.history_count||0);
+ $('tasksRankHint').textContent=historyCount<5?historyCount+' snapshots · preliminary':historyCount+' snapshots · '+(rm.improvement_rate??50)+'% improving';
  const recent=Array.isArray(data?.recent_badges)?data.recent_badges:[];
  const earnedLabels=[...new Set(recent.map(b=>b.badge_label).filter(Boolean))];
  const pendingLabels=[...new Set(tasks.filter(t=>t.status==='open').map(t=>t.badge_label).filter(Boolean))].filter(x=>!earnedLabels.includes(x));
- const shelf=[...earnedLabels.map(x=>'<span class="badge-pill earned" title="Earned badge">'+esc(x)+'</span>'),...pendingLabels.map(x=>'<span class="badge-pill pending" title="Available when its task is verified">'+esc(x)+'</span>')];
- const maxBadges=6,extra=Math.max(0,shelf.length-maxBadges);
- $('tasksRecentBadges').innerHTML=shelf.slice(0,maxBadges).join('')+(extra?'<span class="badge-pill more">+'+extra+'</span>':'')||'<span class="badge-pill pending">No badges available yet</span>';
+ const badgeIcon=label=>({'Supplier Closer':'S','Profit Protector':'P','Recovery Specialist':'R','Crisis Reviewer':'C','Data Cleaner':'D','Cycle Breaker':'A','Order Controller':'O'})[label]||'✓';
+ const shelf=[...earnedLabels.map(x=>'<div class="badge-medal earned" title="'+esc(x)+' · earned"><span class="badge-medal-icon">✓</span><span class="badge-medal-name">'+esc(x)+'</span></div>'),...pendingLabels.map(x=>'<div class="badge-medal pending" title="'+esc(x)+' · available from an open task"><span class="badge-medal-icon">'+esc(badgeIcon(x))+'</span><span class="badge-medal-name">'+esc(x)+'</span></div>')];
+ const maxBadges=7,extra=Math.max(0,shelf.length-maxBadges);
+ $('tasksRecentBadges').innerHTML=shelf.slice(0,maxBadges).join('')+(extra?'<div class="badge-medal more"><span class="badge-medal-icon">+'+extra+'</span><span class="badge-medal-name">More</span></div>':'')||'<span class="badge-shelf-empty">No badges available yet</span>';
  const cycle=data?.cycle;
  $('tasksEventTitle').textContent=cycle?.event_title||'Waiting for stock refresh';
  $('tasksEventText').textContent=cycle?.event_text||(freshness.fresh?'A new cycle will open from this snapshot if no active 48-hour cycle exists.':'Refresh stock to generate the next event and priority tasks.');
@@ -1124,7 +1162,7 @@ function openInventoryModal(){
  modal.classList.remove('hidden');document.body.classList.add('modal-open');setTimeout(()=>$('inventoryFile')?.focus(),0);
 }
 function closeInventoryModal(){const modal=$('inventoryModal');if(!modal)return;modal.classList.add('hidden');document.body.classList.remove('modal-open');}
-$('openInventoryModal').onclick=openInventoryModal;const topUpload=$('openInventoryModalTop');if(topUpload)topUpload.onclick=openInventoryModal;const taskUpload=$('tasksOpenInventory');if(taskUpload)taskUpload.onclick=openInventoryModal;const lockUpload=$('inventoryLockUpload');if(lockUpload)lockUpload.onclick=openInventoryModal;const goBosBtn=$('goBosFromDashboard');if(goBosBtn)goBosBtn.onclick=()=>go('recommendations');$('closeInventoryModal').onclick=closeInventoryModal;$('cancelInventoryModal').onclick=closeInventoryModal;
+$('openInventoryModal').onclick=openInventoryModal;const topUpload=$('openInventoryModalTop');if(topUpload)topUpload.onclick=openInventoryModal;const taskUpload=$('tasksOpenInventory');if(taskUpload)taskUpload.onclick=openInventoryModal;const taskJump=$('tasksOpenJump');if(taskJump)taskJump.onclick=()=>$('tasksPriorityList')?.scrollIntoView({behavior:'smooth',block:'start'});const lockUpload=$('inventoryLockUpload');if(lockUpload)lockUpload.onclick=openInventoryModal;const goBosBtn=$('goBosFromDashboard');if(goBosBtn)goBosBtn.onclick=()=>go('recommendations');$('closeInventoryModal').onclick=closeInventoryModal;$('cancelInventoryModal').onclick=closeInventoryModal;
 $('inventoryModal').addEventListener('click',e=>{if(e.target===$('inventoryModal'))closeInventoryModal();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('inventoryModal').classList.contains('hidden'))closeInventoryModal();});
 $('authForm').addEventListener('submit',signIn);$('signUpBtn').onclick=signUp;
