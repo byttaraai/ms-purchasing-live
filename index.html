@@ -911,7 +911,7 @@ function buildPriorityTasks(model){
 
  return out;
 }
-function taskStillOpenfunction taskStillOpen(t){
+function taskStillOpen(t){
  if(t.focus==='suppliers'){
   const codes=Array.isArray(t.codes)?t.codes:[],remaining=codes.filter(code=>{const r=state.rows.find(x=>x.product_code===code);return r&&shortageNeedsOrder(r);}).length;
   return remaining>0;
