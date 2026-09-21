@@ -209,9 +209,22 @@ body.modal-open{overflow:hidden}.validation{margin-top:18px}.summary-numbers{gri
 .critical-subhead span{font-size:9px;color:#7c879e}
 .critical-empty{padding:9px 10px;border:1px dashed #e1d9c8;background:#fffdf8;border-radius:9px;color:#7a6d58;font-size:9px;line-height:1.4}
 @media(max-width:900px){.task-columns{grid-template-columns:1fr}}
+
+.account-identity{display:flex;flex-direction:column;min-width:0;line-height:1.15}.account-identity strong{font-size:11px;color:#243556;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.account-identity .account{font-size:10px;max-width:150px;margin-top:3px}
+.tasks-overview-strip{display:grid;grid-template-columns:1.2fr .82fr 1.8fr .72fr 1.08fr;gap:10px;align-items:stretch}
+.tasks-overview-strip>div{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:12px 14px;min-width:0}
+.tasks-overview-strip small{display:block;font-size:9px;font-weight:900;letter-spacing:.45px;color:#77839c;margin-bottom:5px}
+.tasks-overview-strip span{display:block;color:var(--muted);font-size:9px;line-height:1.35}
+.tasks-overview-score{display:flex;align-items:center;gap:11px}.tasks-score-ring.compact{width:62px;height:62px}.tasks-score-ring.compact:after{inset:6px}.tasks-score-ring.compact strong{font-size:21px}.tasks-overview-score>div:last-child{min-width:0}.tasks-overview-score>div:last-child>strong{display:block;font-size:12px;color:#18294f;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px}
+.tasks-overview-level{display:flex;flex-direction:column;justify-content:center}.level-inline{display:flex;align-items:center;gap:9px}.tasks-overview-level .level-number{font-size:30px;font-weight:900;color:#5b34fc;line-height:1}.tasks-overview-level b{display:block;color:#18294f;font-size:11px;margin-bottom:2px}
+.tasks-overview-badges{display:flex;flex-direction:column;justify-content:center}.overview-head{display:flex;align-items:center;justify-content:space-between;gap:8px}.overview-head small{margin:0}.overview-head>span{font-size:9px;color:#64718d}.overview-head b{color:#18294f;font-size:11px}.badge-shelf{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px;min-height:23px}.badge-pill{display:inline-flex!important;align-items:center!important;border-radius:999px;padding:4px 7px;font-size:8px!important;font-weight:850;white-space:nowrap;line-height:1!important}.badge-pill.earned{background:#5b34fc;color:#fff!important;box-shadow:0 3px 8px #5b34fc26}.badge-pill.pending{background:#f0f2f6;color:#9aa3b5!important;border:1px dashed #cfd5e0}.badge-pill.more{background:#eef1f7;color:#61708d!important}.badge-legend{display:flex;align-items:center;gap:4px;margin-top:6px;color:#929bae;font-size:7.5px}.badge-legend .earned-dot,.badge-legend .pending-dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-left:5px}.badge-legend .earned-dot{background:#5b34fc}.badge-legend .pending-dot{background:#d7dce6}
+.tasks-overview-open,.tasks-overview-rank{display:flex;flex-direction:column;justify-content:center}.tasks-overview-open>strong{font-size:28px;color:#18294f;line-height:1}.tasks-overview-rank>strong{font-size:19px;color:#18294f;line-height:1.05;margin-bottom:4px}
+.tasks-freshness-compact{margin-top:0}
+@media(max-width:1180px){.account-identity{display:none}.tasks-overview-strip{grid-template-columns:1fr 1fr 1.5fr}.tasks-overview-badges{grid-column:span 1}.tasks-overview-rank{grid-column:span 1}}
+@media(max-width:760px){.tasks-overview-strip{grid-template-columns:1fr 1fr}.tasks-overview-badges{grid-column:1/-1}.tasks-overview-rank{grid-column:span 1}}
 </style></head><body>
-<div class="auth" id="auth"><form class="auth-card" id="authForm"><div class="brand"><div class="logo"><svg aria-hidden="true" viewbox="0 0 24 24"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l3 14h12l3-10H6M8 15l-1 3h14"></path></svg></div><div><h1>MS Purchasing</h1><p>One purchase unit. Traceable calculations.</p></div></div><p class="muted">Sign in with your approved purchasing account.</p><div class="field"><label for="authEmail">Email</label><input autocomplete="username" id="authEmail" placeholder="name@company.com" required="" type="email"/></div><div class="field"><label for="authPassword">Password</label><input autocomplete="current-password" id="authPassword" required="" type="password"/></div><button class="btn primary" id="signInBtn" type="submit">Sign In</button><button class="btn" id="signUpBtn" type="button">Create Account</button><button class="btn hidden" id="openLocalBtn" type="button">Open local test data</button><p class="auth-error" id="authError" role="alert"></p><p class="sub">Create Account is enabled for the approved purchasing email. Choose your own password, then sign in.</p><span class="build-tag">Dashboard + BOs + Tasks Assistant - Live Build 12</span></form></div>
-<div class="hidden" id="app"><header class="topbar"><div class="brand"><div class="logo"><svg aria-hidden="true" viewbox="0 0 24 24"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l3 14h12l3-10H6M8 15l-1 3h14"></path></svg></div><div><h1>MS Purchasing</h1><p>Smarter Purchasing. Healthier Stock.</p></div></div><nav><button class="active" data-tab="daily-tasks"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M4 20V10m6 10V4m6 16v-7m4 7V7"></path></svg> Dashboard</button><button class="" data-tab="recommendations"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="m3 10 9-7 9 7v11h-6v-7H9v7H3z"></path></svg> BOs Assistant</button><button class="" data-tab="tasks-assistant"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M9 11l2 2 4-4M5 4h14v16H5zM8 17h8"></path></svg> Tasks Assistant</button></nav><div class="actions"><button class="btn primary upload-inventory-top" id="openInventoryModalTop" title="Upload inventory" type="button"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M12 16V3m-5 5 5-5 5 5M4 15v6h16v-6"></path></svg><span class="label">Upload Inventory</span></button><button class="btn" id="refreshBtn" title="Reload data"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M20 7a8 8 0 1 0 1 8M20 3v5h-5"></path></svg><span class="label">Refresh</span></button><span class="avatar">MS</span><span class="account" id="accountEmail"></span><button class="btn" id="logoutBtn" title="Sign out"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M10 4H3v16h7m4-12 4 4-4 4M8 12h10"></path></svg></button></div></header>
+<div class="auth" id="auth"><form class="auth-card" id="authForm"><div class="brand"><div class="logo"><svg aria-hidden="true" viewbox="0 0 24 24"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l3 14h12l3-10H6M8 15l-1 3h14"></path></svg></div><div><h1>MS Purchasing</h1><p>One purchase unit. Traceable calculations.</p></div></div><p class="muted">Sign in with your approved purchasing account.</p><div class="field"><label for="authEmail">Email</label><input autocomplete="username" id="authEmail" placeholder="name@company.com" required="" type="email"/></div><div class="field"><label for="authPassword">Password</label><input autocomplete="current-password" id="authPassword" required="" type="password"/></div><button class="btn primary" id="signInBtn" type="submit">Sign In</button><button class="btn" id="signUpBtn" type="button">Create Account</button><button class="btn hidden" id="openLocalBtn" type="button">Open local test data</button><p class="auth-error" id="authError" role="alert"></p><p class="sub">Create Account is enabled for the approved purchasing email. Choose your own password, then sign in.</p><span class="build-tag">Dashboard + BOs + Tasks Assistant - Live Build 13</span></form></div>
+<div class="hidden" id="app"><header class="topbar"><div class="brand"><div class="logo"><svg aria-hidden="true" viewbox="0 0 24 24"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l3 14h12l3-10H6M8 15l-1 3h14"></path></svg></div><div><h1>MS Purchasing</h1><p>Smarter Purchasing. Healthier Stock.</p></div></div><nav><button class="active" data-tab="daily-tasks"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M4 20V10m6 10V4m6 16v-7m4 7V7"></path></svg> Dashboard</button><button class="" data-tab="recommendations"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="m3 10 9-7 9 7v11h-6v-7H9v7H3z"></path></svg> BOs Assistant</button><button class="" data-tab="tasks-assistant"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M9 11l2 2 4-4M5 4h14v16H5zM8 17h8"></path></svg> Tasks Assistant</button></nav><div class="actions"><button class="btn primary upload-inventory-top" id="openInventoryModalTop" title="Upload inventory" type="button"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M12 16V3m-5 5 5-5 5 5M4 15v6h16v-6"></path></svg><span class="label">Upload Inventory</span></button><button class="btn" id="refreshBtn" title="Reload data"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M20 7a8 8 0 1 0 1 8M20 3v5h-5"></path></svg><span class="label">Refresh</span></button><span class="avatar">MS</span><div class="account-identity"><strong id="accountName"></strong><span class="account" id="accountEmail"></span></div><button class="btn" id="logoutBtn" title="Sign out"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M10 4H3v16h7m4-12 4 4-4 4M8 12h10"></path></svg></button></div></header>
 <main class="page"><div class="banner hidden" id="demoBanner"><div><strong>LOCAL TEST - NOT LIVE</strong>  Your original reorder-point numbers are retained. Unit conversions only. Changes here never update Supabase. Do not publish this test file: it contains your data.</div></div><div class="error-panel hidden" id="globalError" role="alert"></div>
 <section class="hidden" data-panel="recommendations"><div class="banner error hidden" id="recommendationFreshnessBanner"><div><strong>Inventory refresh required</strong>  Inventory is older than the recommended refresh window. Review the snapshot date before ordering.</div></div>
   <div class="kpis">
@@ -253,36 +266,35 @@ body.modal-open{overflow:hidden}.validation{margin-top:18px}.summary-numbers{gri
       <button class="btn primary" id="tasksOpenInventory" type="button">Upload Inventory</button>
     </div>
 
-    <div class="dashboard-freshness-card">
+    <div class="tasks-overview-strip">
+      <div class="tasks-overview-score">
+        <div class="tasks-score-ring compact" id="tasksScoreRing"><strong id="tasksScore">-</strong></div>
+        <div><small>BO SCORE</small><strong id="tasksScoreTitle">BO Performance Score</strong><span id="tasksScoreText">Calculating current purchasing health...</span></div>
+      </div>
+      <div class="tasks-overview-level">
+        <small>BO LEVEL</small>
+        <div class="level-inline"><strong class="level-number" id="tasksLevelNumber">-</strong><div><b id="tasksLevelName">-</b><span id="tasksLevelRange">Score-based level</span></div></div>
+      </div>
+      <div class="tasks-overview-badges">
+        <div class="overview-head"><small>BADGES</small><span><b id="tasksBadgeTotal">0</b> earned</span></div>
+        <div class="badge-shelf" id="tasksRecentBadges"></div>
+        <div class="badge-legend"><span class="earned-dot"></span>Earned <span class="pending-dot"></span>Available from open tasks</div>
+      </div>
+      <div class="tasks-overview-open">
+        <small>OPEN TASKS</small>
+        <strong id="tasksOpenCount">0</strong>
+        <span>Current stock cycle</span>
+      </div>
+      <div class="tasks-overview-rank">
+        <small>PROFESSIONAL RANK</small>
+        <strong id="tasksProfessionalRank">Builder</strong>
+        <span id="tasksRankHint">90-day consistency & improvement</span>
+      </div>
+    </div>
+
+    <div class="dashboard-freshness-card tasks-freshness-compact">
       <div class="freshness-copy"><strong>Inventory Snapshot</strong><span id="tasksInventoryFreshnessText">Checking latest inventory snapshot...</span></div>
       <div class="freshness-meta"><span class="fresh-chip neutral" id="tasksInventoryFreshnessStatus">Checking</span><span class="fresh-chip neutral" id="tasksInventoryFreshnessAge">-</span></div>
-    </div>
-
-    <div class="tasks-score-grid">
-      <div class="tasks-score-card">
-        <div class="tasks-score-main">
-          <div class="tasks-score-ring" id="tasksScoreRing"><strong id="tasksScore">-</strong></div>
-          <div class="tasks-score-copy">
-            <strong id="tasksScoreTitle">BO Performance Score</strong>
-            <span id="tasksScoreText">Calculating current purchasing health...</span>
-          </div>
-        </div>
-      </div>
-      <div class="tasks-level-card">
-        <div>
-          <span class="tasks-kicker">BO LEVEL</span>
-          <h3 id="tasksLevelName">-</h3>
-          <p id="tasksLevelRange">Score-based level</p>
-        </div>
-        <div class="level-number" id="tasksLevelNumber">-</div>
-      </div>
-    </div>
-
-    <div class="tasks-summary-grid">
-      <div class="tasks-stat-card"><small>Employee</small><strong id="tasksEmployeeName">-</strong><span id="tasksEmployeeEmail">-</span></div>
-      <div class="tasks-stat-card"><small>Open Tasks</small><strong id="tasksOpenCount">0</strong><span>Open tasks in current stock-refresh cycle</span></div>
-      <div class="tasks-stat-card"><small>Total Badges</small><strong id="tasksBadgeTotal">0</strong><span>Verified completed tasks</span><div class="tasks-recent-badges" id="tasksRecentBadges"></div></div>
-      <div class="tasks-stat-card"><small>Professional Rank</small><strong id="tasksProfessionalRank">Builder</strong><span id="tasksRankHint">90-day consistency & improvement</span></div>
     </div>
 
     <div class="tasks-main-grid">
@@ -649,7 +661,7 @@ async function signUp(){
    $('authError').textContent=/already|registered|exists/i.test(msg)?'This email already has an account. Use Sign In with the password you created.':msg;
  }finally{$('signUpBtn').disabled=false;$('signInBtn').disabled=false;}
 }
-function openApp(){$('auth').classList.add('hidden');$('app').classList.remove('hidden');$('demoBanner').classList.toggle('hidden',state.mode!=='local');$('accountEmail').textContent=state.mode==='local'?'Local test only':state.session?.user?.email||'Signed in';$('modeLabel').textContent=state.mode==='local'?'LOCAL / NOT LIVE':'LIVE / SUPABASE';go('daily-tasks');}
+function openApp(){$('auth').classList.add('hidden');$('app').classList.remove('hidden');$('demoBanner').classList.toggle('hidden',state.mode!=='local');const local=state.mode==='local';const name=local?'Local Test':tasksEmployeeDisplayName();$('accountName').textContent=name;$('accountEmail').textContent=local?'Local test only':state.session?.user?.email||'Signed in';$('modeLabel').textContent=local?'LOCAL / NOT LIVE':'LIVE / SUPABASE';go('daily-tasks');}
 async function loadLive(){
  if(state.loading)return;state.loading=true;$('refreshBtn').disabled=true;$('globalError').classList.add('hidden');
  try{const d=await rpc('purchasing_dashboard_v5');if(d.schema_version!==5||!d.seed_applied)throw Error('Complete the V5 schema and baseline migrations first. No legacy calculations are being used.');
@@ -979,12 +991,15 @@ function renderTasksAssistant(data,model){
  $('tasksScoreTitle').textContent='BO Performance Score · '+(score>=85?'Strong':score>=70?'Improving':score>=55?'Controlled':score>=40?'Needs Attention':'Recovery Needed');
  $('tasksScoreText').textContent='Business health score. It moves with stock coverage, order backlog, supplier backlog and master-data quality.';
  $('tasksLevelNumber').textContent=lv.n;$('tasksLevelName').textContent='Level '+lv.n+' · '+lv.name;$('tasksLevelRange').textContent=tasksLevelRange(lv.n);
- $('tasksEmployeeName').textContent=tasksEmployeeDisplayName();$('tasksEmployeeEmail').textContent=state.session?.user?.email||'';
  const tasks=Array.isArray(data?.tasks)?data.tasks:[],open=tasks.filter(t=>t.status==='open').length;
  $('tasksOpenCount').textContent=open;$('tasksBadgeTotal').textContent=data?.badge_total??0;$('tasksProfessionalRank').textContent=data?.professional_rank||'Builder';
  const rm=data?.rank_metrics||{};$('tasksRankHint').textContent=(rm.history_count||0)+' stock snapshots · '+(rm.improvement_rate??50)+'% improvement ratio';
  const recent=Array.isArray(data?.recent_badges)?data.recent_badges:[];
- $('tasksRecentBadges').innerHTML=recent.slice(0,3).map(b=>'<span>'+esc(b.badge_label)+'</span>').join('');
+ const earnedLabels=[...new Set(recent.map(b=>b.badge_label).filter(Boolean))];
+ const pendingLabels=[...new Set(tasks.filter(t=>t.status==='open').map(t=>t.badge_label).filter(Boolean))].filter(x=>!earnedLabels.includes(x));
+ const shelf=[...earnedLabels.map(x=>'<span class="badge-pill earned" title="Earned badge">'+esc(x)+'</span>'),...pendingLabels.map(x=>'<span class="badge-pill pending" title="Available when its task is verified">'+esc(x)+'</span>')];
+ const maxBadges=6,extra=Math.max(0,shelf.length-maxBadges);
+ $('tasksRecentBadges').innerHTML=shelf.slice(0,maxBadges).join('')+(extra?'<span class="badge-pill more">+'+extra+'</span>':'')||'<span class="badge-pill pending">No badges available yet</span>';
  const cycle=data?.cycle;
  $('tasksEventTitle').textContent=cycle?.event_title||'Waiting for stock refresh';
  $('tasksEventText').textContent=cycle?.event_text||(freshness.fresh?'A new cycle will open from this snapshot if no active 48-hour cycle exists.':'Refresh stock to generate the next event and priority tasks.');
