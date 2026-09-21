@@ -971,10 +971,10 @@ async function syncTasksAssistant(){
   const payload={upload_id:state.upload?.id||null,score,bo_level:lv.n,event_focus:event.focus,event_title:event.title,event_text:event.text,tasks:candidates,resolved_task_ids:[]};
   let data;
   if(state.upload?.id&&state.upload?.is_complete&&state.upload?.excludes_zero){
-    data=await rpc('purchasing_tasks_sync_v5',payload);
+    data=await rpc('purchasing_tasks_sync_v5',{payload});
     if(data?.cycle?.upload_id&&data.cycle.upload_id!==state.upload.id&&Array.isArray(data.tasks)){
       const resolved=data.tasks.filter(t=>t.status==='open'&&!taskStillOpen(t)).map(t=>t.id);
-      if(resolved.length)data=await rpc('purchasing_tasks_sync_v5',{...payload,resolved_task_ids:resolved});
+      if(resolved.length)data=await rpc('purchasing_tasks_sync_v5',{payload:{...payload,resolved_task_ids:resolved}});
     }
   }else data={cycle:null,tasks:[],badge_total:state.taskAssistant?.badge_total||0,professional_rank:state.taskAssistant?.professional_rank||'Builder',recent_badges:state.taskAssistant?.recent_badges||[],rank_metrics:state.taskAssistant?.rank_metrics||{}};
   state.taskAssistant=data;renderTasksAssistant(data,model);
