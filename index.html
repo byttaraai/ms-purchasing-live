@@ -120,9 +120,68 @@ body.modal-open{overflow:hidden}.validation{margin-top:18px}.summary-numbers{gri
 /* Production operations dashboard - no game UI */
 .ops-dashboard{display:flex;flex-direction:column;gap:16px}.dashboard-heading{display:flex;align-items:center;justify-content:space-between;gap:18px}.dashboard-heading h2{margin:2px 0 2px;font-size:26px}.dashboard-heading p{margin:0;color:var(--muted);font-size:12px}.dashboard-heading-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.dashboard-eyebrow{font-size:10px;letter-spacing:1px;color:var(--primary);font-weight:800}.dashboard-freshness-card{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:14px}.freshness-copy{display:flex;flex-direction:column;gap:2px}.freshness-copy strong{font-size:13px}.freshness-copy span{font-size:11px;color:var(--muted)}.freshness-meta{display:flex;gap:7px;flex-wrap:wrap}.fresh-chip{display:inline-flex;align-items:center;padding:5px 8px;border-radius:999px;background:#f2f5fa;color:#687894;font-size:10px;font-weight:700}.fresh-chip.warn{background:#fff1d8;color:#9a6408}.fresh-chip.good{background:#e9f8ef;color:#14774e}.dashboard-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.dash-metric{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:16px}.dash-metric strong{display:block;font-size:30px;line-height:1.15;margin:5px 0;color:#18294f}.dash-metric small{font-size:10.5px;color:var(--muted)}.dash-label{font-size:11px;font-weight:800;color:#51617e;text-transform:uppercase;letter-spacing:.35px}.dash-metric.danger{background:linear-gradient(125deg,#fff,#fff4f5)}.dash-metric.danger strong{color:#d83a4e}.dash-metric.warn{background:linear-gradient(125deg,#fff,#fff8e8)}.dash-metric.warn strong{color:#b87513}.dash-metric.review{background:linear-gradient(125deg,#fff,#f7f4ff)}.dash-metric.review strong{color:#5b34fc}.dashboard-actions-card{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:15px 17px;display:flex;justify-content:space-between;align-items:center;gap:15px}.dashboard-actions-card p{margin:3px 0 0;color:var(--muted);font-size:11px}.ops-dashboard .kpis{margin-bottom:0}.recommendations-readonly .row-select,.recommendations-readonly #selectAllFiltered,.recommendations-readonly #printSelected{pointer-events:none}.topbar .upload-inventory-top{white-space:nowrap}
 @media(max-width:950px){.dashboard-grid{grid-template-columns:repeat(2,1fr)}.dashboard-freshness-card,.dashboard-heading,.dashboard-actions-card{align-items:flex-start;flex-direction:column}}@media(max-width:620px){.dashboard-grid{grid-template-columns:1fr}}
+
+.tasks-assistant-page{display:flex;flex-direction:column;gap:16px}
+.tasks-header{display:flex;align-items:flex-end;justify-content:space-between;gap:18px}
+.tasks-header h2{margin:3px 0 4px;font-size:26px;color:#18294f}
+.tasks-header p{margin:0;color:var(--muted);font-size:12px}
+.tasks-kicker{font-size:10px;font-weight:900;letter-spacing:.7px;color:#6b51e8}
+.tasks-score-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:14px}
+.tasks-score-card,.tasks-level-card,.tasks-stat-card,.tasks-event-card,.tasks-requests-card,.task-card{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
+.tasks-score-card,.tasks-level-card{padding:18px}
+.tasks-score-main{display:flex;align-items:center;gap:16px}
+.tasks-score-ring{--score:0;width:88px;height:88px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(#5b34fc calc(var(--score)*1%),#eceff6 0);position:relative;flex:0 0 auto}
+.tasks-score-ring:after{content:"";position:absolute;inset:8px;background:#fff;border-radius:50%}
+.tasks-score-ring strong{position:relative;z-index:1;font-size:28px;color:#18294f}
+.tasks-score-copy strong{display:block;font-size:16px;color:#18294f;margin-bottom:5px}
+.tasks-score-copy span{font-size:11px;color:var(--muted);line-height:1.5}
+.tasks-level-card{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.tasks-level-card .level-number{font-size:36px;font-weight:900;color:#5b34fc;line-height:1}
+.tasks-level-card h3{margin:0 0 4px;font-size:16px;color:#18294f}
+.tasks-level-card p{margin:0;color:var(--muted);font-size:11px}
+.tasks-summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.tasks-stat-card{padding:14px 15px}
+.tasks-stat-card small{display:block;font-size:10px;font-weight:800;letter-spacing:.35px;text-transform:uppercase;color:#77839c;margin-bottom:6px}
+.tasks-stat-card strong{display:block;font-size:22px;color:#18294f;line-height:1.15}
+.tasks-stat-card span{display:block;margin-top:5px;color:var(--muted);font-size:10.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tasks-main-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:14px}
+.tasks-event-card,.tasks-requests-card{padding:16px}
+.tasks-card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.tasks-card-head h3{margin:0;font-size:15px;color:#18294f}
+.tasks-chip{display:inline-flex;align-items:center;border-radius:999px;padding:5px 8px;background:#f0edff;color:#5b34fc;font-size:9.5px;font-weight:900;letter-spacing:.3px}
+.tasks-event-card h4{margin:4px 0 6px;font-size:18px;color:#18294f}
+.tasks-event-card p{margin:0;color:var(--muted);font-size:11px;line-height:1.55}
+.tasks-request-list{display:grid;gap:8px}
+.tasks-request{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:9px 10px;border-radius:10px;background:#f8f9fc;border:1px solid #edf0f6}
+.tasks-request strong{display:block;font-size:11px;color:#23345a}
+.tasks-request span{font-size:10px;color:var(--muted)}
+.tasks-request .status{font-weight:900;white-space:nowrap}
+.tasks-list-wrap{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:16px}
+.tasks-list-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:12px}
+.tasks-list-head h3{margin:0;font-size:17px;color:#18294f}
+.tasks-list-head p{margin:3px 0 0;font-size:10.5px;color:var(--muted)}
+.tasks-cycle-note{font-size:10px;color:#6b7280;font-weight:700}
+.tasks-list{display:grid;gap:10px}
+.task-card{padding:14px;box-shadow:none}
+.task-card.completed{background:#f7fbf8;border-color:#dceee0}
+.task-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.task-type{font-size:9px;font-weight:900;letter-spacing:.4px;text-transform:uppercase;color:#6b51e8}
+.task-impact{font-size:10px;font-weight:800;color:#d66f00;background:#fff5e9;border-radius:999px;padding:4px 7px}
+.task-card.completed .task-impact{color:#1d7d49;background:#eaf8ef}
+.task-card h4{margin:7px 0 5px;color:#18294f;font-size:14px}
+.task-card p{margin:0;color:var(--muted);font-size:10.8px;line-height:1.5}
+.task-meta{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+.task-meta span{font-size:9.5px;background:#f3f5f9;color:#52607a;border-radius:999px;padding:4px 7px}
+.task-bottom{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:11px}
+.task-badge{font-size:10px;font-weight:800;color:#5b34fc}
+.task-empty{padding:22px 12px;text-align:center;color:var(--muted);font-size:11px;border:1px dashed #d7dce7;border-radius:12px;background:#fafbfc}
+.tasks-recent-badges{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+.tasks-recent-badges span{font-size:9px;font-weight:800;background:#f1efff;color:#5b34fc;border-radius:999px;padding:4px 7px}
+@media(max-width:920px){.tasks-score-grid,.tasks-main-grid{grid-template-columns:1fr}.tasks-summary-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.tasks-summary-grid{grid-template-columns:1fr 1fr}.tasks-header{align-items:flex-start;flex-direction:column}.tasks-level-card{align-items:flex-start}.tasks-score-main{align-items:flex-start}}
 </style></head><body>
-<div class="auth" id="auth"><form class="auth-card" id="authForm"><div class="brand"><div class="logo"><svg aria-hidden="true" viewbox="0 0 24 24"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l3 14h12l3-10H6M8 15l-1 3h14"></path></svg></div><div><h1>MS Purchasing</h1><p>One purchase unit. Traceable calculations.</p></div></div><p class="muted">Sign in with your approved purchasing account.</p><div class="field"><label for="authEmail">Email</label><input autocomplete="username" id="authEmail" placeholder="name@company.com" required="" type="email"/></div><div class="field"><label for="authPassword">Password</label><input autocomplete="current-password" id="authPassword" required="" type="password"/></div><button class="btn primary" id="signInBtn" type="submit">Sign In</button><button class="btn" id="signUpBtn" type="button">Create Account</button><button class="btn hidden" id="openLocalBtn" type="button">Open local test data</button><p class="auth-error" id="authError" role="alert"></p><p class="sub">Create Account is enabled for the approved purchasing email. Choose your own password, then sign in.</p><span class="build-tag">Dashboard + BOs Assistant - Live Build 4</span></form></div>
-<div class="hidden" id="app"><header class="topbar"><div class="brand"><div class="logo"><svg aria-hidden="true" viewbox="0 0 24 24"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l3 14h12l3-10H6M8 15l-1 3h14"></path></svg></div><div><h1>MS Purchasing</h1><p>Smarter Purchasing. Healthier Stock.</p></div></div><nav><button class="active" data-tab="daily-tasks"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M4 20V10m6 10V4m6 16v-7m4 7V7"></path></svg> Dashboard</button><button class="" data-tab="recommendations"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="m3 10 9-7 9 7v11h-6v-7H9v7H3z"></path></svg> BOs Assistant</button></nav><div class="actions"><button class="btn primary upload-inventory-top" id="openInventoryModalTop" title="Upload inventory" type="button"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M12 16V3m-5 5 5-5 5 5M4 15v6h16v-6"></path></svg><span class="label">Upload Inventory</span></button><button class="btn" id="refreshBtn" title="Reload data"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M20 7a8 8 0 1 0 1 8M20 3v5h-5"></path></svg><span class="label">Refresh</span></button><span class="avatar">MS</span><span class="account" id="accountEmail"></span><button class="btn" id="logoutBtn" title="Sign out"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M10 4H3v16h7m4-12 4 4-4 4M8 12h10"></path></svg></button></div></header>
+<div class="auth" id="auth"><form class="auth-card" id="authForm"><div class="brand"><div class="logo"><svg aria-hidden="true" viewbox="0 0 24 24"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l3 14h12l3-10H6M8 15l-1 3h14"></path></svg></div><div><h1>MS Purchasing</h1><p>One purchase unit. Traceable calculations.</p></div></div><p class="muted">Sign in with your approved purchasing account.</p><div class="field"><label for="authEmail">Email</label><input autocomplete="username" id="authEmail" placeholder="name@company.com" required="" type="email"/></div><div class="field"><label for="authPassword">Password</label><input autocomplete="current-password" id="authPassword" required="" type="password"/></div><button class="btn primary" id="signInBtn" type="submit">Sign In</button><button class="btn" id="signUpBtn" type="button">Create Account</button><button class="btn hidden" id="openLocalBtn" type="button">Open local test data</button><p class="auth-error" id="authError" role="alert"></p><p class="sub">Create Account is enabled for the approved purchasing email. Choose your own password, then sign in.</p><span class="build-tag">Dashboard + BOs + Tasks Assistant - Live Build 5</span></form></div>
+<div class="hidden" id="app"><header class="topbar"><div class="brand"><div class="logo"><svg aria-hidden="true" viewbox="0 0 24 24"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l3 14h12l3-10H6M8 15l-1 3h14"></path></svg></div><div><h1>MS Purchasing</h1><p>Smarter Purchasing. Healthier Stock.</p></div></div><nav><button class="active" data-tab="daily-tasks"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M4 20V10m6 10V4m6 16v-7m4 7V7"></path></svg> Dashboard</button><button class="" data-tab="recommendations"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="m3 10 9-7 9 7v11h-6v-7H9v7H3z"></path></svg> BOs Assistant</button><button class="" data-tab="tasks-assistant"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M9 11l2 2 4-4M5 4h14v16H5zM8 17h8"></path></svg> Tasks Assistant</button></nav><div class="actions"><button class="btn primary upload-inventory-top" id="openInventoryModalTop" title="Upload inventory" type="button"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M12 16V3m-5 5 5-5 5 5M4 15v6h16v-6"></path></svg><span class="label">Upload Inventory</span></button><button class="btn" id="refreshBtn" title="Reload data"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M20 7a8 8 0 1 0 1 8M20 3v5h-5"></path></svg><span class="label">Refresh</span></button><span class="avatar">MS</span><span class="account" id="accountEmail"></span><button class="btn" id="logoutBtn" title="Sign out"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M10 4H3v16h7m4-12 4 4-4 4M8 12h10"></path></svg></button></div></header>
 <main class="page"><div class="banner hidden" id="demoBanner"><div><strong>LOCAL TEST - NOT LIVE</strong>  Your original reorder-point numbers are retained. Unit conversions only. Changes here never update Supabase. Do not publish this test file: it contains your data.</div></div><div class="error-panel hidden" id="globalError" role="alert"></div>
 <section class="hidden" data-panel="recommendations"><div class="banner error hidden" id="recommendationFreshnessBanner"><div><strong>Inventory refresh required</strong>  Inventory is older than the recommended refresh window. Review the snapshot date before ordering.</div></div>
 <div class="filter-card"><div class="filters"><div class="field supplier-control"><label for="supplierFilter">Filter by Supplier</label><select id="supplierFilter"><option value="">All Suppliers</option></select></div><div class="field profit-control"><label>Profitability</label><div class="multi-select" id="profitMulti"><button aria-expanded="false" aria-haspopup="true" class="multi-trigger" id="profitButton" type="button"><span id="profitButtonText">All Profitability</span><svg aria-hidden="true" viewbox="0 0 24 24"><path d="m6 9 6 6 6-6"></path></svg></button><div class="multi-menu hidden" id="profitMenu"><label><input class="profit-choice" type="checkbox" value="Super"/> <span>Super</span></label><label><input class="profit-choice" type="checkbox" value="High"/> <span>High</span></label><label><input class="profit-choice" type="checkbox" value="Medium"/> <span>Medium</span></label><label><input class="profit-choice" type="checkbox" value="Low"/> <span>Low</span></label><label><input class="profit-choice" type="checkbox" value="Loss"/> <span>Loss</span></label><label><input class="profit-choice" type="checkbox" value="Unclassified"/> <span>Unclassified</span></label><button class="multi-all" id="profitAll" type="button">Show all profitability</button></div></div></div><div class="field"><label for="stockThreshold">Stock % (below)</label><div class="percent"><input id="stockThreshold" min="0" placeholder="e.g. 80" step="any" type="number"/><span>%</span></div></div><div class="field search-control"><label for="productSearch">Product Search</label><div class="input-icon"><svg aria-hidden="true" viewbox="0 0 24 24"><circle cx="10" cy="10" r="7"></circle><path d="m15 15 6 6"></path></svg><input id="productSearch" placeholder="Search by product name..."/></div></div><label class="zero-toggle"><input id="showZeroStock" type="checkbox"/><span class="toggle-track"><span class="toggle-knob"></span></span><span class="toggle-copy"><strong>Show Zero Stock</strong><small id="zeroStateText">Hidden</small></span></label><button class="btn outline" id="clearFilters" type="button"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M20 7a8 8 0 1 0 1 8M20 3v5h-5"></path></svg> Clear Filters</button></div></div>
@@ -153,6 +212,70 @@ body.modal-open{overflow:hidden}.validation{margin-top:18px}.summary-numbers{gri
     <article class="kpi green"><span class="bubble"><svg aria-hidden="true" viewbox="0 0 24 24"><rect height="17" rx="2" width="18" x="3" y="5"></rect><path d="M7 2v6m10-6v6M3 11h18m-14 4h2m3 0h2m3 0h1M7 18h2m3 0h2"></path></svg></span><div><h2>Last Inventory</h2><strong class="date" id="kpiUpdate">-</strong><div class="sub" id="kpiUpdateSub">-</div></div></article>
   </div>
 </div></section>
+<section class="hidden" data-panel="tasks-assistant">
+  <div class="tasks-assistant-page">
+    <div class="tasks-header">
+      <div>
+        <span class="tasks-kicker">48H PURCHASING WORKFLOW</span>
+        <h2>Tasks Assistant</h2>
+        <p>Priority tasks are generated from the latest full stock refresh and verified by a later inventory refresh.</p>
+      </div>
+      <button class="btn primary" id="tasksOpenInventory" type="button">Upload Inventory</button>
+    </div>
+
+    <div class="dashboard-freshness-card">
+      <div class="freshness-copy"><strong>Inventory Snapshot</strong><span id="tasksInventoryFreshnessText">Checking latest inventory snapshot...</span></div>
+      <div class="freshness-meta"><span class="fresh-chip neutral" id="tasksInventoryFreshnessStatus">Checking</span><span class="fresh-chip neutral" id="tasksInventoryFreshnessAge">-</span></div>
+    </div>
+
+    <div class="tasks-score-grid">
+      <div class="tasks-score-card">
+        <div class="tasks-score-main">
+          <div class="tasks-score-ring" id="tasksScoreRing"><strong id="tasksScore">-</strong></div>
+          <div class="tasks-score-copy">
+            <strong id="tasksScoreTitle">BO Performance Score</strong>
+            <span id="tasksScoreText">Calculating current purchasing health...</span>
+          </div>
+        </div>
+      </div>
+      <div class="tasks-level-card">
+        <div>
+          <span class="tasks-kicker">BO LEVEL</span>
+          <h3 id="tasksLevelName">-</h3>
+          <p id="tasksLevelRange">Score-based level</p>
+        </div>
+        <div class="level-number" id="tasksLevelNumber">-</div>
+      </div>
+    </div>
+
+    <div class="tasks-summary-grid">
+      <div class="tasks-stat-card"><small>Employee</small><strong id="tasksEmployeeName">-</strong><span id="tasksEmployeeEmail">-</span></div>
+      <div class="tasks-stat-card"><small>Open Tasks</small><strong id="tasksOpenCount">0</strong><span>Maximum 5 per 48H cycle</span></div>
+      <div class="tasks-stat-card"><small>Total Badges</small><strong id="tasksBadgeTotal">0</strong><span>Verified completed tasks</span><div class="tasks-recent-badges" id="tasksRecentBadges"></div></div>
+      <div class="tasks-stat-card"><small>Professional Rank</small><strong id="tasksProfessionalRank">Builder</strong><span id="tasksRankHint">90-day consistency & improvement</span></div>
+    </div>
+
+    <div class="tasks-main-grid">
+      <div class="tasks-event-card">
+        <div class="tasks-card-head"><h3>Current Event</h3><span class="tasks-chip">48H</span></div>
+        <h4 id="tasksEventTitle">Waiting for stock refresh</h4>
+        <p id="tasksEventText">The event follows the highest-impact weakness in the current BO score.</p>
+      </div>
+      <div class="tasks-requests-card">
+        <div class="tasks-card-head"><h3>Requests & Alerts</h3><span class="tasks-chip" id="tasksRequestsCount">0</span></div>
+        <div class="tasks-request-list" id="tasksRequestsList"></div>
+      </div>
+    </div>
+
+    <div class="tasks-list-wrap">
+      <div class="tasks-list-head">
+        <div><h3>Priority Tasks</h3><p>The five highest-impact tasks from the active stock cycle.</p></div>
+        <div class="tasks-cycle-note" id="tasksCycleNote">Waiting for task cycle...</div>
+      </div>
+      <div class="tasks-list" id="tasksPriorityList"><div class="task-empty">Loading priority tasks...</div></div>
+    </div>
+  </div>
+</section>
 <div aria-labelledby="inventoryModalTitle" aria-modal="true" class="modal-overlay hidden" id="inventoryModal" role="dialog">
 <div class="inventory-modal-card" role="document">
 <div class="modal-head">
@@ -454,7 +577,7 @@ const CONFIG={url:'https://mpxpbbpqnvoinyjmuuvf.supabase.co',key:'sb_publishable
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmt=(n,d=2)=>n===null||n===undefined||!Number.isFinite(Number(n))?'\u2014':Number(n).toLocaleString('en-US',{maximumFractionDigits:d});
-const state={mode:'live',session:null,master:[],aliases:[],rows:[],upload:null,revision:0,role:null,filtered:[],page:1,quick:'',reviewOnly:false,dailyFocus:null,pendingMaster:null,pendingInventory:null,loading:false,fixturesLines:[],fixturesUploads:[],selected:new Set(),shortageCycles:{},shortageStoreLoaded:false,activeJustifyCode:null,gameProgress:null,gameProgressLoaded:false};
+const state={mode:'live',session:null,master:[],aliases:[],rows:[],upload:null,revision:0,role:null,filtered:[],page:1,quick:'',reviewOnly:false,dailyFocus:null,pendingMaster:null,pendingInventory:null,loading:false,fixturesLines:[],fixturesUploads:[],selected:new Set(),shortageCycles:{},shortageStoreLoaded:false,activeJustifyCode:null,gameProgress:null,gameProgressLoaded:false,taskAssistant:null,taskSyncing:false};
 function toast(msg){$('toast').textContent=msg;$('toast').classList.remove('hidden');clearTimeout(toast.timer);toast.timer=setTimeout(()=>$('toast').classList.add('hidden'),6000);}
 function showError(msg){$('globalError').textContent=msg;$('globalError').classList.remove('hidden');}
 function uuid(){if(crypto.randomUUID)return crypto.randomUUID();const a=new Uint8Array(16);crypto.getRandomValues(a);a[6]=(a[6]&15)|64;a[8]=(a[8]&63)|128;const h=[...a].map(x=>x.toString(16).padStart(2,'0')).join('');return`${h.slice(0,8)}-${h.slice(8,12)}-${h.slice(12,16)}-${h.slice(16,20)}-${h.slice(20)}`;}
@@ -501,7 +624,7 @@ async function loadLive(){
  try{const d=await rpc('purchasing_dashboard_v5');if(d.schema_version!==5||!d.seed_applied)throw Error('Complete the V5 schema and baseline migrations first. No legacy calculations are being used.');
   state.master=d.master||[];state.aliases=d.aliases||[];state.rows=d.rows||[];state.upload=d.upload;state.revision=d.master_revision;state.role=d.role;
   for(const r of state.rows)for(const k of ['stock_qty','reorder_point','stock_ratio','min_order_qty','max_order_qty','factor','raw_quantity'])if(r[k]!=null)r[k]=C.number(r[k]);
-  state.pendingInventory=null;state.pendingMaster=null;resetPreviews();populateSuppliers();applyFilters();const mm=$('masterMaintenance');if(mm)mm.classList.toggle('hidden',state.role!=='admin');
+  state.pendingInventory=null;state.pendingMaster=null;resetPreviews();populateSuppliers();applyFilters();const mm=$('masterMaintenance');if(mm)mm.classList.toggle('hidden',state.role!=='admin');if(document.querySelector('nav [data-tab="tasks-assistant"]')?.classList.contains('active'))await syncTasksAssistant();
  }catch(e){state.rows=[];state.master=[];state.aliases=[];state.upload=null;populateSuppliers();applyFilters();showError(e.message);}finally{state.loading=false;$('refreshBtn').disabled=false;}
 }
 function openLocal(){
@@ -685,7 +808,166 @@ function saveJustification(){const code=state.activeJustifyCode,c=shortageCycleF
 function reopenJustification(code){const old=shortageCycleFor(code);if(!old)return;const history=old.history||[];if(old.active)archiveCycle(old,scoreAsOf(),'reopened_by_user');const next=newShortageCycle(scoreAsOf());next.history=old.history||history;next.lastJustification=old.lastJustification||null;state.shortageCycles[code]=next;saveShortageStore();renderDailyTasks();renderExternalDialog();toast('Product re-entered a new shortage cycle from Day 0.');}
 function renderExternalDialog(){ensureShortageCycles();const list=Object.entries(state.shortageCycles).filter(([,c])=>c?.active&&c.justification);$('externalShortagesBody').innerHTML=list.length?`<table class="external-table"><thead><tr><th>Product</th><th>Supplier</th><th>Reason</th><th>Status</th><th>Since</th><th>Next Review</th><th>Stock %</th><th>Action</th></tr></thead><tbody>${list.map(([code,c])=>{const r=state.rows.find(x=>x.product_code===code),j=c.justification;return`<tr><td>${esc(r?.product_name||code)}</td><td>${esc(r?.supplier||'Not assigned')}</td><td>${esc(justificationLabel(j.reason))}${j.alternativeProduct?`<br><span class="sub">Alt: ${esc(j.alternativeProduct)}</span>`:''}${j.comment?`<br><span class="sub">${esc(j.comment)}</span>`:''}</td><td>${j.status==='accepted'?'Excluded':'Pending approval'}</td><td>${esc(c.startDate)}</td><td>${esc(j.nextReviewDate||'—')}</td><td>${C.finite(r?.stock_ratio)?fmt(r.stock_ratio,1)+'%':'—'}</td><td><button class="btn outline reopen-shortage" data-code="${esc(code)}" type="button">Reopen</button></td></tr>`}).join('')}</tbody></table>`:'<div class="empty">No justified or pending shortages.</div>';document.querySelectorAll('.reopen-shortage').forEach(b=>b.onclick=()=>reopenJustification(b.dataset.code));}
 function updateDetailShortage(code){const box=$('detailShortageStatus');if(!box)return;const r=state.rows.find(x=>x.product_code===code),c=shortageCycleFor(code);if(!r||!c?.active){box.className='shortage-status hidden';box.innerHTML='';return;}const age=shortageAge(code),j=c.justification;if(j){const accepted=j.status==='accepted';box.className='shortage-status '+(accepted?'justified':'aging');box.innerHTML=`<div class="status-line"><div><strong>${accepted?'Excluded from employee score':'Pending exception · still affects score'} · ${esc(justificationLabel(j.reason))}</strong><small>Shortage cycle started ${esc(c.startDate)}${j.nextReviewDate?' · next review '+esc(j.nextReviewDate):''}. Actual stock risk still includes this product.</small></div><button class="btn outline" type="button" id="detailReopenShortage">Reopen cycle</button></div>`;setTimeout(()=>{const b=$('detailReopenShortage');if(b)b.onclick=()=>{reopenJustification(code);updateDetailShortage(code);};},0);return;}box.className='shortage-status '+(age>=30?'danger':age>=20?'aging':'');box.innerHTML=`<div class="status-line"><div><strong>Active shortage cycle · Day ${age}</strong><small>${age>=30?'Action required: resolve or record a controlled justification.':age>=20?'Warning: approaching the 30-day action threshold.':'Tracking from '+esc(c.startDate)+'.'}</small></div>${age>=30?`<button class="btn outline" type="button" id="detailJustifyShortage">Justify</button>`:''}</div>`;if(age>=30)setTimeout(()=>{const b=$('detailJustifyShortage');if(b)b.onclick=()=>openJustification(code);},0);}
-function go(tab){document.querySelectorAll('[data-panel]').forEach(el=>el.classList.toggle('hidden',el.dataset.panel!==tab));document.querySelectorAll('nav [data-tab]').forEach(el=>el.classList.toggle('active',el.dataset.tab===tab));if(tab==='daily-tasks')renderOperationsDashboard();}
+
+function tasksEmployeeDisplayName(){
+ const u=state.session?.user||{};
+ return u.user_metadata?.full_name||u.user_metadata?.name||(u.email?u.email.split('@')[0]:'Purchasing User');
+}
+function tasksLevelRange(level){
+ if(level<=0)return'Score below 40';
+ const min=40+(level-1)*5,max=level===12?100:min+4;
+ return'Score '+min+'–'+max;
+}
+function tasksEventForFocus(focus){
+ const map={
+  shortage_mid:['Recovery Window','Recover the 10–50% stock zone first. It carries the highest shortage-health weight and can lift the BO score quickly.'],
+  shortage_low:['Red Zone Review','Separate recoverable sub-10% shortages from genuine external exceptions and prevent avoidable stock-outs.'],
+  aging:['Cycle Breaker','Prioritize aging shortages before they cross the next action threshold.'],
+  products:['Order Rescue','Reduce the number of products currently requiring an order.'],
+  suppliers:['Supplier Focus','Close the heaviest supplier backlog as one coordinated purchasing action.'],
+  data:['Clean Data','Remove master-data blockers so recommendations become reliable and actionable.']
+ };
+ const x=map[focus]||map.products;
+ return{focus,title:x[0],text:x[1]};
+}
+function tasksBadgeFor(focus){
+ return({
+  suppliers:['supplier_closer','Supplier Closer'],
+  shortage_mid:['stock_recovery','Recovery Specialist'],
+  shortage_low:['crisis_resolution','Crisis Resolver'],
+  aging:['aging_breaker','Cycle Breaker'],
+  data:['data_quality','Data Cleaner'],
+  products:['order_control','Order Controller']
+ })[focus]||['purchasing_action','Purchasing Achiever'];
+}
+function buildPriorityTasks(model){
+ const list=[];
+ const add=(o)=>{const badge=tasksBadgeFor(o.focus);list.push({...o,badge_type:badge[0],badge_label:badge[1]});};
+ const supplier=supplierQuestData()[0];
+ if(supplier){
+  const codes=supplier.rows.map(r=>r.product_code),impact=estimateScoreGain(model,codes,{supplierClose:true});
+  add({task_key:'supplier|'+supplier.supplier,task_type:'Supplier Quest',focus:'suppliers',target:supplier.supplier,codes,target_count:codes.length,title:'Close '+supplier.supplier,description:'Handle this supplier end-to-end and close the active BO actions grouped under it.',score_impact:impact,meta:[supplier.order+' orders',supplier.mid+' at 10–50%',supplier.low+' under 10%',supplier.review+' reviews']});
+ }
+ if(model.counts.tenTo50){
+  const codes=model.tenTo50Rows.map(r=>r.product_code),target=Math.min(5,codes.length),slice=codes.slice(0,target),impact=estimateScoreGain(model,slice);
+  add({task_key:'recovery|10-50',task_type:'Recovery',focus:'shortage_mid',codes:slice,target_count:target,title:'Recover '+target+' product'+(target===1?'':'s')+' from the 10–50% zone',description:'Move the selected products out of the highest-weight actionable shortage zone.',score_impact:impact,meta:[model.counts.tenTo50+' currently in zone','Target '+target]});
+ }
+ if(model.counts.action30){
+  const codes=model.action30.map(([code])=>code),target=Math.min(3,codes.length),slice=codes.slice(0,target),impact=estimateScoreGain(model,slice);
+  add({task_key:'aging|30+',task_type:'Aging',focus:'aging30',codes:slice,target_count:target,title:'Resolve '+target+' shortage action'+(target===1?'':'s')+' at Day 30+',description:'Close the selected aging shortages or move legitimate external cases into the controlled exception flow.',score_impact:impact,meta:[model.counts.action30+' action required','Target '+target]});
+ }else if(model.counts.warn20){
+  const codes=model.warn20.map(([code])=>code),target=Math.min(3,codes.length),slice=codes.slice(0,target),impact=estimateScoreGain(model,slice);
+  add({task_key:'aging|20+',task_type:'Aging',focus:'aging20',codes:slice,target_count:target,title:'Clear '+target+' aging warning'+(target===1?'':'s')+' before Day 30',description:'Resolve the selected shortages before they cross the formal action threshold.',score_impact:impact,meta:[model.counts.warn20+' warnings','Target '+target]});
+ }
+ if(model.counts.under10){
+  const codes=model.under10Rows.map(r=>r.product_code),target=Math.min(3,codes.length),slice=codes.slice(0,target),impact=estimateScoreGain(model,slice);
+  add({task_key:'red-zone|under10',task_type:'Extreme Low',focus:'shortage_low',codes:slice,target_count:target,title:'Review '+target+' product'+(target===1?'':'s')+' below 10%',description:'Recover avoidable extreme-low stock or document a legitimate external exception.',score_impact:impact,meta:[model.counts.under10+' products below 10%','Target '+target]});
+ }
+ if(model.counts.review){
+  const codes=model.reviewRows.map(r=>r.product_code),target=Math.min(3,codes.length),slice=codes.slice(0,target),impact=estimateScoreGain(model,slice);
+  add({task_key:'master|review',task_type:'Master Review',focus:'data',codes:slice,target_count:target,title:'Clear '+target+' master-data blocker'+(target===1?'':'s'),description:'Fix the selected master-data issues so purchasing recommendations can become actionable.',score_impact:impact,meta:[model.counts.review+' products need review','Target '+target]});
+ }
+ if(model.counts.reorderProducts){
+  const codes=model.reorder.slice(0,5).map(r=>r.product_code),target=Math.min(5,codes.length),impact=estimateScoreGain(model,codes);
+  add({task_key:'orders|priority',task_type:'Order Control',focus:'products',codes,target_count:target,title:'Close '+target+' priority order requirement'+(target===1?'':'s'),description:'Reduce the active products-needing-order backlog from the current snapshot.',score_impact:impact,meta:[model.counts.reorderProducts+' products need order','Target '+target]});
+ }
+ return list.sort((a,b)=>b.score_impact-a.score_impact||a.title.localeCompare(b.title)).slice(0,5).map((t,i)=>({...t,priority:i+1}));
+}
+function taskStillOpen(t){
+ if(t.focus==='suppliers'){
+  const g=supplierQuestData().find(x=>x.supplier===t.target);
+  return Boolean(g&&g.rows.length);
+ }
+ const codes=Array.isArray(t.codes)?t.codes:[];
+ if(!codes.length)return false;
+ if(t.focus==='products'){
+  const remaining=codes.filter(code=>{const r=state.rows.find(x=>x.product_code===code);return r&&shortageNeedsOrder(r);}).length;
+  return (codes.length-remaining)<Math.max(1,Number(t.target_count)||codes.length);
+ }
+ const remaining=codes.filter(code=>codeStillFocus(code,t.focus)).length;
+ return (codes.length-remaining)<Math.max(1,Number(t.target_count)||codes.length);
+}
+function renderTasksInventoryFreshness(){
+ const f=inventoryFreshness(),status=$('tasksInventoryFreshnessStatus'),age=$('tasksInventoryFreshnessAge'),txt=$('tasksInventoryFreshnessText');
+ if(!status)return f;
+ status.className='fresh-chip '+(f.fresh?'good':'warn');
+ status.textContent=f.status==='missing'?'No inventory':(f.fresh?'Current':'Old snapshot');
+ age.className='fresh-chip '+(f.fresh?'neutral':'warn');
+ age.textContent=Number.isFinite(f.ageHours)?(f.ageHours<1?'<1h old':Math.floor(f.ageHours)+'h old'):'No valid age';
+ txt.textContent=state.upload?(f.fresh?'Latest full inventory snapshot is current. Tasks remain valid for the 48-hour stock cycle.':'Upload a new full inventory snapshot to start or renew the next 48-hour task cycle.'):'Upload the first full inventory snapshot to generate priority tasks.';
+ return f;
+}
+function tasksRequestItems(model,freshness){
+ const out=[];
+ if(!freshness.fresh)out.push({title:'Inventory refresh required',text:'A current full stock snapshot is required before a new task cycle can open.',status:'Action'});
+ if(model.counts.review)out.push({title:'Master-data review',text:model.counts.review+' product'+(model.counts.review===1?'':'s')+' currently need review.',status:'Open'});
+ if(model.counts.action30)out.push({title:'30+ day shortage action',text:model.counts.action30+' shortage'+(model.counts.action30===1?'':'s')+' require resolution or controlled justification.',status:'Urgent'});
+ if(!out.length)out.push({title:'No blocking request',text:'The current snapshot has no system request blocking the task workflow.',status:'Clear'});
+ return out;
+}
+function renderTasksAssistant(data,model){
+ const freshness=renderTasksInventoryFreshness(),score=Math.round(model.score),lv=scoreLevelForScore(score);
+ $('tasksScore').textContent=score;$('tasksScoreRing').style.setProperty('--score',score);
+ $('tasksScoreTitle').textContent='BO Performance Score · '+(score>=85?'Strong':score>=70?'Improving':score>=55?'Controlled':score>=40?'Needs Attention':'Recovery Needed');
+ $('tasksScoreText').textContent='Business health score. It moves with stock coverage, order backlog, supplier backlog and master-data quality.';
+ $('tasksLevelNumber').textContent=lv.n;$('tasksLevelName').textContent='Level '+lv.n+' · '+lv.name;$('tasksLevelRange').textContent=tasksLevelRange(lv.n);
+ $('tasksEmployeeName').textContent=tasksEmployeeDisplayName();$('tasksEmployeeEmail').textContent=state.session?.user?.email||'';
+ const tasks=Array.isArray(data?.tasks)?data.tasks:[],open=tasks.filter(t=>t.status==='open').length;
+ $('tasksOpenCount').textContent=open;$('tasksBadgeTotal').textContent=data?.badge_total??0;$('tasksProfessionalRank').textContent=data?.professional_rank||'Builder';
+ const rm=data?.rank_metrics||{};$('tasksRankHint').textContent=(rm.history_count||0)+' stock snapshots · '+(rm.improvement_rate??50)+'% improvement ratio';
+ const recent=Array.isArray(data?.recent_badges)?data.recent_badges:[];
+ $('tasksRecentBadges').innerHTML=recent.slice(0,3).map(b=>'<span>'+esc(b.badge_label)+'</span>').join('');
+ const cycle=data?.cycle;
+ $('tasksEventTitle').textContent=cycle?.event_title||'Waiting for stock refresh';
+ $('tasksEventText').textContent=cycle?.event_text||(freshness.fresh?'A new cycle will open from this snapshot if no active 48-hour cycle exists.':'Refresh stock to generate the next event and priority tasks.');
+ const req=tasksRequestItems(model,freshness);$('tasksRequestsCount').textContent=req.length;
+ $('tasksRequestsList').innerHTML=req.map(x=>'<div class="tasks-request"><div><strong>'+esc(x.title)+'</strong><span>'+esc(x.text)+'</span></div><span class="status">'+esc(x.status)+'</span></div>').join('');
+ if(cycle?.expires_at){
+  const left=Math.max(0,Date.parse(cycle.expires_at)-Date.now()),hrs=Math.ceil(left/3600000);
+  $('tasksCycleNote').textContent=(cycle.status==='open'?hrs+'h left in this 48H cycle':'Cycle '+cycle.status);
+ }else $('tasksCycleNote').textContent=freshness.fresh?'Waiting for next eligible stock cycle':'Waiting for stock refresh';
+ if(!tasks.length){
+  $('tasksPriorityList').innerHTML='<div class="task-empty">'+(freshness.fresh?'No priority task is open for this cycle. If the BO score is clear, the system will not invent work.':'Upload a current full inventory snapshot to generate up to five priority tasks.')+'</div>';
+  return;
+ }
+ $('tasksPriorityList').innerHTML=tasks.map(t=>{
+   const done=t.status==='completed',impact=Number(t.score_impact||0);
+   const meta=['~+'+impact.toFixed(1)+' score potential','Badge: '+t.badge_label];
+   return '<article class="task-card '+(done?'completed':'')+'"><div class="task-top"><span class="task-type">'+esc(t.task_type)+'</span><span class="task-impact">'+(done?'Verified':'Impact '+impact.toFixed(1))+'</span></div><h4>'+esc(t.title)+'</h4><p>'+esc(t.description||'')+'</p><div class="task-meta">'+meta.map(x=>'<span>'+esc(x)+'</span>').join('')+'</div><div class="task-bottom"><span class="task-badge">'+(done?'Badge earned · ':'Badge on verified completion · ')+esc(t.badge_label)+'</span>'+(done?'':'<button class="btn outline tasks-open-task" data-task-id="'+esc(t.id)+'" type="button">Open in BO Assistant</button>')+'</div></article>';
+ }).join('');
+ document.querySelectorAll('.tasks-open-task').forEach(b=>b.onclick=()=>{
+   const t=tasks.find(x=>x.id===b.dataset.taskId);if(!t)return;
+   if(t.focus==='suppliers')startDailyFocus('supplier',t.target);
+   else if(t.focus==='shortage_mid')startDailyFocus('shortage_mid');
+   else if(t.focus==='shortage_low')startDailyFocus('shortage_low');
+   else if(t.focus==='aging30'||t.focus==='aging20')startDailyFocus('aging');
+   else if(t.focus==='data')startDailyFocus('data');
+   else startDailyFocus('products');
+ });
+}
+async function syncTasksAssistant(){
+ if(state.taskSyncing||state.mode!=='live'||!state.session)return;
+ state.taskSyncing=true;
+ try{
+  const freshness=renderTasksInventoryFreshness();
+  ensureShortageCycles();
+  let model=boHealthModel(),score=Math.round(model.score),lv=scoreLevelForScore(score),weakest=weakestFocus(model),event=tasksEventForFocus(weakest[0]),candidates=buildPriorityTasks(model);
+  const payload={upload_id:state.upload?.id||null,score,bo_level:lv.n,event_focus:event.focus,event_title:event.title,event_text:event.text,tasks:candidates,resolved_task_ids:[]};
+  let data;
+  if(state.upload?.id&&state.upload?.is_complete&&state.upload?.excludes_zero){
+    data=await rpc('purchasing_tasks_sync_v5',payload);
+    if(data?.cycle?.upload_id&&data.cycle.upload_id!==state.upload.id&&Array.isArray(data.tasks)){
+      const resolved=data.tasks.filter(t=>t.status==='open'&&!taskStillOpen(t)).map(t=>t.id);
+      if(resolved.length)data=await rpc('purchasing_tasks_sync_v5',{...payload,resolved_task_ids:resolved});
+    }
+  }else data={cycle:null,tasks:[],badge_total:state.taskAssistant?.badge_total||0,professional_rank:state.taskAssistant?.professional_rank||'Builder',recent_badges:state.taskAssistant?.recent_badges||[],rank_metrics:state.taskAssistant?.rank_metrics||{}};
+  state.taskAssistant=data;renderTasksAssistant(data,model);
+ }catch(e){
+  const model=boHealthModel();renderTasksAssistant(state.taskAssistant||{},model);
+  const list=$('tasksPriorityList');if(list)list.innerHTML='<div class="task-empty">Tasks Assistant could not sync: '+esc(e.message)+'</div>';
+ }finally{state.taskSyncing=false;}
+}
+function go(tab){document.querySelectorAll('[data-panel]').forEach(el=>el.classList.toggle('hidden',el.dataset.panel!==tab));document.querySelectorAll('nav [data-tab]').forEach(el=>el.classList.toggle('active',el.dataset.tab===tab));if(tab==='daily-tasks')renderOperationsDashboard();if(tab==='tasks-assistant')syncTasksAssistant();}
 async function readFile(file){if(!file)throw Error('Choose a file first.');if(file.size>15*1024*1024)throw Error('File is larger than 15 MB.');if(/\.xlsx$/i.test(file.name)){return{records:C.recordsFromRows(await readXlsxRows(await file.arrayBuffer())),raw:null};}if(!/\.csv$/i.test(file.name))throw Error('Use a CSV or XLSX file.');const raw=await file.text();return{records:C.recordsFromRows(C.parseCSV(raw)),raw};}
 function normalizeHeaders(records){if(!records.length)throw Error('No product data.');const pairs=Object.keys(records[0]).map(h=>[h,h.trim().toLowerCase().replace(/[\s-]+/g,'_')]);if(new Set(pairs.map(p=>p[1])).size!==pairs.length)throw Error('Column names become duplicates.');return records.map(r=>Object.fromEntries(pairs.map(([a,b])=>[b,r[a]])));}
 function normalizeMasterFile(records){const rr=normalizeHeaders(records),headers=Object.keys(rr[0]);let skipped=0,rawRows=[];
@@ -743,7 +1025,7 @@ function openInventoryModal(){
  modal.classList.remove('hidden');document.body.classList.add('modal-open');setTimeout(()=>$('inventoryFile')?.focus(),0);
 }
 function closeInventoryModal(){const modal=$('inventoryModal');if(!modal)return;modal.classList.add('hidden');document.body.classList.remove('modal-open');}
-$('openInventoryModal').onclick=openInventoryModal;const topUpload=$('openInventoryModalTop');if(topUpload)topUpload.onclick=openInventoryModal;const goBosBtn=$('goBosFromDashboard');if(goBosBtn)goBosBtn.onclick=()=>go('recommendations');$('closeInventoryModal').onclick=closeInventoryModal;$('cancelInventoryModal').onclick=closeInventoryModal;
+$('openInventoryModal').onclick=openInventoryModal;const topUpload=$('openInventoryModalTop');if(topUpload)topUpload.onclick=openInventoryModal;const taskUpload=$('tasksOpenInventory');if(taskUpload)taskUpload.onclick=openInventoryModal;const goBosBtn=$('goBosFromDashboard');if(goBosBtn)goBosBtn.onclick=()=>go('recommendations');$('closeInventoryModal').onclick=closeInventoryModal;$('cancelInventoryModal').onclick=closeInventoryModal;
 $('inventoryModal').addEventListener('click',e=>{if(e.target===$('inventoryModal'))closeInventoryModal();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('inventoryModal').classList.contains('hidden'))closeInventoryModal();});
 $('authForm').addEventListener('submit',signIn);$('signUpBtn').onclick=signUp;
