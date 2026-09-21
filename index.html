@@ -624,7 +624,7 @@ async function loadLive(){
  try{const d=await rpc('purchasing_dashboard_v5');if(d.schema_version!==5||!d.seed_applied)throw Error('Complete the V5 schema and baseline migrations first. No legacy calculations are being used.');
   state.master=d.master||[];state.aliases=d.aliases||[];state.rows=d.rows||[];state.upload=d.upload;state.revision=d.master_revision;state.role=d.role;
   for(const r of state.rows)for(const k of ['stock_qty','reorder_point','stock_ratio','min_order_qty','max_order_qty','factor','raw_quantity'])if(r[k]!=null)r[k]=C.number(r[k]);
-  state.pendingInventory=null;state.pendingMaster=null;resetPreviews();populateSuppliers();applyFilters();const mm=$('masterMaintenance');if(mm)mm.classList.toggle('hidden',state.role!=='admin');if(document.querySelector('nav [data-tab="tasks-assistant"]')?.classList.contains('active'))await syncTasksAssistant();
+  state.pendingInventory=null;state.pendingMaster=null;resetPreviews();populateSuppliers();applyFilters();const mm=$('masterMaintenance');if(mm)mm.classList.toggle('hidden',state.role!=='admin');await syncTasksAssistant();
  }catch(e){state.rows=[];state.master=[];state.aliases=[];state.upload=null;populateSuppliers();applyFilters();showError(e.message);}finally{state.loading=false;$('refreshBtn').disabled=false;}
 }
 function openLocal(){
@@ -871,7 +871,23 @@ function buildPriorityTasks(model){
   const codes=model.reorder.slice(0,5).map(r=>r.product_code),target=Math.min(5,codes.length),impact=estimateScoreGain(model,codes);
   add({task_key:'orders|priority',task_type:'Order Control',focus:'products',codes,target_count:target,title:'Close '+target+' priority order requirement'+(target===1?'':'s'),description:'Reduce the active products-needing-order backlog from the current snapshot.',score_impact:impact,meta:[model.counts.reorderProducts+' products need order','Target '+target]});
  }
- return list.sort((a,b)=>b.score_impact-a.score_impact||a.title.localeCompare(b.title)).slice(0,5).map((t,i)=>({...t,priority:i+1}));
+ const claimed=new Set(),selected=[];
+ for(const original of list.sort((a,b)=>b.score_impact-a.score_impact||a.title.localeCompare(b.title))){
+  if(selected.length>=5)break;
+  const codes=(original.codes||[]).filter(code=>!claimed.has(code));
+  if(!codes.length)continue;
+  const target=Math.min(Math.max(1,Number(original.target_count)||1),codes.length);
+  let title=original.title;
+  if(original.task_type==='Recovery')title='Recover '+target+' product'+(target===1?'':'s')+' from the 10–50% zone';
+  if(original.task_type==='Extreme Low')title='Review '+target+' product'+(target===1?'':'s')+' below 10%';
+  if(original.task_type==='Master Review')title='Clear '+target+' master-data blocker'+(target===1?'':'s');
+  if(original.task_type==='Aging')title=original.focus==='aging30'?'Resolve '+target+' shortage action'+(target===1?'':'s')+' at Day 30+':'Clear '+target+' aging warning'+(target===1?'':'s')+' before Day 30';
+  if(original.task_type==='Order Control')title='Close '+target+' priority order requirement'+(target===1?'':'s');
+  const impact=estimateScoreGain(model,codes,{supplierClose:original.focus==='suppliers'});
+  selected.push({...original,codes,target_count:target,title,score_impact:impact,priority:selected.length+1});
+  codes.forEach(code=>claimed.add(code));
+ }
+ return selected;
 }
 function taskStillOpen(t){
  if(t.focus==='suppliers'){
@@ -951,7 +967,7 @@ async function syncTasksAssistant(){
  try{
   const freshness=renderTasksInventoryFreshness();
   ensureShortageCycles();
-  let model=boHealthModel(),score=Math.round(model.score),lv=scoreLevelForScore(score),weakest=weakestFocus(model),event=tasksEventForFocus(weakest[0]),candidates=buildPriorityTasks(model);
+  let model=boHealthModel(),score=Math.round(model.score),lv=scoreLevelForScore(score),weakest=weakestFocus(model),candidates=buildPriorityTasks(model),event=candidates.length?tasksEventForFocus(weakest[0]):{focus:'clear',title:'Maintain the Standard',text:'No corrective task is required from this stock snapshot. Keep the current BO health stable until the next refresh.'};
   const payload={upload_id:state.upload?.id||null,score,bo_level:lv.n,event_focus:event.focus,event_title:event.title,event_text:event.text,tasks:candidates,resolved_task_ids:[]};
   let data;
   if(state.upload?.id&&state.upload?.is_complete&&state.upload?.excludes_zero){
