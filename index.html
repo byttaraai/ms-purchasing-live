@@ -179,8 +179,8 @@ body.modal-open{overflow:hidden}.validation{margin-top:18px}.summary-numbers{gri
 .tasks-recent-badges span{font-size:9px;font-weight:800;background:#f1efff;color:#5b34fc;border-radius:999px;padding:4px 7px}
 @media(max-width:920px){.tasks-score-grid,.tasks-main-grid{grid-template-columns:1fr}.tasks-summary-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:560px){.tasks-summary-grid{grid-template-columns:1fr 1fr}.tasks-header{align-items:flex-start;flex-direction:column}.tasks-level-card{align-items:flex-start}.tasks-score-main{align-items:flex-start}}
-</style></head><body>
-<div class="auth" id="auth"><form class="auth-card" id="authForm"><div class="brand"><div class="logo"><svg aria-hidden="true" viewbox="0 0 24 24"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l3 14h12l3-10H6M8 15l-1 3h14"></path></svg></div><div><h1>MS Purchasing</h1><p>One purchase unit. Traceable calculations.</p></div></div><p class="muted">Sign in with your approved purchasing account.</p><div class="field"><label for="authEmail">Email</label><input autocomplete="username" id="authEmail" placeholder="name@company.com" required="" type="email"/></div><div class="field"><label for="authPassword">Password</label><input autocomplete="current-password" id="authPassword" required="" type="password"/></div><button class="btn primary" id="signInBtn" type="submit">Sign In</button><button class="btn" id="signUpBtn" type="button">Create Account</button><button class="btn hidden" id="openLocalBtn" type="button">Open local test data</button><p class="auth-error" id="authError" role="alert"></p><p class="sub">Create Account is enabled for the approved purchasing email. Choose your own password, then sign in.</p><span class="build-tag">Dashboard + BOs + Tasks Assistant - Live Build 6</span></form></div>
+.inventory-lock-overlay{position:fixed;inset:0;z-index:900;background:rgba(239,242,248,.88);backdrop-filter:blur(4px);display:grid;place-items:center;padding:24px}.inventory-lock-overlay.hidden{display:none!important}.inventory-lock-card{width:min(520px,92vw);background:#fff;border:1px solid #d9deea;border-radius:20px;box-shadow:0 24px 80px rgba(19,34,72,.18);padding:28px;text-align:center}.inventory-lock-card .lock-icon{width:58px;height:58px;margin:0 auto 14px;border-radius:16px;background:#f0edff;color:#5b34fc;display:grid;place-items:center;font-size:27px;font-weight:900}.inventory-lock-card h2{margin:0 0 8px;color:#18294f}.inventory-lock-card p{margin:0 0 18px;color:#6f7d99;line-height:1.55}.inventory-lock-card .lock-age{display:inline-block;margin-bottom:16px;padding:6px 10px;border-radius:999px;background:#fff2e7;color:#b55a00;font-size:11px;font-weight:900}</style></head><body>
+<div class="auth" id="auth"><form class="auth-card" id="authForm"><div class="brand"><div class="logo"><svg aria-hidden="true" viewbox="0 0 24 24"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l3 14h12l3-10H6M8 15l-1 3h14"></path></svg></div><div><h1>MS Purchasing</h1><p>One purchase unit. Traceable calculations.</p></div></div><p class="muted">Sign in with your approved purchasing account.</p><div class="field"><label for="authEmail">Email</label><input autocomplete="username" id="authEmail" placeholder="name@company.com" required="" type="email"/></div><div class="field"><label for="authPassword">Password</label><input autocomplete="current-password" id="authPassword" required="" type="password"/></div><button class="btn primary" id="signInBtn" type="submit">Sign In</button><button class="btn" id="signUpBtn" type="button">Create Account</button><button class="btn hidden" id="openLocalBtn" type="button">Open local test data</button><p class="auth-error" id="authError" role="alert"></p><p class="sub">Create Account is enabled for the approved purchasing email. Choose your own password, then sign in.</p><span class="build-tag">Dashboard + BOs + Tasks Assistant - Live Build 7</span></form></div>
 <div class="hidden" id="app"><header class="topbar"><div class="brand"><div class="logo"><svg aria-hidden="true" viewbox="0 0 24 24"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l3 14h12l3-10H6M8 15l-1 3h14"></path></svg></div><div><h1>MS Purchasing</h1><p>Smarter Purchasing. Healthier Stock.</p></div></div><nav><button class="active" data-tab="daily-tasks"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M4 20V10m6 10V4m6 16v-7m4 7V7"></path></svg> Dashboard</button><button class="" data-tab="recommendations"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="m3 10 9-7 9 7v11h-6v-7H9v7H3z"></path></svg> BOs Assistant</button><button class="" data-tab="tasks-assistant"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M9 11l2 2 4-4M5 4h14v16H5zM8 17h8"></path></svg> Tasks Assistant</button></nav><div class="actions"><button class="btn primary upload-inventory-top" id="openInventoryModalTop" title="Upload inventory" type="button"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M12 16V3m-5 5 5-5 5 5M4 15v6h16v-6"></path></svg><span class="label">Upload Inventory</span></button><button class="btn" id="refreshBtn" title="Reload data"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M20 7a8 8 0 1 0 1 8M20 3v5h-5"></path></svg><span class="label">Refresh</span></button><span class="avatar">MS</span><span class="account" id="accountEmail"></span><button class="btn" id="logoutBtn" title="Sign out"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M10 4H3v16h7m4-12 4 4-4 4M8 12h10"></path></svg></button></div></header>
 <main class="page"><div class="banner hidden" id="demoBanner"><div><strong>LOCAL TEST - NOT LIVE</strong>  Your original reorder-point numbers are retained. Unit conversions only. Changes here never update Supabase. Do not publish this test file: it contains your data.</div></div><div class="error-panel hidden" id="globalError" role="alert"></div>
 <section class="hidden" data-panel="recommendations"><div class="banner error hidden" id="recommendationFreshnessBanner"><div><strong>Inventory refresh required</strong>  Inventory is older than the recommended refresh window. Review the snapshot date before ordering.</div></div>
@@ -250,7 +250,7 @@ body.modal-open{overflow:hidden}.validation{margin-top:18px}.summary-numbers{gri
 
     <div class="tasks-summary-grid">
       <div class="tasks-stat-card"><small>Employee</small><strong id="tasksEmployeeName">-</strong><span id="tasksEmployeeEmail">-</span></div>
-      <div class="tasks-stat-card"><small>Open Tasks</small><strong id="tasksOpenCount">0</strong><span>Maximum 5 per 48H cycle</span></div>
+      <div class="tasks-stat-card"><small>Open Tasks</small><strong id="tasksOpenCount">0</strong><span>Maximum 5 per stock-refresh cycle</span></div>
       <div class="tasks-stat-card"><small>Total Badges</small><strong id="tasksBadgeTotal">0</strong><span>Verified completed tasks</span><div class="tasks-recent-badges" id="tasksRecentBadges"></div></div>
       <div class="tasks-stat-card"><small>Professional Rank</small><strong id="tasksProfessionalRank">Builder</strong><span id="tasksRankHint">90-day consistency & improvement</span></div>
     </div>
@@ -269,13 +269,14 @@ body.modal-open{overflow:hidden}.validation{margin-top:18px}.summary-numbers{gri
 
     <div class="tasks-list-wrap">
       <div class="tasks-list-head">
-        <div><h3>Priority Tasks</h3><p>The five highest-impact tasks from the active stock cycle.</p></div>
+        <div><h3>Priority Tasks</h3><p>Up to five highest-priority tasks from the latest stock refresh.</p></div>
         <div class="tasks-cycle-note" id="tasksCycleNote">Waiting for task cycle...</div>
       </div>
       <div class="tasks-list" id="tasksPriorityList"><div class="task-empty">Loading priority tasks...</div></div>
     </div>
   </div>
 </section>
+<div class="inventory-lock-overlay hidden" id="inventoryLockOverlay" aria-live="polite"><div class="inventory-lock-card"><div class="lock-icon">↻</div><span class="lock-age" id="inventoryLockAge">48H refresh required</span><h2>Stock Refresh Required</h2><p>The latest full inventory refresh is no longer current. Upload a new full inventory snapshot to unlock Dashboard, BO Assistant and Tasks Assistant and start a fresh task cycle.</p><button class="btn primary" id="inventoryLockUpload" type="button">Upload Inventory Now</button></div></div>
 <div aria-labelledby="inventoryModalTitle" aria-modal="true" class="modal-overlay hidden" id="inventoryModal" role="dialog">
 <div class="inventory-modal-card" role="document">
 <div class="modal-head">
@@ -754,9 +755,10 @@ function localDateString(d=new Date()){const x=new Date(d.getTime()-d.getTimezon
 function daysBetween(a,b){const x=new Date(a+'T12:00:00'),y=new Date(b+'T12:00:00');return Math.max(0,Math.floor((y-x)/86400000));}
 function addDays(date,days){const d=new Date(date+'T12:00:00');d.setDate(d.getDate()+days);return localDateString(d);}
 function scoreAsOf(){return localDateString();}
-function inventoryFreshness(nowMs=Date.now()){const u=state.upload;if(!u)return{fresh:false,status:'missing',label:'No inventory loaded',ageHours:Infinity};if(u.status&&u.status!=='completed')return{fresh:false,status:'invalid',label:'Inventory upload is not completed',ageHours:Infinity};if(!(u.is_complete&&u.excludes_zero))return{fresh:false,status:'partial',label:'A full inventory snapshot is required',ageHours:Infinity};const refs=[];if(u.uploaded_at){const t=Date.parse(u.uploaded_at);if(Number.isFinite(t))refs.push({kind:'upload',time:t});}if(u.snapshot_date){const t=Date.parse(u.snapshot_date+'T23:59:59');if(Number.isFinite(t))refs.push({kind:'as-of',time:t});}if(!refs.length)return{fresh:false,status:'undated',label:'Inventory date is unavailable',ageHours:Infinity};const ages=refs.map(x=>Math.max(0,(nowMs-x.time)/3600000)),age=Math.max(...ages),fresh=age<=GAME_CONFIG.inventoryFreshHours;return{fresh,status:fresh?'fresh':'stale',label:fresh?'Inventory is fresh':'Inventory is older than 48 hours',ageHours:age,refs,upload:u};}
-function purchaseActionsLocked(){return false;}
-function renderInventoryFreshness(){const f=inventoryFreshness(),status=$('inventoryFreshnessStatus'),age=$('inventoryFreshnessAge'),txt=$('inventoryFreshnessText'),rec=$('recommendationFreshnessBanner');if(!status)return f;status.className='fresh-chip '+(f.fresh?'good':'warn');status.textContent=f.status==='missing'?'No inventory':(f.fresh?'Current':'Old snapshot');age.className='fresh-chip '+(f.fresh?'neutral':'warn');age.textContent=Number.isFinite(f.ageHours)?(f.ageHours<1?'<1h old':Math.floor(f.ageHours)+'h old'):'No valid age';const u=state.upload;txt.textContent=u?(f.fresh?'Latest full inventory snapshot is current.':'Latest inventory is older than the recommended refresh window. Review the as-of date before ordering.'):'Upload the first full inventory snapshot to start purchasing operations.';if(rec)rec.classList.add('hidden');return f;}
+function inventoryFreshness(nowMs=Date.now()){const u=state.upload;if(!u)return{fresh:false,status:'missing',label:'No inventory loaded',ageHours:Infinity};if(u.status&&u.status!=='completed')return{fresh:false,status:'invalid',label:'Inventory upload is not completed',ageHours:Infinity};if(!(u.is_complete&&u.excludes_zero))return{fresh:false,status:'partial',label:'A full inventory snapshot is required',ageHours:Infinity};let t=u.uploaded_at?Date.parse(u.uploaded_at):NaN;if(!Number.isFinite(t)&&u.snapshot_date)t=Date.parse(u.snapshot_date+'T12:00:00Z');if(!Number.isFinite(t))return{fresh:false,status:'undated',label:'Inventory refresh time is unavailable',ageHours:Infinity};const age=Math.max(0,(nowMs-t)/3600000),fresh=age<48;return{fresh,status:fresh?'fresh':'stale',label:fresh?'Inventory is current':'Inventory refresh is 48+ hours old',ageHours:age,upload:u};}
+function purchaseActionsLocked(){return state.mode==='live'&&!inventoryFreshness().fresh;}
+function updateInventoryLock(){const el=$('inventoryLockOverlay');if(!el)return;const f=inventoryFreshness(),locked=state.mode==='live'&&!f.fresh&&!$('app').classList.contains('hidden');el.classList.toggle('hidden',!locked);if(locked){const a=$('inventoryLockAge');if(a)a.textContent=Number.isFinite(f.ageHours)?Math.floor(f.ageHours)+'h since last full refresh':'Full inventory refresh required';}return locked;}
+function renderInventoryFreshness(){const f=inventoryFreshness(),status=$('inventoryFreshnessStatus'),age=$('inventoryFreshnessAge'),txt=$('inventoryFreshnessText'),rec=$('recommendationFreshnessBanner');if(!status)return f;status.className='fresh-chip '+(f.fresh?'good':'warn');status.textContent=f.status==='missing'?'No inventory':(f.fresh?'Current':'Old snapshot');age.className='fresh-chip '+(f.fresh?'neutral':'warn');age.textContent=Number.isFinite(f.ageHours)?(f.ageHours<1?'<1h old':Math.floor(f.ageHours)+'h old'):'No valid age';const u=state.upload;txt.textContent=u?(f.fresh?'Latest full inventory snapshot is current.':'Latest inventory is older than the recommended refresh window. Review the as-of date before ordering.'):'Upload the first full inventory snapshot to start purchasing operations.';if(rec)rec.classList.add('hidden');updateInventoryLock();return f;}
 function shortageStoreKey(){return'ms-purchasing-shortage-cycles-v3';}
 function loadShortageStore(){if(state.shortageStoreLoaded)return;state.shortageStoreLoaded=true;try{const x=JSON.parse(localStorage.getItem(shortageStoreKey())||'{}');if(x&&typeof x==='object')state.shortageCycles=x;}catch{state.shortageCycles={};}}
 function saveShortageStore(){try{localStorage.setItem(shortageStoreKey(),JSON.stringify(state.shortageCycles));}catch{}}
@@ -787,11 +789,32 @@ function awardQuestPoints(q,score){const p=loadGameProgress();if(p.completedQues
 function dailySeed(){const d=new Date(),start=new Date(d.getFullYear(),0,0);return Math.floor((d-start)/86400000);}
 function dailyEventFor(focus){const catalog={shortage_mid:[['Recovery Window','Products between 10% and 50% are the highest-impact shortage zone today. Recover them before they become extreme.'],['50% Line Challenge','Push actionable shortages above the danger zone. Matching recovery quests earn a bonus.']],shortage_low:[['Extreme Low Review','Review sub-10% products carefully: recover unplanned shortages and justify legitimate exceptions.'],['Red Zone Check','Separate true purchasing gaps from justified extreme-low cases.']],aging:[['Aging Shortage Day','Prioritize products approaching or exceeding the 20/30-day shortage thresholds.'],['Cycle Breaker','Close aging shortage cycles before they drag the score down further.']],products:[['Order Rescue','Focus on products currently needing an order. Product recovery quests earn extra points.'],['Backlog Breaker','Clear order-required products without leaving partial work behind.']],suppliers:[['Supplier Rush','Close supplier backlogs today. Supplier-focused quests earn a bonus.'],['Close the Loop','Finish one supplier end-to-end where several actions are grouped together.']],data:[['Clean Data Day','Clear review blockers so BO recommendations can become actionable.'],['Review Hunt','Fix uncertain product data with a light bonus today.']]};const list=catalog[focus]||catalog.shortage_mid,item=list[dailySeed()%list.length];return{focus,title:item[0],text:item[1],bonus:'+50% verified quest points on matching focus today'};}
 function weakestFocus(model){const c=model.components,arr=[['shortage_mid',c.tenTo50],['aging',c.aging],['shortage_low',c.under10],['products',c.products],['suppliers',c.suppliers],['data',c.data]];return arr.sort((a,b)=>a[1]-b[1])[0];}
-function supplierQuestData(){const groups=new Map();for(const r of activeEmployeeRows()){if(!r.supplier)continue;const needsOrder=shortageNeedsOrder(r),needsReview=r.needs_review,low=C.finite(r.stock_ratio)&&r.stock_ratio<10,mid=C.finite(r.stock_ratio)&&r.stock_ratio>=10&&r.stock_ratio<50,age=shortageAge(r.product_code);if(!needsOrder&&!needsReview&&!low&&!mid&&age<20)continue;const g=groups.get(r.supplier)||{supplier:r.supplier,rows:[],order:0,review:0,low:0,mid:0,aging20:0,rank:0};g.rows.push(r);if(needsOrder)g.order++;if(needsReview)g.review++;if(low)g.low++;if(mid)g.mid++;if(age>=20)g.aging20++;g.rank+=needsOrder*2+needsReview+mid*5+low*3+(age>=20?4:0)+(age>=30?4:0);groups.set(r.supplier,g);}return[...groups.values()].sort((a,b)=>b.rank-a.rank||b.rows.length-a.rows.length);}
-function stableQuestId(type,target,codes=[]){return[type,target||'',state.upload?.id||state.upload?.snapshot_date||'no-upload'].join('|');}
+function profitabilityWeight(v){const k=String(v||'').trim().toLowerCase();if(k==='super')return 5;if(k==='high')return 4;if(k==='medium')return 2;if(k==='low')return 1;if(k==='loss')return 0;return 1;}
+function supplierQuestData(){
+ const totals=new Map();for(const r of activeEmployeeRows()){if(r.supplier)totals.set(r.supplier,(totals.get(r.supplier)||0)+1);}
+ const groups=new Map();
+ for(const r of activeEmployeeRows()){
+  if(!r.supplier||!shortageNeedsOrder(r))continue;
+  const ratio=C.finite(r.stock_ratio)?Number(r.stock_ratio):999,age=shortageAge(r.product_code),pw=profitabilityWeight(r.profitability_class);
+  const low=ratio<10,mid=ratio>=10&&ratio<50,under80=ratio>=50&&ratio<80;
+  const severity=low?6:mid?4:under80?2:1.5;
+  const g=groups.get(r.supplier)||{supplier:r.supplier,rows:[],order:0,low:0,mid:0,under80:0,aging20:0,super:0,high:0,medium:0,lowProfit:0,loss:0,weightedOrder:0,rank:0,totalProducts:totals.get(r.supplier)||1};
+  g.rows.push(r);g.order++;if(low)g.low++;if(mid)g.mid++;if(under80)g.under80++;if(age>=20)g.aging20++;
+  const pc=String(r.profitability_class||'').trim().toLowerCase();if(pc==='super')g.super++;else if(pc==='high')g.high++;else if(pc==='medium')g.medium++;else if(pc==='low')g.lowProfit++;else if(pc==='loss')g.loss++;
+  g.weightedOrder+=pw;
+  g.rank+=pw*(severity+(age>=30?4:age>=20?2:0));
+  groups.set(r.supplier,g);
+ }
+ for(const g of groups.values()){
+  const weightedRatio=g.weightedOrder/Math.max(1,g.totalProducts*5);
+  g.rank+=g.weightedOrder*.8+weightedRatio*25;
+ }
+ return[...groups.values()].sort((a,b)=>b.rank-a.rank||b.order-a.order||b.low-a.low);
+}
+function stableQuestIdfunction stableQuestId(type,target,codes=[]){return[type,target||'',state.upload?.id||state.upload?.snapshot_date||'no-upload'].join('|');}
 function estimateScoreGain(model,codes,{supplierClose=false}={}){let gain=0;const unique=[...new Set(codes)];for(const code of unique){const r=state.rows.find(x=>x.product_code===code);if(!r||isScoreExcluded(code))continue;if(C.finite(r.stock_ratio)&&r.stock_ratio>=10&&r.stock_ratio<50)gain+=.55*.50*(100/model.meta.totalProducts);else if(C.finite(r.stock_ratio)&&r.stock_ratio<10)gain+=.55*.20*(100/model.meta.totalProducts);if(shortageNeedsOrder(r))gain+=.25*(100/model.meta.totalProducts);if(r.needs_review)gain+=.05*(100/model.meta.eligibleCount);const d=shortageAge(code),af=d<10?0:d<20?.25:d<30?.6:1;if(shortageNeedsOrder(r))gain+=.55*.30*(100/model.meta.shortageCount)*af;}if(supplierClose)gain+=.15*(100/model.meta.supplierCount);return Math.max(.1,Math.min(20,gain));}
 function rewardForImpact(model,impact,eventMatch){const perScore=pointStepForScore(model.score)/5;return Math.max(50,Math.round(impact*perScore*(eventMatch?GAME_CONFIG.eventMultiplier:1)));}
-function codeStillFocus(code,focus){const r=state.rows.find(x=>x.product_code===code);if(!r)return false;if(focus==='shortage_mid')return!isScoreExcluded(code)&&C.finite(r.stock_ratio)&&r.stock_ratio>=10&&r.stock_ratio<50;if(focus==='shortage_low')return!isScoreExcluded(code)&&C.finite(r.stock_ratio)&&r.stock_ratio<10;if(focus==='aging30')return!isScoreExcluded(code)&&shortageAge(code)>=30&&shortageCycleFor(code)?.active;if(focus==='aging20')return!isScoreExcluded(code)&&shortageAge(code)>=20&&shortageCycleFor(code)?.active;if(focus==='data')return r.needs_review;return false;}
+function codeStillFocus(code,focus){const r=state.rows.find(x=>x.product_code===code);if(!r)return false;if(focus==='shortage_mid')return!isScoreExcluded(code)&&C.finite(r.stock_ratio)&&r.stock_ratio>=10&&r.stock_ratio<50;if(focus==='shortage_low')return!isScoreExcluded(code)&&C.finite(r.stock_ratio)&&r.stock_ratio<10;if(focus==='aging30')return!isScoreExcluded(code)&&shortageAge(code)>=30&&shortageCycleFor(code)?.active;if(focus==='aging20')return!isScoreExcluded(code)&&shortageAge(code)>=20&&shortageCycleFor(code)?.active;if(focus==='profit_recovery')return!isScoreExcluded(code)&&C.finite(r.stock_ratio)&&r.stock_ratio>=10&&r.stock_ratio<80&&['super','high'].includes(String(r.profitability_class||'').trim().toLowerCase());if(focus==='data')return r.needs_review;return false;}
 function activeQuestById(id){return loadGameProgress().activeQuests.find(x=>x.id===id);}
 function startQuest(q){if(purchaseActionsLocked()){toast('Refresh inventory first. Daily quests are locked after 48 hours.');return;}const p=loadGameProgress();if(p.completedQuestIds[q.id]){toast('This quest cycle has already been rewarded.');q.action?.();return;}if(!p.activeQuests.some(x=>x.id===q.id)){p.activeQuests.push({id:q.id,title:q.title,type:q.type,focus:q.focus,target:q.target||null,codes:q.codes||[],targetCount:q.targetCount||0,reward:q.reward,startedAt:new Date().toISOString(),eventFocus:q.eventFocus||null});saveGameProgress();toast('Quest started. Completion will be verified from real data.');}q.action?.();}
 function questIsComplete(q){if(q.type==='Supplier Quest'){const g=supplierQuestData().find(x=>x.supplier===q.target);return!g||g.rows.length===0;}const codes=q.codes||[];if(!codes.length)return false;const remaining=codes.filter(code=>codeStillFocus(code,q.focus)).length,resolved=codes.length-remaining;return resolved>=Math.max(1,q.targetCount||codes.length);}
@@ -818,81 +841,89 @@ function tasksLevelRange(level){
  const min=40+(level-1)*5,max=level===12?100:min+4;
  return'Score '+min+'–'+max;
 }
-function tasksEventForFocus(focus){
- const map={
-  shortage_mid:['Recovery Window','Recover the 10–50% stock zone first. It carries the highest shortage-health weight and can lift the BO score quickly.'],
-  shortage_low:['Red Zone Review','Separate recoverable sub-10% shortages from genuine external exceptions and prevent avoidable stock-outs.'],
-  aging:['Cycle Breaker','Prioritize aging shortages before they cross the next action threshold.'],
-  products:['Order Rescue','Reduce the number of products currently requiring an order.'],
-  suppliers:['Supplier Focus','Close the heaviest supplier backlog as one coordinated purchasing action.'],
-  data:['Clean Data','Remove master-data blockers so recommendations become reliable and actionable.']
- };
- const x=map[focus]||map.products;
- return{focus,title:x[0],text:x[1]};
+function tasksEventFromSelected(tasks){
+ if(!tasks.length)return{focus:'clear',title:'Maintain the Standard',text:'No corrective task is required from this stock snapshot. Keep the current BO health stable until the next stock refresh.'};
+ const supplierTasks=tasks.filter(t=>t.focus==='suppliers');
+ const totalImpact=tasks.reduce((a,t)=>a+Number(t.score_impact||0),0);
+ if(supplierTasks.length>=2){
+  const critical=supplierTasks.reduce((a,t)=>a+(t.critical_count||0),0),profit=supplierTasks.reduce((a,t)=>a+(t.super_high_count||0),0),orders=supplierTasks.reduce((a,t)=>a+(t.target_count||0),0);
+  return{focus:'suppliers',title:'Priority Supplier Sprint',text:supplierTasks.length+' priority suppliers · '+orders+' order lines · '+critical+' critical items · '+profit+' Super/High shortages · ~+'+totalImpact.toFixed(1)+' score potential.'};
+ }
+ const top=tasks[0];
+ const map={profit_recovery:['Profitability Recovery','Protect high-value stock before it drops into deeper shortage.'],shortage_mid:['Recovery Window','Recover products from the 10–50% shortage zone.'],shortage_low:['Red Zone Review','Review sub-10% products for order need or a controlled exception.'],aging30:['Cycle Breaker','Resolve the oldest shortages first.'],aging20:['Aging Control','Clear warning-stage shortages before Day 30.'],data:['Data Unlock','Fix the highest-impact master-data blockers.'],suppliers:['Supplier Focus','Close the highest-priority supplier backlog first.']};
+ const x=map[top.focus]||['Priority Action','Work the highest-impact purchasing actions first.'];
+ return{focus:top.focus,title:x[0],text:x[1]+' '+tasks.length+' priority task'+(tasks.length===1?'':'s')+' · ~+'+totalImpact.toFixed(1)+' score potential.'};
 }
 function tasksBadgeFor(focus){
- return({
-  suppliers:['supplier_closer','Supplier Closer'],
-  shortage_mid:['stock_recovery','Recovery Specialist'],
-  shortage_low:['crisis_resolution','Crisis Resolver'],
-  aging:['aging_breaker','Cycle Breaker'],
-  data:['data_quality','Data Cleaner'],
-  products:['order_control','Order Controller']
- })[focus]||['purchasing_action','Purchasing Achiever'];
+ return({suppliers:['supplier_closer','Supplier Closer'],profit_recovery:['profit_recovery','Profit Protector'],shortage_mid:['stock_recovery','Recovery Specialist'],shortage_low:['crisis_resolution','Crisis Reviewer'],aging30:['aging_breaker','Cycle Breaker'],aging20:['aging_breaker','Cycle Breaker'],data:['data_quality','Data Cleaner'],products:['order_control','Order Controller']})[focus]||['purchasing_action','Purchasing Achiever'];
+}
+function masterReviewSeverity(r){
+ const x=String(r.review_reason||'').toLowerCase();let n=0;
+ if(x.includes('not in the master'))n+=12;
+ if(x.includes('unknown or conflicting'))n+=10;
+ if(x.includes('negative stock'))n+=9;
+ if(x.includes('reorder point is not confirmed'))n+=6;
+ n+=profitabilityWeight(r.profitability_class)*2;
+ return n;
 }
 function buildPriorityTasks(model){
- const list=[];
- const add=(o)=>{const badge=tasksBadgeFor(o.focus);list.push({...o,badge_type:badge[0],badge_label:badge[1]});};
- const supplier=supplierQuestData()[0];
- if(supplier){
-  const codes=supplier.rows.map(r=>r.product_code),impact=estimateScoreGain(model,codes,{supplierClose:true});
-  add({task_key:'supplier|'+supplier.supplier,task_type:'Supplier Quest',focus:'suppliers',target:supplier.supplier,codes,target_count:codes.length,title:'Close '+supplier.supplier,description:'Handle this supplier end-to-end and close the active BO actions grouped under it.',score_impact:impact,meta:[supplier.order+' orders',supplier.mid+' at 10–50%',supplier.low+' under 10%',supplier.review+' reviews']});
+ const list=[],add=o=>{const b=tasksBadgeFor(o.focus);list.push({...o,badge_type:b[0],badge_label:b[1]});};
+
+ // Up to five supplier candidates. Profitability strongly affects ranking; Loss contributes zero commercial weight.
+ for(const g of supplierQuestData().slice(0,5)){
+  const codes=g.rows.map(r=>r.product_code),impact=estimateScoreGain(model,codes,{supplierClose:true});
+  add({task_key:'supplier|'+g.supplier,task_type:'Supplier Pre-Order',focus:'suppliers',target:g.supplier,codes,target_count:codes.length,title:'Pre-order '+g.supplier,
+   description:'Prioritize this supplier from shortage severity, breadth, aging and profitability mix.',
+   score_impact:impact,business_priority:impact*100+g.rank*4,critical_count:g.low,super_high_count:g.super+g.high,
+   meta:[g.order+' order lines',g.low+' below 10%',g.mid+' at 10–50%',g.super+' Super',g.high+' High']});
  }
+
+ // Commercial recovery: Super first; High fills the remaining slots. Under-10 stays a Review task.
+ const superRows=state.rows.filter(r=>!isScoreExcluded(r.product_code)&&!r.needs_review&&C.finite(r.stock_ratio)&&r.stock_ratio>=10&&r.stock_ratio<80&&String(r.profitability_class||'').trim().toLowerCase()==='super').sort((a,b)=>a.stock_ratio-b.stock_ratio);
+ const highRows=state.rows.filter(r=>!isScoreExcluded(r.product_code)&&!r.needs_review&&C.finite(r.stock_ratio)&&r.stock_ratio>=10&&r.stock_ratio<80&&String(r.profitability_class||'').trim().toLowerCase()==='high').sort((a,b)=>a.stock_ratio-b.stock_ratio);
+ const commercial=[...superRows,...highRows].slice(0,5);
+ if(commercial.length){
+  const codes=commercial.map(r=>r.product_code),impact=estimateScoreGain(model,codes),sw=commercial.reduce((a,r)=>a+profitabilityWeight(r.profitability_class),0);
+  add({task_key:'recovery|profit',task_type:'Profitability Recovery',focus:'profit_recovery',codes,target_count:codes.length,title:'Recover '+codes.length+' Super/High product'+(codes.length===1?'':'s')+' below 80%',description:'Protect the highest-profit products before shortage becomes more severe.',score_impact:impact,business_priority:impact*100+sw*14,meta:[superRows.length+' Super candidates',highRows.length+' High candidates']});
+ }
+
  if(model.counts.tenTo50){
-  const codes=model.tenTo50Rows.map(r=>r.product_code),target=Math.min(5,codes.length),slice=codes.slice(0,target),impact=estimateScoreGain(model,slice);
-  add({task_key:'recovery|10-50',task_type:'Recovery',focus:'shortage_mid',codes:slice,target_count:target,title:'Recover '+target+' product'+(target===1?'':'s')+' from the 10–50% zone',description:'Move the selected products out of the highest-weight actionable shortage zone.',score_impact:impact,meta:[model.counts.tenTo50+' currently in zone','Target '+target]});
+  const rows=model.tenTo50Rows.slice().sort((a,b)=>profitabilityWeight(b.profitability_class)-profitabilityWeight(a.profitability_class)||a.stock_ratio-b.stock_ratio),slice=rows.slice(0,5),codes=slice.map(r=>r.product_code),impact=estimateScoreGain(model,codes);
+  add({task_key:'recovery|10-50',task_type:'Recovery',focus:'shortage_mid',codes,target_count:codes.length,title:'Recover '+codes.length+' product'+(codes.length===1?'':'s')+' from the 10–50% zone',description:'Move products out of the highest-weight actionable shortage zone.',score_impact:impact,business_priority:impact*100+slice.reduce((a,r)=>a+profitabilityWeight(r.profitability_class),0)*5});
  }
- if(model.counts.action30){
-  const codes=model.action30.map(([code])=>code),target=Math.min(3,codes.length),slice=codes.slice(0,target),impact=estimateScoreGain(model,slice);
-  add({task_key:'aging|30+',task_type:'Aging',focus:'aging30',codes:slice,target_count:target,title:'Resolve '+target+' shortage action'+(target===1?'':'s')+' at Day 30+',description:'Close the selected aging shortages or move legitimate external cases into the controlled exception flow.',score_impact:impact,meta:[model.counts.action30+' action required','Target '+target]});
- }else if(model.counts.warn20){
-  const codes=model.warn20.map(([code])=>code),target=Math.min(3,codes.length),slice=codes.slice(0,target),impact=estimateScoreGain(model,slice);
-  add({task_key:'aging|20+',task_type:'Aging',focus:'aging20',codes:slice,target_count:target,title:'Clear '+target+' aging warning'+(target===1?'':'s')+' before Day 30',description:'Resolve the selected shortages before they cross the formal action threshold.',score_impact:impact,meta:[model.counts.warn20+' warnings','Target '+target]});
- }
+
  if(model.counts.under10){
-  const codes=model.under10Rows.map(r=>r.product_code),target=Math.min(3,codes.length),slice=codes.slice(0,target),impact=estimateScoreGain(model,slice);
-  add({task_key:'red-zone|under10',task_type:'Extreme Low',focus:'shortage_low',codes:slice,target_count:target,title:'Review '+target+' product'+(target===1?'':'s')+' below 10%',description:'Recover avoidable extreme-low stock or document a legitimate external exception.',score_impact:impact,meta:[model.counts.under10+' products below 10%','Target '+target]});
+  const rows=model.under10Rows.slice().sort((a,b)=>profitabilityWeight(b.profitability_class)-profitabilityWeight(a.profitability_class)||a.stock_ratio-b.stock_ratio),slice=rows.slice(0,5),codes=slice.map(r=>r.product_code),impact=estimateScoreGain(model,codes);
+  add({task_key:'review|under10',task_type:'Critical Review',focus:'shortage_low',codes,target_count:codes.length,title:'Review '+codes.length+' product'+(codes.length===1?'':'s')+' below 10%',description:'Check order need, active demand and legitimate external exceptions before taking action.',score_impact:impact,business_priority:impact*100+40+slice.reduce((a,r)=>a+profitabilityWeight(r.profitability_class),0)*4});
  }
+
+ if(model.counts.action30){
+  const codes=model.action30.slice(0,5).map(([c])=>c),impact=estimateScoreGain(model,codes);
+  add({task_key:'aging|30+',task_type:'Aging',focus:'aging30',codes,target_count:codes.length,title:'Resolve '+codes.length+' shortage action'+(codes.length===1?'':'s')+' at Day 30+',description:'Resolve or move legitimate external cases into the controlled exception flow.',score_impact:impact,business_priority:impact*100+80});
+ }else if(model.counts.warn20){
+  const codes=model.warn20.slice(0,5).map(([c])=>c),impact=estimateScoreGain(model,codes);
+  add({task_key:'aging|20+',task_type:'Aging',focus:'aging20',codes,target_count:codes.length,title:'Clear '+codes.length+' aging warning'+(codes.length===1?'':'s')+' before Day 30',description:'Resolve warning-stage shortages before they cross the action threshold.',score_impact:impact,business_priority:impact*100+45});
+ }
+
  if(model.counts.review){
-  const codes=model.reviewRows.map(r=>r.product_code),target=Math.min(3,codes.length),slice=codes.slice(0,target),impact=estimateScoreGain(model,slice);
-  add({task_key:'master|review',task_type:'Master Review',focus:'data',codes:slice,target_count:target,title:'Clear '+target+' master-data blocker'+(target===1?'':'s'),description:'Fix the selected master-data issues so purchasing recommendations can become actionable.',score_impact:impact,meta:[model.counts.review+' products need review','Target '+target]});
+  const rows=model.reviewRows.slice().sort((a,b)=>masterReviewSeverity(b)-masterReviewSeverity(a)),slice=rows.slice(0,5),codes=slice.map(r=>r.product_code),impact=estimateScoreGain(model,codes);
+  add({task_key:'master|review',task_type:'Master Review',focus:'data',codes,target_count:codes.length,title:'Clear '+codes.length+' high-impact master blocker'+(codes.length===1?'':'s'),description:'Fix unit conflicts, missing master records, negative stock issues or unconfirmed reorder points that block reliable purchasing decisions.',score_impact:impact,business_priority:impact*100+slice.reduce((a,r)=>a+masterReviewSeverity(r),0)*3});
  }
- if(model.counts.reorderProducts){
-  const codes=model.reorder.slice(0,5).map(r=>r.product_code),target=Math.min(5,codes.length),impact=estimateScoreGain(model,codes);
-  add({task_key:'orders|priority',task_type:'Order Control',focus:'products',codes,target_count:target,title:'Close '+target+' priority order requirement'+(target===1?'':'s'),description:'Reduce the active products-needing-order backlog from the current snapshot.',score_impact:impact,meta:[model.counts.reorderProducts+' products need order','Target '+target]});
- }
+
  const claimed=new Set(),selected=[];
- for(const original of list.sort((a,b)=>b.score_impact-a.score_impact||a.title.localeCompare(b.title))){
+ for(const original of list.sort((a,b)=>(b.business_priority||0)-(a.business_priority||0)||b.score_impact-a.score_impact)){
   if(selected.length>=5)break;
-  const codes=(original.codes||[]).filter(code=>!claimed.has(code));
-  if(!codes.length)continue;
-  const target=Math.min(Math.max(1,Number(original.target_count)||1),codes.length);
-  let title=original.title;
-  if(original.task_type==='Recovery')title='Recover '+target+' product'+(target===1?'':'s')+' from the 10–50% zone';
-  if(original.task_type==='Extreme Low')title='Review '+target+' product'+(target===1?'':'s')+' below 10%';
-  if(original.task_type==='Master Review')title='Clear '+target+' master-data blocker'+(target===1?'':'s');
-  if(original.task_type==='Aging')title=original.focus==='aging30'?'Resolve '+target+' shortage action'+(target===1?'':'s')+' at Day 30+':'Clear '+target+' aging warning'+(target===1?'':'s')+' before Day 30';
-  if(original.task_type==='Order Control')title='Close '+target+' priority order requirement'+(target===1?'':'s');
-  const impact=estimateScoreGain(model,codes,{supplierClose:original.focus==='suppliers'});
-  selected.push({...original,codes,target_count:target,title,score_impact:impact,priority:selected.length+1});
-  codes.forEach(code=>claimed.add(code));
+  const codes=(original.codes||[]).filter(c=>!claimed.has(c));if(!codes.length)continue;
+  const target=Math.min(Math.max(1,Number(original.target_count)||1),codes.length),impact=estimateScoreGain(model,codes,{supplierClose:original.focus==='suppliers'});
+  selected.push({...original,codes,target_count:target,score_impact:impact,priority:selected.length+1});
+  codes.forEach(c=>claimed.add(c));
  }
  return selected;
 }
-function taskStillOpen(t){
+function taskStillOpenfunction taskStillOpen(t){
  if(t.focus==='suppliers'){
-  const g=supplierQuestData().find(x=>x.supplier===t.target);
-  return Boolean(g&&g.rows.length);
+  const codes=Array.isArray(t.codes)?t.codes:[],remaining=codes.filter(code=>{const r=state.rows.find(x=>x.product_code===code);return r&&shortageNeedsOrder(r);}).length;
+  return remaining>0;
  }
  const codes=Array.isArray(t.codes)?t.codes:[];
  if(!codes.length)return false;
@@ -910,7 +941,7 @@ function renderTasksInventoryFreshness(){
  status.textContent=f.status==='missing'?'No inventory':(f.fresh?'Current':'Old snapshot');
  age.className='fresh-chip '+(f.fresh?'neutral':'warn');
  age.textContent=Number.isFinite(f.ageHours)?(f.ageHours<1?'<1h old':Math.floor(f.ageHours)+'h old'):'No valid age';
- txt.textContent=state.upload?(f.fresh?'Latest full inventory snapshot is current. Tasks remain valid for the 48-hour stock cycle.':'Upload a new full inventory snapshot to start or renew the next 48-hour task cycle.'):'Upload the first full inventory snapshot to generate priority tasks.';
+ txt.textContent=state.upload?(f.fresh?'Current stock refresh. A new task cycle starts with every new full inventory upload.':'48 hours have passed. Upload a new full inventory snapshot to unlock the system and start a new task cycle.'):'Upload the first full inventory snapshot to generate priority tasks.';
  return f;
 }
 function tasksRequestItems(model,freshness){
@@ -965,25 +996,24 @@ async function syncTasksAssistant(){
  if(state.taskSyncing||state.mode!=='live'||!state.session)return;
  state.taskSyncing=true;
  try{
-  const freshness=renderTasksInventoryFreshness();
-  ensureShortageCycles();
-  let model=boHealthModel(),score=Math.round(model.score),lv=scoreLevelForScore(score),weakest=weakestFocus(model),candidates=buildPriorityTasks(model),event=candidates.length?tasksEventForFocus(weakest[0]):{focus:'clear',title:'Maintain the Standard',text:'No corrective task is required from this stock snapshot. Keep the current BO health stable until the next refresh.'};
+  const freshness=renderTasksInventoryFreshness();ensureShortageCycles();
+  const model=boHealthModel(),score=Math.round(model.score),lv=scoreLevelForScore(score),candidates=buildPriorityTasks(model),event=tasksEventFromSelected(candidates);
   const payload={upload_id:state.upload?.id||null,score,bo_level:lv.n,event_focus:event.focus,event_title:event.title,event_text:event.text,tasks:candidates,resolved_task_ids:[]};
   let data;
   if(state.upload?.id&&state.upload?.is_complete&&state.upload?.excludes_zero){
     data=await rpc('purchasing_tasks_sync_v5',{payload});
     if(data?.cycle?.upload_id&&data.cycle.upload_id!==state.upload.id&&Array.isArray(data.tasks)){
       const resolved=data.tasks.filter(t=>t.status==='open'&&!taskStillOpen(t)).map(t=>t.id);
-      if(resolved.length)data=await rpc('purchasing_tasks_sync_v5',{payload:{...payload,resolved_task_ids:resolved}});
+      data=await rpc('purchasing_tasks_rollover_v5',{payload:{...payload,resolved_task_ids:resolved}});
     }
   }else data={cycle:null,tasks:[],badge_total:state.taskAssistant?.badge_total||0,professional_rank:state.taskAssistant?.professional_rank||'Builder',recent_badges:state.taskAssistant?.recent_badges||[],rank_metrics:state.taskAssistant?.rank_metrics||{}};
-  state.taskAssistant=data;renderTasksAssistant(data,model);
+  state.taskAssistant=data;renderTasksAssistant(data,model);updateInventoryLock();
  }catch(e){
-  const model=boHealthModel();renderTasksAssistant(state.taskAssistant||{},model);
+  const model=boHealthModel();renderTasksAssistant(state.taskAssistant||{},model);updateInventoryLock();
   const list=$('tasksPriorityList');if(list)list.innerHTML='<div class="task-empty">Tasks Assistant could not sync: '+esc(e.message)+'</div>';
  }finally{state.taskSyncing=false;}
 }
-function go(tab){document.querySelectorAll('[data-panel]').forEach(el=>el.classList.toggle('hidden',el.dataset.panel!==tab));document.querySelectorAll('nav [data-tab]').forEach(el=>el.classList.toggle('active',el.dataset.tab===tab));if(tab==='daily-tasks')renderOperationsDashboard();if(tab==='tasks-assistant')syncTasksAssistant();}
+function go(tab)function go(tab){document.querySelectorAll('[data-panel]').forEach(el=>el.classList.toggle('hidden',el.dataset.panel!==tab));document.querySelectorAll('nav [data-tab]').forEach(el=>el.classList.toggle('active',el.dataset.tab===tab));if(tab==='daily-tasks')renderOperationsDashboard();if(tab==='tasks-assistant')syncTasksAssistant();}
 async function readFile(file){if(!file)throw Error('Choose a file first.');if(file.size>15*1024*1024)throw Error('File is larger than 15 MB.');if(/\.xlsx$/i.test(file.name)){return{records:C.recordsFromRows(await readXlsxRows(await file.arrayBuffer())),raw:null};}if(!/\.csv$/i.test(file.name))throw Error('Use a CSV or XLSX file.');const raw=await file.text();return{records:C.recordsFromRows(C.parseCSV(raw)),raw};}
 function normalizeHeaders(records){if(!records.length)throw Error('No product data.');const pairs=Object.keys(records[0]).map(h=>[h,h.trim().toLowerCase().replace(/[\s-]+/g,'_')]);if(new Set(pairs.map(p=>p[1])).size!==pairs.length)throw Error('Column names become duplicates.');return records.map(r=>Object.fromEntries(pairs.map(([a,b])=>[b,r[a]])));}
 function normalizeMasterFile(records){const rr=normalizeHeaders(records),headers=Object.keys(rr[0]);let skipped=0,rawRows=[];
@@ -1041,7 +1071,7 @@ function openInventoryModal(){
  modal.classList.remove('hidden');document.body.classList.add('modal-open');setTimeout(()=>$('inventoryFile')?.focus(),0);
 }
 function closeInventoryModal(){const modal=$('inventoryModal');if(!modal)return;modal.classList.add('hidden');document.body.classList.remove('modal-open');}
-$('openInventoryModal').onclick=openInventoryModal;const topUpload=$('openInventoryModalTop');if(topUpload)topUpload.onclick=openInventoryModal;const taskUpload=$('tasksOpenInventory');if(taskUpload)taskUpload.onclick=openInventoryModal;const goBosBtn=$('goBosFromDashboard');if(goBosBtn)goBosBtn.onclick=()=>go('recommendations');$('closeInventoryModal').onclick=closeInventoryModal;$('cancelInventoryModal').onclick=closeInventoryModal;
+$('openInventoryModal').onclick=openInventoryModal;const topUpload=$('openInventoryModalTop');if(topUpload)topUpload.onclick=openInventoryModal;const taskUpload=$('tasksOpenInventory');if(taskUpload)taskUpload.onclick=openInventoryModal;const lockUpload=$('inventoryLockUpload');if(lockUpload)lockUpload.onclick=openInventoryModal;const goBosBtn=$('goBosFromDashboard');if(goBosBtn)goBosBtn.onclick=()=>go('recommendations');$('closeInventoryModal').onclick=closeInventoryModal;$('cancelInventoryModal').onclick=closeInventoryModal;
 $('inventoryModal').addEventListener('click',e=>{if(e.target===$('inventoryModal'))closeInventoryModal();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('inventoryModal').classList.contains('hidden'))closeInventoryModal();});
 $('authForm').addEventListener('submit',signIn);$('signUpBtn').onclick=signUp;
@@ -1100,7 +1130,7 @@ $('validateMaster').onclick=validateMaster;$('applyMaster').onclick=applyMaster;
 $('masterFile').onchange=()=>{state.pendingMaster=null;$('applyMaster').disabled=true;$('masterValidation').classList.add('hidden');};
 for(const id of ['inventoryFile','inventoryDate','inventoryComplete'])$(id).onchange=()=>{state.pendingInventory=null;$('applyInventory').disabled=true;$('inventoryValidation').classList.add('hidden');};
 function syncStickyOffsets(){const root=document.documentElement,top=document.querySelector('.topbar'),tools=document.querySelector('.table-tools');root.style.setProperty('--topbar-height',(top?.offsetHeight||0)+'px');root.style.setProperty('--table-tools-height',(tools?.offsetHeight||0)+'px');}
-window.addEventListener('resize',syncStickyOffsets);if('ResizeObserver' in window){const ro=new ResizeObserver(syncStickyOffsets);const top=document.querySelector('.topbar'),tools=document.querySelector('.table-tools');if(top)ro.observe(top);if(tools)ro.observe(tools);}requestAnimationFrame(syncStickyOffsets);
+window.addEventListener('resize',syncStickyOffsets);if('ResizeObserver' in window){const ro=new ResizeObserver(syncStickyOffsets);const top=document.querySelector('.topbar'),tools=document.querySelector('.table-tools');if(top)ro.observe(top);if(tools)ro.observe(tools);}requestAnimationFrame(syncStickyOffsets);setInterval(updateInventoryLock,60000);
 window.msAudit={getState:()=>state,core:C,normalizeMasterFile,validateMaster,validateInventory,filters,clearAllFilters,hasActiveFilters,inventoryFreshness,boHealthModel,scoreLevelForScore,pointsLevelForPoints,levelState,ensureShortageCycles,buildDailyQuests,getGameProgress:()=>loadGameProgress()};
 (async()=>{if(window.LOCAL_FIXTURE){$('openLocalBtn').classList.remove('hidden');openLocal();return;}try{const saved=sessionStorage.getItem('msp_v5_session');if(saved){saveSession(JSON.parse(saved));openApp();await loadLive();}}catch(e){$('authError').textContent=e.message;}})();
 </script></body></html>
