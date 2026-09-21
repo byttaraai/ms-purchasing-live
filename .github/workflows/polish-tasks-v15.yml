@@ -1,0 +1,28 @@
+name: Apply verified Tasks overview v15
+on:
+  push:
+    branches: [main]
+    paths: ['.github/scripts/polish_tasks_v15.py']
+permissions:
+  contents: write
+concurrency:
+  group: tasks-ui-v15
+  cancel-in-progress: false
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: main
+      - name: Apply presentation patch and validate all scripts
+        run: python .github/scripts/polish_tasks_v15.py
+      - name: Commit only the verified application file
+        run: |
+          git diff --check
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git commit -m 'Polish Tasks overview with real badges, readable rank and compact layout'
+          git push origin HEAD:main
