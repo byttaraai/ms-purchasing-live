@@ -7,11 +7,13 @@ on:
       - 'assets/js/workspace-v47.js'
       - 'maintenance/patch47.py'
       - 'tests/workspace-v47.cjs'
+      - 'tests/browser-v47.py'
 permissions:
   contents: write
 jobs:
   test-and-integrate:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
@@ -24,6 +26,23 @@ jobs:
           node --check assets/js/workspace-v47.js
           node tests/workspace-v47.cjs .
           rm index.before.html
+      - name: Browser smoke test with synthetic data only
+        run: |
+          python3 tests/browser-v47.py
+          python3 -m http.server 8765 --bind 127.0.0.1 > /tmp/workspace-http.log 2>&1 &
+          SERVER=$!
+          trap 'kill $SERVER; rm -f smoke.html' EXIT
+          sleep 1
+          CHROME=$(command -v google-chrome || command -v chromium || command -v chromium-browser)
+          timeout 35s "$CHROME" --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --virtual-time-budget=15000 --dump-dom http://127.0.0.1:8765/smoke.html > /tmp/workspace-smoke.html 2>/tmp/workspace-chrome.log
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          s=Path('/tmp/workspace-smoke.html').read_text()
+          m=re.search(r'<p id="workspace-smoke-result">([^<]+)</p>',s)
+          print(m.group(1) if m else 'FAIL: browser test did not finish')
+          assert m and m.group(1).startswith('PASS:'), 'Browser smoke test failed'
+          PY
       - name: Commit tested integration on review branch only
         run: |
           git config user.name 'github-actions[bot]'
