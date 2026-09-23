@@ -118,38 +118,68 @@ function notifyWorkspaceDecisionChange() {
 function supplierTaskRows(task){
   const supplier=String(task?.target||'').trim(),maxShortageValue=Math.max(0,...state.rows.map(averageShortageValue));
   return state.rows
-    .filter(r=>supplier&&r.supplier===supplier&&!isScoreExcluded(r.product_code)&&shortageNeedsOrder(r))
+    .filter(r=>{
+      if(!supplier||r.supplier!==supplier||isScoreExcluded(r.product_code))return false;
+      const zero=C.finite(r.stock_qty)&&Math.abs(Number(r.stock_qty))<1e-12;
+      return shortageNeedsOrder(r)||Boolean(r.needs_review)||zero;
+    })
     .map(r=>({...r,shortage_value:averageShortageValue(r),priority_score:priorityScore(r,maxShortageValue)}))
     .sort((a,b)=>(b.priority_score||0)-(a.priority_score||0)||(b.shortage_value||0)-(a.shortage_value||0)||(C.finite(a.stock_ratio)?a.stock_ratio:Infinity)-(C.finite(b.stock_ratio)?b.stock_ratio:Infinity)||a.product_name.localeCompare(b.product_name));
 }
 function supplierTaskPrint(rows,supplier){
   if(!rows.length)return;
-  const w=window.open('','_blank','width=1100,height=780');
+  const w=window.open('','_blank','width=900,height=760');
   if(!w){toast('Please allow pop-ups to open the print preview.');return;}
-  const total=rows.reduce((sum,r)=>sum+Number(r.shortage_value||0),0),today=new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
-  const body=rows.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.product_name)}</td><td>${esc(r.purchase_unit||'—')}</td><td>${esc(fmt(r.stock_qty,4))}</td><td>${esc(fmt(r.reorder_point,4))}</td><td>${C.finite(r.stock_ratio)?esc(fmt(r.stock_ratio,1))+'%':'—'}</td><td>${esc(C.profitLabel(r.profitability_class)||'—')}</td><td>${esc(fmt(r.purchase_price,1))}</td><td>${esc(fmt(r.min_order_qty,4))}</td><td>${esc(fmt(r.max_order_qty,4))}</td><td>${esc(fmt(r.shortage_value,0))}</td></tr>`).join('');
-  w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>${esc(supplier)} Purchase Request</title><style>body{font:12px Arial,sans-serif;color:#17264e;padding:24px}h1{font-size:20px;margin:0 0 4px}.meta{color:#64748b;margin-bottom:16px}table{width:100%;border-collapse:collapse}th,td{padding:8px 7px;border-bottom:1px solid #e5e7eb;text-align:right}th:nth-child(2),td:nth-child(2),th:nth-child(3),td:nth-child(3){text-align:left}th{background:#f5f7fb;font-size:10px;text-transform:uppercase;color:#52627d}.totals{display:flex;justify-content:flex-end;gap:24px;margin-top:16px;font-weight:700}@media print{body{padding:0}}</style></head><body><h1>${esc(supplier)}</h1><div class="meta">Supplier priority purchase request · ${today}</div><table><thead><tr><th>#</th><th>Product</th><th>Unit</th><th>Stock</th><th>Reorder</th><th>Stock %</th><th>Rating</th><th>Price</th><th>Min</th><th>Max</th><th>Shortage Value</th></tr></thead><tbody>${body}</tbody></table><div class="totals"><span>${rows.length} Products</span><span>Total Shortage Value: SAR ${fmt(total,0)}</span></div><script>window.onload=()=>window.print()<\/script></body></html>`);
+  const today=new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+  const body=rows.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.product_name)}</td><td>${esc(r.purchase_unit||'—')}</td><td>${esc(fmt(r.min_order_qty,4))}</td><td>${esc(fmt(r.max_order_qty,4))}</td></tr>`).join('');
+  w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>${esc(supplier)} Purchase Request</title><style>@page{size:A4 portrait;margin:12mm}*{box-sizing:border-box}body{font:10pt Arial,sans-serif;color:#17264e;margin:0}h1{font-size:16pt;margin:0 0 2mm}.meta{font-size:8.5pt;color:#64748b;margin-bottom:5mm;display:flex;justify-content:space-between;gap:8mm}table{width:100%;border-collapse:collapse;table-layout:fixed}th,td{padding:2.3mm 2mm;border-bottom:.25mm solid #dfe4ec;vertical-align:middle}th{background:#f4f6fa;font-size:7.5pt;text-transform:uppercase;color:#52627d;text-align:right}th:nth-child(1),td:nth-child(1){width:8%;text-align:center}th:nth-child(2),td:nth-child(2){width:46%;text-align:left}th:nth-child(3),td:nth-child(3){width:16%;text-align:left}th:nth-child(4),td:nth-child(4),th:nth-child(5),td:nth-child(5){width:15%;text-align:right;font-weight:700}.foot{margin-top:4mm;font-size:8.5pt;color:#59677f;text-align:right}@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}</style></head><body><h1>${esc(supplier)}</h1><div class="meta"><span>Purchase Request</span><span>${today}</span></div><table><thead><tr><th>#</th><th>Product</th><th>Unit</th><th>Min Order</th><th>Max Order</th></tr></thead><tbody>${body}</tbody></table><div class="foot">${rows.length} selected product${rows.length===1?'':'s'}</div><script>window.onload=()=>window.print()<\/script></body></html>`);
   w.document.close();
 }
-function openSupplierTaskPopup(task){
+function renderSupplierTaskPopup(task,selectedCodes){
   const rows=supplierTaskRows(task),supplier=String(task?.target||task?.title||'Supplier').trim(),total=rows.reduce((sum,r)=>sum+Number(r.shortage_value||0),0);
+  const selected=selectedCodes instanceof Set?new Set([...selectedCodes].filter(code=>rows.some(r=>r.product_code===code))):new Set(rows.filter(shortageNeedsOrder).map(r=>r.product_code));
   let d=$('supplierTaskDialog');
   if(!d){d=document.createElement('dialog');d.id='supplierTaskDialog';d.className='supplier-task-dialog';document.body.append(d);}
-  const body=rows.map((r,i)=>`<tr><td class="supplier-task-rank">${i+1}</td><td><div class="product-cell"><span class="product-button-wrap"><span class="supplier-task-product" title="${esc(r.product_name)}">${esc(r.product_name)}</span></span></div></td><td class="unit">${esc(r.purchase_unit||'—')}</td><td>${stockHtml(r)}</td><td>${pill(r.stock_ratio)}</td><td>${ratingHtml(r.profitability_class)}</td><td class="money">${fmt(r.purchase_price,1)}</td><td class="order">${fmt(r.min_order_qty,4)}</td><td class="order">${fmt(r.max_order_qty,4)}</td><td class="money">${fmt(r.shortage_value,0)}</td><td class="supplier" title="${esc(r.supplier||'Not assigned')}">${esc(r.supplier||'Not assigned')}</td></tr>`).join('');
-  d.innerHTML=`<div class="supplier-task-shell"><header class="supplier-task-head"><div><span class="supplier-task-eyebrow">Supplier Priority</span><h2 dir="auto">${esc(supplier)}</h2><p>Current purchase-priority products · ordered by the approved BO product priority.</p></div><button class="supplier-task-x" id="supplierTaskCloseX" type="button" aria-label="Close">&times;</button></header><div class="supplier-task-table-wrap"><table class="supplier-task-table"><thead><tr><th>#</th><th>Product</th><th>Unit</th><th>Stock / Reorder</th><th>Stock %</th><th>Rating</th><th>Price</th><th>Min Order</th><th>Max Order</th><th>Shortage Value</th><th>Supplier</th></tr></thead><tbody>${body||'<tr><td colspan="11" class="supplier-task-empty">No current purchase-priority products for this supplier.</td></tr>'}</tbody></table></div><footer class="supplier-task-footer"><div class="supplier-task-totals"><span><b>${fmt(rows.length,0)}</b> Products</span><span><b>SAR ${fmt(total,0)}</b> Total Shortage Value</span></div><div class="supplier-task-actions"><button class="btn" id="supplierTaskPrint" type="button" ${rows.length?'':'disabled'}><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v7H6z"></path></svg> Print</button><button class="btn primary" id="supplierTaskBack" type="button">Back to Tasks</button></div></footer></div>`;
+  const body=rows.map((r,i)=>`<tr class="${r.needs_review?'supplier-task-review-row':''}"><td class="supplier-task-select"><input type="checkbox" class="supplier-task-check" data-code="${esc(r.product_code)}" aria-label="Select ${esc(r.product_name)}" ${selected.has(r.product_code)?'checked':''}></td><td class="supplier-task-rank">${i+1}</td><td><div class="product-cell"><span class="product-button-wrap"><span class="supplier-task-product" title="${esc(r.product_name)}">${esc(r.product_name)}</span>${reviewIndicator(r)}</span></div></td><td class="unit">${esc(r.purchase_unit||'—')}</td><td>${stockHtml(r)}</td><td>${pill(r.stock_ratio)}</td><td>${ratingHtml(r.profitability_class)}</td><td class="money">${fmt(r.purchase_price,1)}</td><td class="order">${fmt(r.min_order_qty,4)}</td><td class="order">${fmt(r.max_order_qty,4)}</td><td class="money">${fmt(r.shortage_value,0)}</td><td class="supplier" title="${esc(r.supplier||'Not assigned')}">${esc(r.supplier||'Not assigned')}</td></tr>`).join('');
+  d.innerHTML=`<div class="supplier-task-shell"><header class="supplier-task-head"><div><span class="supplier-task-eyebrow">Supplier Priority</span><h2 dir="auto">${esc(supplier)}</h2><p>All current supplier actions: purchase shortages, zero stock and data review. Ordered by the approved BO product priority.</p></div><button class="supplier-task-x" id="supplierTaskCloseX" type="button" aria-label="Close">&times;</button></header><div class="supplier-task-table-wrap"><table class="supplier-task-table"><thead><tr><th class="supplier-task-select"><input type="checkbox" id="supplierTaskSelectAll" aria-label="Select all"></th><th>#</th><th>Product</th><th>Unit</th><th>Stock / Reorder</th><th>Stock %</th><th>Rating</th><th>Price</th><th>Min Order</th><th>Max Order</th><th>Shortage Value</th><th>Supplier</th></tr></thead><tbody>${body||'<tr><td colspan="12" class="supplier-task-empty">No current supplier action products.</td></tr>'}</tbody></table></div><footer class="supplier-task-footer"><div class="supplier-task-totals"><span><b>${fmt(rows.length,0)}</b> Products</span><span><b>SAR ${fmt(total,0)}</b> Total Shortage Value</span><span class="supplier-task-selected"><b id="supplierTaskSelectedCount">0</b> Selected</span></div><div class="supplier-task-actions"><button class="btn" id="supplierTaskPrint" type="button"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v7H6z"></path></svg> Print Selected</button><button class="btn primary" id="supplierTaskBack" type="button">Back to Tasks</button></div></footer></div>`;
+  const checks=()=>[...d.querySelectorAll('.supplier-task-check')],selectedRows=()=>{const set=new Set(checks().filter(x=>x.checked).map(x=>x.dataset.code));return rows.filter(r=>set.has(r.product_code));};
+  const updateSelection=()=>{const cs=checks(),n=cs.filter(x=>x.checked).length,all=cs.length>0&&n===cs.length,master=$('supplierTaskSelectAll');if(master){master.checked=all;master.indeterminate=n>0&&!all;}const count=$('supplierTaskSelectedCount');if(count)count.textContent=fmt(n,0);const print=$('supplierTaskPrint');if(print)print.disabled=n===0;};
+  checks().forEach(x=>x.onchange=updateSelection);
+  const all=$('supplierTaskSelectAll');if(all)all.onchange=()=>{checks().forEach(x=>x.checked=all.checked);updateSelection();};
   $('supplierTaskCloseX').onclick=()=>d.close();
   $('supplierTaskBack').onclick=()=>d.close();
-  $('supplierTaskPrint').onclick=()=>supplierTaskPrint(rows,supplier);
+  $('supplierTaskPrint').onclick=()=>supplierTaskPrint(selectedRows(),supplier);
   d.onclick=e=>{if(e.target===d)d.close();};
+  updateSelection();
   if(!d.open)d.showModal();
+  return{dialog:d,selected:new Set(checks().filter(x=>x.checked).map(x=>x.dataset.code))};
+}
+function openSupplierTaskPopup(task){
+  return renderSupplierTaskPopup(task);
+}
+async function refreshSupplierTaskPopup(taskKey,selectedCodes){
+  if(state.mode!=='live')return;
+  try{
+    const v=await rpc('purchasing_workspace_revision_v47');
+    if(v.master_revision!==state.revision||v.upload_id!==state.upload?.id||WORKSPACE_RUNTIME.day!==scoreAsOf()||WORKSPACE_RUNTIME.decisionsDirty)await loadLive();
+    const d=$('supplierTaskDialog');if(!d?.open)return;
+    const current=(state.taskAssistant?.tasks||[]).find(t=>t.task_key===taskKey&&t.status==='open');
+    if(!current){d.close();toast('This supplier task changed after a data update.');return;}
+    renderSupplierTaskPopup(current,selectedCodes);
+  }catch(e){/* Keep the already-open current workspace; background refresh can retry later. */}
 }
 async function ta16OpenTask(task) {
   try {
+    const current=(state.taskAssistant?.tasks||[]).find(t=>t.task_key===task.task_key&&t.status==='open')||task;
+    if(current.focus==='suppliers'){
+      const view=openSupplierTaskPopup(current);
+      void refreshSupplierTaskPopup(current.task_key,view?.selected);
+      return;
+    }
     if(state.mode==='live')await loadLive();
-    const current=(state.taskAssistant?.tasks||[]).find(t=>t.task_key===task.task_key&&t.status==='open');
-    if(!current){toast('This task changed after a data update. Use the current task list.');return;}
-    if(current.focus==='suppliers'){openSupplierTaskPopup(current);return;}
-    ta16OpenCodes(current.codes||[]);state.dailyFocus.task_key=current.task_key;
+    const refreshed=(state.taskAssistant?.tasks||[]).find(t=>t.task_key===task.task_key&&t.status==='open');
+    if(!refreshed){toast('This task changed after a data update. Use the current task list.');return;}
+    ta16OpenCodes(refreshed.codes||[]);state.dailyFocus.task_key=refreshed.task_key;
   } catch(e){toast('Task data could not be refreshed. Please try again.');}
 }
 window.addEventListener('focus',()=>{pollWorkspaceRevision();});
