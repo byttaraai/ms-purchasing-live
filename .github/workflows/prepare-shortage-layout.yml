@@ -1,0 +1,103 @@
+name: Prepare shortage card layout
+on:
+  push:
+    branches: ['ui/shortage-card-layout-26']
+    paths: ['.github/workflows/prepare-shortage-layout.yml']
+permissions:
+  contents: write
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Prepare verified presentation blob without changing production
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          import os, json, base64, hashlib, re, urllib.request
+          repo='byttaraai/ms-purchasing-live'
+          original_sha='9c346f166b1d269af82fa3ab596cbc53ee3d692d'
+          expected_sha='59d6555a7603ed9e07dc070eecb2769a6b662d48'
+          def api(path, data=None):
+              body=None if data is None else json.dumps(data).encode()
+              req=urllib.request.Request('https://api.github.com/repos/'+repo+path,data=body,headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json','Content-Type':'application/json','User-Agent':'MS-Purchasing-layout-check'})
+              with urllib.request.urlopen(req,timeout=30) as response:
+                  return json.load(response)
+          blob=api('/git/blobs/'+original_sha)
+          raw=base64.b64decode(blob['content'])
+          def sha(data):
+              return hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()
+          assert sha(raw)==original_sha
+          s=raw.decode('utf-8')
+          original_scripts=re.findall(r'<script\b[^>]*>([\s\S]*?)</script>',s)
+          old_build='Dashboard + BOs + Tasks Assistant - Live Build 25'
+          assert s.count(old_build)==1
+          s=s.replace(old_build,'Dashboard + BOs + Tasks Assistant - Live Build 26')
+          old=re.search(r'<article class="kpi green"><span class="bubble">[\s\S]*?<h2>Total Shortage Value</h2>[\s\S]*?</article>',s)
+          assert old, 'Expected Build 25 shortage card not found'
+          new='''<article class="kpi green kpi-shortage-card">
+            <span class="bubble" aria-hidden="true"><svg viewbox="0 0 24 24"><path d="M4 19h16M6 16V9m4 7V5m4 11v-4m4 4V7"></path></svg></span>
+            <h2>Total Shortage Value <span class="kpi-shortage-currency">SAR</span></h2>
+            <strong class="kpi-shortage-main" id="kpiShortageValue">-</strong>
+            <span class="kpi-shortage-rating good" id="kpiShortageRating">-</span>
+            <div class="kpi-shortage-footer"><span id="kpiInventoryValue">Inventory: -</span><span id="kpiShortagePct">Shortage: -</span></div>
+          </article>'''
+          s=s[:old.start()]+new+s[old.end():]
+          css='''
+          /* Build 26: presentation only; existing totals, thresholds and IDs stay unchanged. */
+          [data-panel="recommendations"] .kpis{grid-template-columns:repeat(4,minmax(0,1fr))}
+          [data-panel="recommendations"] .kpis>.kpi{min-width:0}
+          [data-panel="recommendations"] .kpis>.kpi>div{min-width:0}
+          [data-panel="recommendations"] .kpi-shortage-card{
+           display:grid;grid-template-columns:36px minmax(0,1fr) auto;
+           grid-template-rows:14px 27px auto;column-gap:10px!important;row-gap:4px!important;
+           align-items:center;align-content:center;
+           background:linear-gradient(115deg,#fff,#f2fbf7);
+          }
+          .kpi-shortage-card>.bubble{grid-column:1;grid-row:1/3;width:36px!important;height:36px!important}
+          .kpi-shortage-card>.bubble svg{width:21px!important;height:21px!important}
+          .kpi-shortage-card>h2{grid-column:2/4;grid-row:1;display:flex;align-items:center;gap:7px;margin:0!important;white-space:nowrap}
+          .kpi-shortage-card .kpi-shortage-currency{font-size:8px;font-weight:700;letter-spacing:.06em;color:#6d8c82;line-height:1}
+          .kpi-shortage-card>.kpi-shortage-main{grid-column:2;grid-row:2;min-width:0;white-space:nowrap;font-size:24px!important;line-height:1.05!important;margin:0!important;letter-spacing:-.65px}
+          .kpi-shortage-card>.kpi-shortage-rating{grid-column:3;grid-row:2;justify-self:end;white-space:nowrap;font-size:9px;line-height:1.4;padding:3px 7px;border-radius:6px;letter-spacing:0}
+          .kpi-shortage-card>.kpi-shortage-footer{grid-column:1/-1;grid-row:3;display:flex;justify-content:space-between;align-items:center;gap:8px;min-width:0;border-top:1px solid #e2eee8;padding-top:6px;margin-top:1px;color:var(--muted);font-size:10px;line-height:1.2;font-variant-numeric:tabular-nums}
+          .kpi-shortage-footer>span{white-space:nowrap}
+          @media(min-width:1101px) and (max-width:1250px){
+           .kpi-shortage-card>.kpi-shortage-main{font-size:22px!important}
+           .kpi-shortage-card>.kpi-shortage-footer{font-size:9.5px}
+          }
+          @media(min-width:761px) and (max-width:1100px){
+           [data-panel="recommendations"] .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+          }
+          @media(max-width:760px){
+           [data-panel="recommendations"] .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+           [data-panel="recommendations"] .kpis>.kpi{min-height:104px}
+           [data-panel="recommendations"] .kpi-shortage-card{grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto auto auto;row-gap:3px!important;column-gap:6px!important;padding:11px}
+           .kpi-shortage-card>.bubble{display:none}
+           .kpi-shortage-card>h2{grid-column:1/-1;grid-row:1;font-size:10.5px!important;gap:4px}
+           .kpi-shortage-card .kpi-shortage-currency{font-size:7px}
+           .kpi-shortage-card>.kpi-shortage-main{grid-column:1/-1;grid-row:2;font-size:24px!important}
+           .kpi-shortage-card>.kpi-shortage-footer{display:contents}
+           .kpi-shortage-footer>#kpiInventoryValue{grid-column:1/-1;grid-row:3;font-size:9.5px;color:var(--muted);line-height:1.3}
+           .kpi-shortage-footer>#kpiShortagePct{grid-column:1;grid-row:4;font-size:9px;color:var(--muted);line-height:1.3}
+           .kpi-shortage-card>.kpi-shortage-rating{grid-column:2;grid-row:4;font-size:8px;padding:2px 5px}
+          }
+          @media(max-width:360px){
+           .kpi-shortage-card>h2{font-size:9px!important}
+           .kpi-shortage-card>.kpi-shortage-main{font-size:21px!important}
+           .kpi-shortage-footer>#kpiShortagePct{font-size:8px}
+           .kpi-shortage-card>.kpi-shortage-rating{font-size:7.5px;padding:2px 4px}
+          }
+          '''
+          assert s.index('</style></head>') < s.index('<script')
+          s=s.replace('</style></head>',css+'</style></head>',1)
+          assert re.findall(r'<script\b[^>]*>([\s\S]*?)</script>',s)==original_scripts, 'Application logic changed'
+          for ident in ['kpiShortageValue','kpiShortageRating','kpiInventoryValue','kpiShortagePct']:
+              assert s.count('id="'+ident+'"')==1
+          assert sha(s.encode())==expected_sha, 'Must match locally rendered and tested HTML exactly'
+          result=api('/git/blobs',{'content':s,'encoding':'utf-8'})
+          assert result['sha']==expected_sha
+          print('Verified presentation blob: '+result['sha'])
+          print('All application JavaScript unchanged. No production branch or database modified.')
+          PY
