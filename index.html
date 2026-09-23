@@ -601,7 +601,7 @@ function normalizeMaster(row,aliases=[],previous=null){
   }
  }
  m.order_multiple=number(row.order_multiple==null?1:row.order_multiple,{nullable:false});if(m.order_multiple<=0)throw Error('Order multiple must be positive');
- m.purchase_price=number(row.purchase_price);if(m.purchase_price!==null&&m.purchase_price<0)throw Error('Purchase price cannot be negative');
+ m.purchase_price=number(row.purchase_price===undefined?previous?.purchase_price:row.purchase_price);if(m.purchase_price!==null&&m.purchase_price<0)throw Error('Purchase price cannot be negative');
  m.profitability_class=text(row.profitability_class)||null;m.supplier=text(row.supplier)||null;return m;
 }
 function masterExportRow(m){
