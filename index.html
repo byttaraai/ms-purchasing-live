@@ -936,19 +936,61 @@ main.page.tasks-view{padding-top:14px}
  .kpi-info{display:none}
  [data-panel="recommendations"] .kpis-summary-layout>.kpi{min-height:auto}
 }
+
+/* Build 41: single-row Quick Filter dropdown */
+[data-panel="recommendations"] .compact-filter-card{padding:7px 8px!important}
+[data-panel="recommendations"] .compact-filters{
+ grid-template-columns:minmax(210px,1.55fr) minmax(145px,.9fr) minmax(145px,.9fr) minmax(120px,.68fr) minmax(190px,1.25fr) minmax(145px,.82fr) 82px!important;
+ gap:7px!important;
+}
+[data-panel="recommendations"] .quick-native{
+ position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important;
+}
+[data-panel="recommendations"] .quick-select{position:relative;width:100%}
+[data-panel="recommendations"] .quick-trigger{
+ width:100%;height:36px;border:0;background:transparent;padding:0;display:flex;align-items:center;justify-content:space-between;gap:10px;color:var(--text);font-size:12.5px;text-align:left;min-width:0;
+}
+[data-panel="recommendations"] .quick-trigger>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+[data-panel="recommendations"] .quick-trigger svg{width:15px;height:15px;color:#687897;flex:none;transition:transform .15s}
+[data-panel="recommendations"] .quick-trigger[aria-expanded="true"] svg{transform:rotate(180deg)}
+[data-panel="recommendations"] .quick-menu{
+ position:absolute;left:-10px;top:calc(100% + 7px);width:calc(100% + 20px);min-width:180px;max-height:300px;overflow:auto;background:#fff;border:1px solid #d9e0ee;border-radius:11px;padding:6px;box-shadow:0 14px 34px rgba(23,38,78,.16);z-index:70;
+}
+[data-panel="recommendations"] .quick-option{
+ width:100%;min-height:34px;border:0;background:transparent;border-radius:7px;padding:7px 9px;display:flex;align-items:center;justify-content:space-between;gap:8px;color:#334463;font-size:11.5px;text-align:left;cursor:pointer;
+}
+[data-panel="recommendations"] .quick-option:hover{background:#f5f7fc;color:#1f3158}
+[data-panel="recommendations"] .quick-option.selected{background:#f0edff;color:#5635de;font-weight:700}
+[data-panel="recommendations"] .quick-option svg{width:14px;height:14px;flex:none}
+[data-panel="recommendations"] .quick-filter-row{display:none!important}
+@media(max-width:1180px){
+ [data-panel="recommendations"] .compact-filters{
+  grid-template-columns:minmax(190px,1.5fr) minmax(135px,.9fr) minmax(135px,.9fr) minmax(115px,.7fr) minmax(180px,1.2fr)!important;
+ }
+ [data-panel="recommendations"] .compact-zero{grid-column:auto!important;width:auto!important}
+ [data-panel="recommendations"] .compact-filters>#clearFilters{grid-column:auto!important;justify-self:stretch!important}
+}
+@media(max-width:760px){
+ [data-panel="recommendations"] .compact-filters{grid-template-columns:1fr 1fr!important}
+ [data-panel="recommendations"] .compact-filters .supplier-control,[data-panel="recommendations"] .compact-filters .search-control{grid-column:1/3}
+ [data-panel="recommendations"] .quick-control,.profit-control,.stock-control{grid-column:auto}
+ [data-panel="recommendations"] .quick-menu{position:fixed;left:12px;right:12px;top:auto;bottom:12px;width:auto;max-height:55vh;min-width:0;border-radius:15px;padding:8px;z-index:1200;box-shadow:0 20px 60px rgba(10,20,56,.24)}
+ [data-panel="recommendations"] .quick-option{min-height:40px;padding:9px 11px;font-size:12px}
+}
 </style></head><body>
-<div class="auth" id="auth"><form class="auth-card" id="authForm"><div class="brand"><div class="logo"><svg aria-hidden="true" viewbox="0 0 24 24"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l3 14h12l3-10H6M8 15l-1 3h14"></path></svg></div><div><h1>MS Purchasing</h1><p>One purchase unit. Traceable calculations.</p></div></div><p class="muted">Sign in with your approved purchasing account.</p><div class="field"><label for="authEmail">Email</label><input autocomplete="username" id="authEmail" placeholder="name@company.com" required="" type="email"/></div><div class="field"><label for="authPassword">Password</label><input autocomplete="current-password" id="authPassword" required="" type="password"/></div><button class="btn primary" id="signInBtn" type="submit">Sign In</button><button class="btn" id="signUpBtn" type="button">Create Account</button><button class="btn hidden" id="openLocalBtn" type="button">Open local test data</button><p class="auth-error" id="authError" role="alert"></p><p class="sub">Create Account is enabled for the approved purchasing email. Choose your own password, then sign in.</p><span class="build-tag">Dashboard + BOs + Tasks Assistant - Live Build 40</span></form></div>
+<div class="auth" id="auth"><form class="auth-card" id="authForm"><div class="brand"><div class="logo"><svg aria-hidden="true" viewbox="0 0 24 24"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l3 14h12l3-10H6M8 15l-1 3h14"></path></svg></div><div><h1>MS Purchasing</h1><p>One purchase unit. Traceable calculations.</p></div></div><p class="muted">Sign in with your approved purchasing account.</p><div class="field"><label for="authEmail">Email</label><input autocomplete="username" id="authEmail" placeholder="name@company.com" required="" type="email"/></div><div class="field"><label for="authPassword">Password</label><input autocomplete="current-password" id="authPassword" required="" type="password"/></div><button class="btn primary" id="signInBtn" type="submit">Sign In</button><button class="btn" id="signUpBtn" type="button">Create Account</button><button class="btn hidden" id="openLocalBtn" type="button">Open local test data</button><p class="auth-error" id="authError" role="alert"></p><p class="sub">Create Account is enabled for the approved purchasing email. Choose your own password, then sign in.</p><span class="build-tag">Dashboard + BOs + Tasks Assistant - Live Build 41</span></form></div>
 <div class="hidden" id="app"><header class="topbar"><div class="brand"><div class="logo"><svg aria-hidden="true" viewbox="0 0 24 24"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l3 14h12l3-10H6M8 15l-1 3h14"></path></svg></div><div><h1>MS Purchasing</h1><p>Smarter Purchasing. Healthier Stock.</p></div></div><nav><button class="active" data-tab="daily-tasks"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M4 20V10m6 10V4m6 16v-7m4 7V7"></path></svg> Dashboard</button><button class="" data-tab="recommendations"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="m3 10 9-7 9 7v11h-6v-7H9v7H3z"></path></svg> BOs Assistant</button><button class="" data-tab="tasks-assistant"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M9 11l2 2 4-4M5 4h14v16H5zM8 17h8"></path></svg> Tasks Assistant</button></nav><div class="actions"><div class="bo-header-actions hidden" id="boHeaderActions"><button class="btn primary" id="exportBtn" title="Export filtered products" type="button"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M12 3v13m-5-5 5 5 5-5M4 16v5h16v-5"></path></svg><span class="label">Export</span></button><button class="btn print-selected" disabled="" id="printSelectedBtn" title="Select products to print or save as PDF" type="button"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v7H6z"></path></svg><span class="label">Print Selected</span> <span class="count" id="selectedCount">(0)</span></button></div><span class="avatar">MS</span><div class="account-identity"><strong id="accountName"></strong><span class="account" id="accountEmail"></span></div><button class="btn" id="logoutBtn" title="Sign out"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M10 4H3v16h7m4-12 4 4-4 4M8 12h10"></path></svg></button></div></header>
 <main class="page"><div class="banner hidden" id="demoBanner"><div><strong>LOCAL TEST - NOT LIVE</strong>  Your original reorder-point numbers are retained. Unit conversions only. Changes here never update Supabase. Do not publish this test file: it contains your data.</div></div><div class="error-panel hidden" id="globalError" role="alert"></div>
 <section class="hidden" data-panel="recommendations"><div class="banner error hidden" id="recommendationFreshnessBanner"><div><strong>Inventory refresh required</strong>  Inventory is older than the recommended refresh window. Review the snapshot date before ordering.</div></div>
 <div class="filter-card compact-filter-card"><div class="filters compact-filters">
   <div class="compact-filter supplier-control"><select class="supplier-native" id="supplierFilter" aria-label="Filter by Supplier"><option value="">All Suppliers</option></select><div class="supplier-select" id="supplierSelect"><button aria-expanded="false" aria-haspopup="listbox" aria-label="Filter by Supplier" class="supplier-trigger" id="supplierButton" type="button"><span id="supplierButtonText">All Suppliers</span><svg aria-hidden="true" viewbox="0 0 24 24"><path d="m6 9 6 6 6-6"></path></svg></button><div class="supplier-menu hidden" id="supplierMenu" role="listbox"></div></div></div>
+  <div class="compact-filter quick-control"><select class="quick-native" id="quickFilter" aria-label="Quick Filter"><option value="">Quick Filter</option><option value="lt10">Below 10%</option><option value="10_50">10-50%</option><option value="50_100">50-100%</option><option value="lt80">Below 80%</option><option value="80_120">80-120%</option><option value="120_200">120-200%</option><option value="gt200">Above 200%</option></select><div class="quick-select" id="quickSelect"><button aria-expanded="false" aria-haspopup="listbox" aria-label="Quick Filter" class="quick-trigger" id="quickButton" type="button"><span id="quickButtonText">Quick Filter</span><svg aria-hidden="true" viewbox="0 0 24 24"><path d="m6 9 6 6 6-6"></path></svg></button><div class="quick-menu hidden" id="quickMenu" role="listbox"></div></div></div>
   <div class="compact-filter profit-control"><div class="multi-select" id="profitMulti"><button aria-expanded="false" aria-haspopup="true" aria-label="Profitability filter" class="multi-trigger" id="profitButton" type="button"><span id="profitButtonText">All Profitability</span><svg aria-hidden="true" viewbox="0 0 24 24"><path d="m6 9 6 6 6-6"></path></svg></button><div class="multi-menu hidden" id="profitMenu"><label><input class="profit-choice" type="checkbox" value="Super"/> <span>Super</span></label><label><input class="profit-choice" type="checkbox" value="High"/> <span>High</span></label><label><input class="profit-choice" type="checkbox" value="Medium"/> <span>Medium</span></label><label><input class="profit-choice" type="checkbox" value="Low"/> <span>Low</span></label><label><input class="profit-choice" type="checkbox" value="Loss"/> <span>Loss</span></label><label><input class="profit-choice" type="checkbox" value="Unclassified"/> <span>Unclassified</span></label><button class="multi-all" id="profitAll" type="button">Show all profitability</button></div></div></div>
   <div class="compact-filter stock-control"><div class="percent"><input aria-label="Stock percentage below" id="stockThreshold" min="0" placeholder="Stock below" step="any" type="number"/><span>%</span></div></div>
   <div class="compact-filter search-control"><div class="input-icon"><svg aria-hidden="true" viewbox="0 0 24 24"><circle cx="10" cy="10" r="7"></circle><path d="m15 15 6 6"></path></svg><input aria-label="Product Search" id="productSearch" placeholder="Search product..."/></div></div>
   <label class="zero-toggle compact-zero"><input id="showZeroStock" type="checkbox"/><span class="toggle-track"><span class="toggle-knob"></span></span><span class="zero-single" id="zeroStateText">Zero Stock</span></label>
   <button class="btn outline compact-clear" id="clearFilters" type="button"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M20 7a8 8 0 1 0 1 8M20 3v5h-5"></path></svg> Clear</button>
-</div><div aria-label="Quick stock filters" class="quick-filter-row"><span class="quick-label">Stock Range</span><button class="quick" data-quick="lt10">Below 10%</button><button class="quick" data-quick="10_50">10-50%</button><button class="quick" data-quick="50_100">50-100%</button><button class="quick" data-quick="lt80">Below 80%</button><button class="quick" data-quick="80_120">80-120%</button><button class="quick" data-quick="120_200">120-200%</button><button class="quick" data-quick="gt200">Above 200%</button></div></div>
+</div></div>
   <div class="kpis kpis-summary-layout">
     <article class="kpi kpi-shortage-card shortage-tone-good" id="shortageKpiCard">
       <span class="bubble" aria-hidden="true"><svg viewbox="0 0 24 24"><path d="M4 19h16M6 16V9m4 7V5m4 11v-4m4 4V7"></path></svg></span>
@@ -1400,11 +1442,15 @@ function supplierLabel(v){if(v==='__none__')return'Supplier not assigned';return
 function updateSupplierButton(){const el=$('supplierButtonText');if(el)el.textContent=supplierLabel($('supplierFilter').value);}
 function renderSupplierMenu(){const menu=$('supplierMenu');if(!menu)return;const current=$('supplierFilter').value;menu.innerHTML=[...$('supplierFilter').options].map(o=>`<button class="supplier-option${o.value===current?' selected':''}" data-value="${esc(o.value)}" role="option" aria-selected="${o.value===current}" type="button"><span>${esc(o.textContent)}</span>${o.value===current?'<svg aria-hidden="true" viewBox="0 0 24 24"><path d="m5 12 4 4 10-10"></path></svg>':''}</button>`).join('');}
 function setSupplierMenu(open){$('supplierMenu').classList.toggle('hidden',!open);$('supplierButton').setAttribute('aria-expanded',String(open));if(open)renderSupplierMenu();}
+function quickLabel(v){const map={'':'Quick Filter',lt10:'Below 10%','10_50':'10-50%','50_100':'50-100%',lt80:'Below 80%','80_120':'80-120%','120_200':'120-200%',gt200:'Above 200%'};return map[v]||'Quick Filter';}
+function updateQuickButton(){const el=$('quickButtonText');if(el)el.textContent=quickLabel(state.quick||'');const native=$('quickFilter');if(native)native.value=state.quick||'';}
+function renderQuickMenu(){const menu=$('quickMenu');if(!menu)return;const current=state.quick||'';menu.innerHTML=[...$('quickFilter').options].map(o=>`<button class="quick-option${o.value===current?' selected':''}" data-value="${esc(o.value)}" role="option" aria-selected="${o.value===current}" type="button"><span>${esc(o.textContent)}</span>${o.value===current?'<svg aria-hidden="true" viewBox="0 0 24 24"><path d="m5 12 4 4 10-10"></path></svg>':''}</button>`).join('');}
+function setQuickMenu(open){$('quickMenu').classList.toggle('hidden',!open);$('quickButton').setAttribute('aria-expanded',String(open));if(open)renderQuickMenu();}
 function populateSuppliers(){const prev=$('supplierFilter').value;const suppliers=[...new Set(state.rows.map(r=>r.supplier).filter(Boolean))].sort((a,b)=>a.localeCompare(b));$('supplierFilter').innerHTML='<option value="">All Suppliers</option><option value="__none__">Supplier not assigned</option>'+suppliers.map(s=>`<option value="${esc(s)}">${esc(s)}</option>`).join('');if([...$('supplierFilter').options].some(o=>o.value===prev))$('supplierFilter').value=prev;updateSupplierButton();renderSupplierMenu();}
 function selectedProfits(){return[...document.querySelectorAll('.profit-choice:checked')].map(x=>x.value);}
 function filters(){return{supplier:$('supplierFilter').value,profits:selectedProfits(),search:$('productSearch').value,threshold:$('stockThreshold').value,quick:state.quick,reviewOnly:state.reviewOnly,showZero:$('showZeroStock').checked};}
 function hasActiveFilters(){return Boolean($('supplierFilter').value||selectedProfits().length||$('productSearch').value.trim()||$('stockThreshold').value!==''||state.quick||state.reviewOnly||$('showZeroStock').checked);}
-function updateFilterUi(){const z=$('zeroStateText');if(z){const zeroCount=state.rows.filter(r=>C.finite(r.stock_qty)&&Math.abs(Number(r.stock_qty))<1e-12).length;z.textContent=zeroCount?'Zero Stock ('+fmt(zeroCount,0)+')':'Zero Stock';const wrap=z.closest('.zero-toggle');if(wrap)wrap.title=zeroCount?($('showZeroStock').checked?'Zero-stock products are included':'Zero-stock products are hidden'):'No zero-stock products';}const b=$('clearFilters');if(b)b.disabled=!hasActiveFilters();}
+function updateFilterUi(){updateQuickButton();const z=$('zeroStateText');if(z){const zeroCount=state.rows.filter(r=>C.finite(r.stock_qty)&&Math.abs(Number(r.stock_qty))<1e-12).length;z.textContent=zeroCount?'Zero Stock ('+fmt(zeroCount,0)+')':'Zero Stock';const wrap=z.closest('.zero-toggle');if(wrap)wrap.title=zeroCount?($('showZeroStock').checked?'Zero-stock products are included':'Zero-stock products are hidden'):'No zero-stock products';}const b=$('clearFilters');if(b)b.disabled=!hasActiveFilters();}
 
 function renderOperationsDashboard(){
  const rows=state.rows||[];
@@ -2000,10 +2046,11 @@ function setProfitMenu(open){$('profitMenu').classList.toggle('hidden',!open);$(
 $('profitButton').onclick=e=>{e.stopPropagation();setProfitMenu($('profitMenu').classList.contains('hidden'));};
 document.querySelectorAll('.profit-choice').forEach(cb=>cb.addEventListener('change',()=>{updateProfitButton();applyFilters();}));
 $('profitAll').onclick=()=>{document.querySelectorAll('.profit-choice').forEach(cb=>cb.checked=false);updateProfitButton();applyFilters();setProfitMenu(false);};
-document.addEventListener('click',e=>{if(!e.target.closest('#profitMulti'))setProfitMenu(false);if(!e.target.closest('#supplierSelect'))setSupplierMenu(false);});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){setProfitMenu(false);setSupplierMenu(false);}});
-$('stockThreshold').addEventListener('input',()=>{state.quick='';document.querySelectorAll('.quick').forEach(b=>b.classList.remove('active'));applyFilters();});
-document.querySelectorAll('.quick').forEach(b=>b.onclick=()=>{state.quick=state.quick===b.dataset.quick?'':b.dataset.quick;$('stockThreshold').value='';document.querySelectorAll('.quick').forEach(q=>q.classList.toggle('active',q.dataset.quick===state.quick));applyFilters();});
+document.addEventListener('click',e=>{if(!e.target.closest('#profitMulti'))setProfitMenu(false);if(!e.target.closest('#supplierSelect'))setSupplierMenu(false);if(!e.target.closest('#quickSelect'))setQuickMenu(false);});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){setProfitMenu(false);setSupplierMenu(false);setQuickMenu(false);}});
+$('stockThreshold').addEventListener('input',()=>{state.quick='';updateQuickButton();renderQuickMenu();applyFilters();});
+$('quickButton').onclick=e=>{e.stopPropagation();setQuickMenu($('quickMenu').classList.contains('hidden'));setSupplierMenu(false);setProfitMenu(false);};
+$('quickMenu').onclick=e=>{const b=e.target.closest('.quick-option');if(!b)return;state.quick=b.dataset.value||'';$('stockThreshold').value='';updateQuickButton();renderQuickMenu();setQuickMenu(false);applyFilters();};
 function clearAllFilters(){
  $('supplierFilter').value='';updateSupplierButton();renderSupplierMenu();setSupplierMenu(false);
  $('productSearch').value='';
@@ -2013,10 +2060,9 @@ function clearAllFilters(){
  document.querySelectorAll('.profit-choice').forEach(cb=>cb.checked=false);
  updateProfitButton();
  setProfitMenu(false);
- state.quick='';
+ state.quick='';updateQuickButton();renderQuickMenu();setQuickMenu(false);
  state.reviewOnly=false;
  state.dailyFocus=null;
- document.querySelectorAll('.quick').forEach(b=>b.classList.remove('active'));
  state.selected.clear();
  state.page=1;
  applyFilters();
