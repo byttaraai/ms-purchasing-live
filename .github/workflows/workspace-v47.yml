@@ -1,0 +1,34 @@
+name: Verify unified workspace v47
+on:
+  push:
+    branches: [work/unified-recalculation-47]
+    paths:
+      - '.github/workflows/workspace-v47.yml'
+      - 'assets/js/workspace-v47.js'
+      - 'maintenance/patch47.py'
+      - 'tests/workspace-v47.cjs'
+permissions:
+  contents: write
+jobs:
+  test-and-integrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: work/unified-recalculation-47
+      - name: Apply guarded patch and regression tests
+        run: |
+          git show 51b35ae7b17db2d7033f88bd122c4f486f438c9f:index.html > index.before.html
+          python3 maintenance/patch47.py index.html
+          node --check assets/js/workspace-v47.js
+          node tests/workspace-v47.cjs .
+          rm index.before.html
+      - name: Commit tested integration on review branch only
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          if ! git diff --cached --quiet; then
+            git commit -m 'Build 47: integrate tested revision-coherent workspace'
+            git push origin HEAD:work/unified-recalculation-47
+          fi
