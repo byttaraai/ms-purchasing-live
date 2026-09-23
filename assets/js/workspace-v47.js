@@ -161,11 +161,14 @@ async function refreshSupplierTaskPopup(taskKey,selectedCodes){
   if(state.mode!=='live')return;
   try{
     const v=await rpc('purchasing_workspace_revision_v47');
-    if(v.master_revision!==state.revision||v.upload_id!==state.upload?.id||WORKSPACE_RUNTIME.day!==scoreAsOf()||WORKSPACE_RUNTIME.decisionsDirty)await loadLive();
-    const d=$('supplierTaskDialog');if(!d?.open)return;
+    const changed=v.master_revision!==state.revision||v.upload_id!==state.upload?.id||WORKSPACE_RUNTIME.day!==scoreAsOf()||WORKSPACE_RUNTIME.decisionsDirty;
+    if(!changed)return;
+    const d=$('supplierTaskDialog'),liveSelection=d?.open?new Set([...d.querySelectorAll('.supplier-task-check')].filter(x=>x.checked).map(x=>x.dataset.code)):selectedCodes;
+    await loadLive();
+    if(!d?.open)return;
     const current=(state.taskAssistant?.tasks||[]).find(t=>t.task_key===taskKey&&t.status==='open');
     if(!current){d.close();toast('This supplier task changed after a data update.');return;}
-    renderSupplierTaskPopup(current,selectedCodes);
+    renderSupplierTaskPopup(current,liveSelection);
   }catch(e){/* Keep the already-open current workspace; background refresh can retry later. */}
 }
 async function ta16OpenTask(task) {
