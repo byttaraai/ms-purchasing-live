@@ -1106,8 +1106,39 @@ main.page.tasks-view{padding-top:14px}
 .supplier-task-review-row{background:#fffdf8}
 .supplier-task-review-row:hover{background:#fffaf0}
 .supplier-task-selected{color:#7866a0}
+
+/* Build 55: clickable >200% KPI and overstock risk table */
+[data-panel="recommendations"] .overstock-clickable{cursor:pointer;transition:transform .14s ease,box-shadow .14s ease,border-color .14s ease}
+[data-panel="recommendations"] .overstock-clickable:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(36,50,82,.10);border-color:#d8ccef}
+[data-panel="recommendations"] .overstock-clickable:focus-visible{outline:3px solid rgba(91,52,252,.18);outline-offset:2px}
+.overstock-risk-dialog{width:min(1540px,calc(100vw - 32px));max-width:none;height:min(88vh,900px);padding:0;border:1px solid #dfe5ef;border-radius:16px;overflow:hidden;background:#fff;color:var(--text);box-shadow:0 28px 90px rgba(18,31,65,.24)}
+.overstock-risk-dialog::backdrop{background:rgba(15,24,49,.48);backdrop-filter:blur(2px)}
+.overstock-risk-shell{height:100%;display:grid;grid-template-rows:auto minmax(0,1fr) auto}
+.overstock-risk-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;padding:17px 20px 14px;border-bottom:1px solid #e8ecf3;background:#fff}
+.overstock-risk-head h2{margin:1px 0 2px;font-size:20px;line-height:1.25;color:#18284a}
+.overstock-risk-head p{margin:0;color:#77849b;font-size:11px}
+.overstock-risk-eyebrow{font-size:9px;letter-spacing:.08em;color:#8a5a38;font-weight:800}
+.overstock-risk-x{width:32px;height:32px;border:1px solid #e0e5ee;border-radius:8px;background:#fff;color:#68758e;font-size:23px;line-height:1;display:grid;place-items:center}
+.overstock-risk-table-wrap{overflow:auto;min-height:0;background:#fff}
+.overstock-risk-table{width:100%;min-width:1240px;table-layout:fixed;border-collapse:collapse}
+.overstock-risk-table th{position:sticky;top:0;z-index:2;height:39px;background:#f7f9fc;color:#40506a;font-size:10.5px;font-weight:700;padding:7px 8px;white-space:nowrap;border-bottom:1px solid #dfe5ee}
+.overstock-risk-table td{padding:10px 8px;border-bottom:1px solid #edf0f5;font-size:12px;color:#263856;vertical-align:middle}
+.overstock-risk-table th:nth-child(1),.overstock-risk-table td:nth-child(1){width:38px;text-align:center}
+.overstock-risk-table th:nth-child(2),.overstock-risk-table td:nth-child(2){width:22%;text-align:left}
+.overstock-risk-table th:nth-child(3),.overstock-risk-table td:nth-child(3){width:6%;text-align:left}
+.overstock-risk-table th:nth-child(4),.overstock-risk-table td:nth-child(4){width:11%;text-align:left}
+.overstock-risk-table th:nth-child(5),.overstock-risk-table td:nth-child(5),.overstock-risk-table th:nth-child(6),.overstock-risk-table td:nth-child(6){width:7%;text-align:center}
+.overstock-risk-table th:nth-child(7),.overstock-risk-table td:nth-child(7),.overstock-risk-table th:nth-child(8),.overstock-risk-table td:nth-child(8),.overstock-risk-table th:nth-child(9),.overstock-risk-table td:nth-child(9),.overstock-risk-table th:nth-child(10),.overstock-risk-table td:nth-child(10){width:8%;text-align:right}
+.overstock-risk-table th:nth-child(11),.overstock-risk-table td:nth-child(11){width:15%;text-align:right}
+.overstock-risk-table th:nth-child(7),.overstock-risk-table td:nth-child(7){border-left:1px solid #d8e0eb}
+.overstock-risk-rank{color:#8a5a38!important;font-weight:800;font-variant-numeric:tabular-nums}
+.overstock-excess-value{font-weight:800!important;color:#8f3b31!important}
+.overstock-risk-empty{text-align:center!important;padding:50px!important;color:#7f8ba0!important}
+.overstock-risk-footer{display:flex;justify-content:flex-end;gap:24px;padding:12px 18px;border-top:1px solid #e5eaf2;background:#fafbfe;color:#6c7890;font-size:11px}
+.overstock-risk-footer b{color:#1d2e54;font-size:14px;font-variant-numeric:tabular-nums}
+@media(max-width:760px){.overstock-risk-dialog{width:calc(100vw - 16px);height:92vh;border-radius:12px}.overstock-risk-head{padding:13px}.overstock-risk-head h2{font-size:17px}.overstock-risk-footer{justify-content:space-between;gap:8px;flex-wrap:wrap}}
 </style></head><body>
-<div class="auth" id="auth"><form class="auth-card" id="authForm"><div class="brand"><div class="logo"><svg aria-hidden="true" viewbox="0 0 24 24"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l3 14h12l3-10H6M8 15l-1 3h14"></path></svg></div><div><h1>MS Purchasing</h1><p>One purchase unit. Traceable calculations.</p></div></div><p class="muted">Sign in with your approved purchasing account.</p><div class="field"><label for="authEmail">Email</label><input autocomplete="username" id="authEmail" placeholder="name@company.com" required="" type="email"/></div><div class="field"><label for="authPassword">Password</label><input autocomplete="current-password" id="authPassword" required="" type="password"/></div><button class="btn primary" id="signInBtn" type="submit">Sign In</button><button class="btn" id="signUpBtn" type="button">Create Account</button><button class="btn hidden" id="openLocalBtn" type="button">Open local test data</button><p class="auth-error" id="authError" role="alert"></p><p class="sub">Create Account is enabled for the approved purchasing email. Choose your own password, then sign in.</p><span class="build-tag">Dashboard + BOs + Tasks Assistant - Live Build 54</span></form></div>
+<div class="auth" id="auth"><form class="auth-card" id="authForm"><div class="brand"><div class="logo"><svg aria-hidden="true" viewbox="0 0 24 24"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l3 14h12l3-10H6M8 15l-1 3h14"></path></svg></div><div><h1>MS Purchasing</h1><p>One purchase unit. Traceable calculations.</p></div></div><p class="muted">Sign in with your approved purchasing account.</p><div class="field"><label for="authEmail">Email</label><input autocomplete="username" id="authEmail" placeholder="name@company.com" required="" type="email"/></div><div class="field"><label for="authPassword">Password</label><input autocomplete="current-password" id="authPassword" required="" type="password"/></div><button class="btn primary" id="signInBtn" type="submit">Sign In</button><button class="btn" id="signUpBtn" type="button">Create Account</button><button class="btn hidden" id="openLocalBtn" type="button">Open local test data</button><p class="auth-error" id="authError" role="alert"></p><p class="sub">Create Account is enabled for the approved purchasing email. Choose your own password, then sign in.</p><span class="build-tag">Dashboard + BOs + Tasks Assistant - Live Build 55</span></form></div>
 <div class="hidden" id="app"><header class="topbar"><div class="brand"><div class="logo"><svg aria-hidden="true" viewbox="0 0 24 24"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l3 14h12l3-10H6M8 15l-1 3h14"></path></svg></div><div><h1>MS Purchasing</h1><p>Smarter Purchasing. Healthier Stock.</p></div></div><nav><button class="active" data-tab="daily-tasks"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M4 20V10m6 10V4m6 16v-7m4 7V7"></path></svg> Dashboard</button><button class="" data-tab="recommendations"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="m3 10 9-7 9 7v11h-6v-7H9v7H3z"></path></svg> BOs Assistant</button><button class="" data-tab="tasks-assistant"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M9 11l2 2 4-4M5 4h14v16H5zM8 17h8"></path></svg> Tasks Assistant</button></nav><div class="actions"><div class="bo-header-actions hidden" id="boHeaderActions"><button class="btn print-selected" disabled="" id="printSelectedBtn" title="Select products to print or save as PDF" type="button"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v7H6z"></path></svg><span class="label">Print Selected</span> <span class="count" id="selectedCount">(0)</span></button></div><span class="avatar">MS</span><div class="account-identity"><strong id="accountName"></strong><span class="account" id="accountEmail"></span></div><button class="btn" id="logoutBtn" title="Sign out"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M10 4H3v16h7m4-12 4 4-4 4M8 12h10"></path></svg></button></div></header>
 <main class="page"><div class="banner hidden" id="demoBanner"><div><strong>LOCAL TEST - NOT LIVE</strong>  Your original reorder-point numbers are retained. Unit conversions only. Changes here never update Supabase. Do not publish this test file: it contains your data.</div></div><div class="error-panel hidden" id="globalError" role="alert"></div>
 <section class="hidden" data-panel="recommendations"><div class="banner error hidden" id="recommendationFreshnessBanner"><div><strong>Inventory refresh required</strong>  Inventory is older than the recommended refresh window. Review the snapshot date before ordering.</div></div>
@@ -1121,7 +1152,7 @@ main.page.tasks-view{padding-top:14px}
   <button class="btn outline compact-clear" id="clearFilters" type="button"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M20 7a8 8 0 1 0 1 8M20 3v5h-5"></path></svg> Clear</button>
 </div></div>
   <div class="kpis kpis-summary-layout">
-    <article class="kpi kpi-overstock-card overstock-tone-low" id="overstockKpiCard">
+    <article aria-label="Open stock above 200 percent risk table" class="kpi kpi-overstock-card overstock-tone-low overstock-clickable" id="overstockKpiCard" role="button" tabindex="0">
       <div class="kpi-overstock-head"><span class="kpi-overstock-icon"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M12 21V7m0 0-5 5m5-5 5 5M4 3h16"></path></svg></span><div><h2>Stock Above 200% <span class="kpi-overstock-currency">SAR</span><span class="kpi-info" title="The percentage shown below is the raw overstock percentage. The risk rating also applies the approved profitability weights.">i</span></h2><div class="sub">Excess above 200% only</div></div></div>
       <div class="kpi-overstock-main"><strong id="kpiOverstockValue">-</strong></div>
       <span class="kpi-overstock-rating low" id="kpiOverstockRating">-</span>
@@ -1591,6 +1622,31 @@ function renderOperationsDashboard(){
 }
 function applyFilters(){try{let rows=C.filterRows(state.rows,filters());if(state.dailyFocus?.kind==='task_selection'){const chosen=new Set(state.dailyFocus.codes||[]);rows=rows.filter(r=>chosen.has(r.product_code));}if(state.dailyFocus?.kind==='shortage_mid')rows=rows.filter(r=>C.finite(r.stock_ratio)&&r.stock_ratio>=10&&r.stock_ratio<50&&!isScoreExcluded(r.product_code));if(state.dailyFocus?.kind==='shortage_low')rows=rows.filter(r=>C.finite(r.stock_ratio)&&r.stock_ratio<10&&!isScoreExcluded(r.product_code));if(state.dailyFocus?.kind==='aging')rows=rows.filter(r=>{const d=shortageAge(r.product_code);return d>=20&&!isScoreExcluded(r.product_code);});const maxShortageValue=Math.max(0,...state.rows.map(averageShortageValue));for(const r of rows){r.shortage_value=averageShortageValue(r);r.priority_score=priorityScore(r,maxShortageValue);}state.filtered=rows.sort((a,b)=>(b.priority_score||0)-(a.priority_score||0)||(b.shortage_value||0)-(a.shortage_value||0)||(C.finite(a.stock_ratio)?a.stock_ratio:Infinity)-(C.finite(b.stock_ratio)?b.stock_ratio:Infinity)||a.product_name.localeCompare(b.product_name));$('stockThreshold').setCustomValidity('');}catch(e){$('stockThreshold').setCustomValidity(e.message);return;}state.selected.clear();state.page=1;updateFilterUi();updateKpis();render();renderOperationsDashboard();}
 function profitabilityWeight(v,mode){const p=C.profitLabel(v);const shortage={Super:1.5,High:1.2,Medium:.8,Low:.6,Loss:.4},overstock={Super:.4,High:.6,Medium:.8,Low:1.2,Loss:1.5};return(mode==='shortage'?shortage:overstock)[p]??1;}
+function overstockProfitRisk(v){return({Loss:100,Low:80,Medium:50,High:20,Super:0})[C.profitLabel(v)]??50;}
+function overstockRiskRows(){
+ const rows=state.filtered.filter(r=>C.finite(r.stock_ratio)&&Number(r.stock_ratio)>200&&C.finite(r.stock_qty)&&C.finite(r.reorder_point));
+ const enriched=rows.map(r=>{
+  const excessQty=Math.max(0,Number(r.stock_qty)-Number(r.reorder_point)*2);
+  const excessValue=C.finite(r.purchase_price)&&Number(r.purchase_price)>0?excessQty*Number(r.purchase_price):0;
+  return{...r,excess_qty:excessQty,excess_value:excessValue};
+ });
+ const maxQty=Math.max(0,...enriched.map(r=>r.excess_qty)),maxValue=Math.max(0,...enriched.map(r=>r.excess_value));
+ return enriched.map(r=>{
+  const qtyScore=maxQty>0?r.excess_qty/maxQty*100:0,valueScore=maxValue>0?r.excess_value/maxValue*100:0,profitRisk=overstockProfitRisk(r.profitability_class);
+  return{...r,overstock_risk:valueScore*.40+qtyScore*.35+profitRisk*.25};
+ }).sort((a,b)=>b.overstock_risk-a.overstock_risk||b.excess_value-a.excess_value||b.excess_qty-a.excess_qty||Number(b.stock_ratio||0)-Number(a.stock_ratio||0)||a.product_name.localeCompare(b.product_name));
+}
+function openOverstockRiskPopup(){
+ const rows=overstockRiskRows(),totalQty=rows.reduce((n,r)=>n+r.excess_qty,0),totalValue=rows.reduce((n,r)=>n+r.excess_value,0);
+ let d=$('overstockRiskDialog');
+ if(!d){d=document.createElement('dialog');d.id='overstockRiskDialog';d.className='overstock-risk-dialog';document.body.append(d);}
+ const body=rows.map((r,i)=>`<tr><td class="overstock-risk-rank">${i+1}</td><td><div class="product-cell">${productButton(r)}</div></td><td class="unit" title="${esc(r.purchase_unit||'')}">${esc(r.purchase_unit||'—')}</td><td>${stockHtml(r)}</td><td>${pill(r.stock_ratio)}</td><td>${ratingHtml(r.profitability_class)}</td><td class="money">${fmt(r.purchase_price,1)}</td><td class="order">${fmt(r.excess_qty,4)}</td><td class="money overstock-excess-value">${fmt(r.excess_value,0)}</td><td class="money">${fmt(r.shortage_value,0)}</td><td class="supplier" title="${esc(r.supplier||'Not assigned')}">${esc(r.supplier||'Not assigned')}</td></tr>`).join('');
+ d.innerHTML=`<div class="overstock-risk-shell"><header class="overstock-risk-head"><div><span class="overstock-risk-eyebrow">OVERSTOCK RISK</span><h2>Stock Above 200%</h2><p>Sorted by 40% excess value + 35% excess quantity + 25% profitability risk.</p></div><button class="overstock-risk-x" id="overstockRiskClose" type="button" aria-label="Close">&times;</button></header><div class="overstock-risk-table-wrap"><table class="overstock-risk-table"><thead><tr><th>#</th><th>Product</th><th>Unit</th><th>Stock / Reorder</th><th>Stock %</th><th>Rating</th><th>Price</th><th>Excess Qty</th><th>Excess Value</th><th>Shortage Value</th><th>Supplier</th></tr></thead><tbody>${body||'<tr><td colspan="11" class="overstock-risk-empty">No products above 200% in the current filters.</td></tr>'}</tbody></table></div><footer class="overstock-risk-footer"><span><b>${fmt(rows.length,0)}</b> Products</span><span><b>${fmt(totalQty,0)}</b> Excess Qty</span><span><b>SAR ${fmt(totalValue,0)}</b> Excess Value</span></footer></div>`;
+ $('overstockRiskClose').onclick=()=>d.close();
+ d.onclick=e=>{if(e.target===d)d.close();const b=e.target.closest('[data-code]');if(b){d.close();detail(b.dataset.code);}};
+ if(!d.open)d.showModal();
+}
+
 function updateKpis(){const k=C.kpis(state.filtered),allK=C.kpis(state.rows);$('kpiSuppliers').textContent=fmt(k.suppliers,0);$('kpiSuppliersSub').textContent='/ '+fmt(allK.suppliers,0);$('kpiBelow80').textContent=fmt(k.below80,0);$('kpiBelow80Sub').textContent=k.products>0?'· '+fmt(k.below80/k.products*100,1)+'%':'—';$('kpiProducts').textContent=fmt(k.products,0);$('kpiProductsSub').textContent='/ '+fmt(state.rows.length,0);$('reviewLink').textContent=(state.reviewOnly?'Show all products':'View '+fmt(k.review,0)+' products awaiting data')+' \u00b7 No estimates substituted';
  const totalShortage=state.filtered.reduce((sum,r)=>sum+averageShortageValue(r),0);
  const adjustedShortage=state.filtered.reduce((sum,r)=>sum+(averageShortageValue(r)*profitabilityWeight(r.profitability_class,'shortage')),0);
@@ -2192,6 +2248,11 @@ function clearAllFilters(){
 }
 $('clearFilters').onclick=clearAllFilters;
 $('reviewLink').onclick=()=>{state.reviewOnly=!state.reviewOnly;applyFilters();};
+const overstockKpi=$('overstockKpiCard');
+if(overstockKpi){
+ overstockKpi.onclick=e=>{if(e.target.closest('.kpi-info'))return;openOverstockRiskPopup();};
+ overstockKpi.onkeydown=e=>{if((e.key==='Enter'||e.key===' ')&&!e.target.closest('.kpi-info')){e.preventDefault();openOverstockRiskPopup();}};
+}
 
 for(const id of ['tableBody','cards']){const el=$(id);el.onclick=e=>{const b=e.target.closest('[data-code]');if(b)detail(b.dataset.code);};el.onchange=e=>{const cb=e.target.closest('[data-select-code]');if(cb)setSelected(cb.dataset.selectCode,cb.checked);};}
 $('closeDetail').onclick=()=>{if(!$('saveProductEdit').disabled&&!confirm('Discard unsaved product changes?'))return;$('detailDialog').close();};
