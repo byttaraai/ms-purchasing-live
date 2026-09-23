@@ -115,11 +115,40 @@ function notifyWorkspaceDecisionChange() {
   // Queue after the existing decision handler finishes; do not turn edits into rewards.
   if(workspaceVisible())queueMicrotask(()=>loadLive().catch(()=>{}));
 }
+function supplierTaskRows(task){
+  const supplier=String(task?.target||'').trim(),maxShortageValue=Math.max(0,...state.rows.map(averageShortageValue));
+  return state.rows
+    .filter(r=>supplier&&r.supplier===supplier&&!isScoreExcluded(r.product_code)&&shortageNeedsOrder(r))
+    .map(r=>({...r,shortage_value:averageShortageValue(r),priority_score:priorityScore(r,maxShortageValue)}))
+    .sort((a,b)=>(b.priority_score||0)-(a.priority_score||0)||(b.shortage_value||0)-(a.shortage_value||0)||(C.finite(a.stock_ratio)?a.stock_ratio:Infinity)-(C.finite(b.stock_ratio)?b.stock_ratio:Infinity)||a.product_name.localeCompare(b.product_name));
+}
+function supplierTaskPrint(rows,supplier){
+  if(!rows.length)return;
+  const w=window.open('','_blank','width=1100,height=780');
+  if(!w){toast('Please allow pop-ups to open the print preview.');return;}
+  const total=rows.reduce((sum,r)=>sum+Number(r.shortage_value||0),0),today=new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+  const body=rows.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.product_name)}</td><td>${esc(r.purchase_unit||'—')}</td><td>${esc(fmt(r.stock_qty,4))}</td><td>${esc(fmt(r.reorder_point,4))}</td><td>${C.finite(r.stock_ratio)?esc(fmt(r.stock_ratio,1))+'%':'—'}</td><td>${esc(C.profitLabel(r.profitability_class)||'—')}</td><td>${esc(fmt(r.purchase_price,1))}</td><td>${esc(fmt(r.min_order_qty,4))}</td><td>${esc(fmt(r.max_order_qty,4))}</td><td>${esc(fmt(r.shortage_value,0))}</td></tr>`).join('');
+  w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>${esc(supplier)} Purchase Request</title><style>body{font:12px Arial,sans-serif;color:#17264e;padding:24px}h1{font-size:20px;margin:0 0 4px}.meta{color:#64748b;margin-bottom:16px}table{width:100%;border-collapse:collapse}th,td{padding:8px 7px;border-bottom:1px solid #e5e7eb;text-align:right}th:nth-child(2),td:nth-child(2),th:nth-child(3),td:nth-child(3){text-align:left}th{background:#f5f7fb;font-size:10px;text-transform:uppercase;color:#52627d}.totals{display:flex;justify-content:flex-end;gap:24px;margin-top:16px;font-weight:700}@media print{body{padding:0}}</style></head><body><h1>${esc(supplier)}</h1><div class="meta">Supplier priority purchase request · ${today}</div><table><thead><tr><th>#</th><th>Product</th><th>Unit</th><th>Stock</th><th>Reorder</th><th>Stock %</th><th>Rating</th><th>Price</th><th>Min</th><th>Max</th><th>Shortage Value</th></tr></thead><tbody>${body}</tbody></table><div class="totals"><span>${rows.length} Products</span><span>Total Shortage Value: SAR ${fmt(total,0)}</span></div><script>window.onload=()=>window.print()<\/script></body></html>`);
+  w.document.close();
+}
+function openSupplierTaskPopup(task){
+  const rows=supplierTaskRows(task),supplier=String(task?.target||task?.title||'Supplier').trim(),total=rows.reduce((sum,r)=>sum+Number(r.shortage_value||0),0);
+  let d=$('supplierTaskDialog');
+  if(!d){d=document.createElement('dialog');d.id='supplierTaskDialog';d.className='supplier-task-dialog';document.body.append(d);}
+  const body=rows.map((r,i)=>`<tr><td class="supplier-task-rank">${i+1}</td><td><div class="product-cell"><span class="product-button-wrap"><span class="supplier-task-product" title="${esc(r.product_name)}">${esc(r.product_name)}</span></span></div></td><td class="unit">${esc(r.purchase_unit||'—')}</td><td>${stockHtml(r)}</td><td>${pill(r.stock_ratio)}</td><td>${ratingHtml(r.profitability_class)}</td><td class="money">${fmt(r.purchase_price,1)}</td><td class="order">${fmt(r.min_order_qty,4)}</td><td class="order">${fmt(r.max_order_qty,4)}</td><td class="money">${fmt(r.shortage_value,0)}</td><td class="supplier" title="${esc(r.supplier||'Not assigned')}">${esc(r.supplier||'Not assigned')}</td></tr>`).join('');
+  d.innerHTML=`<div class="supplier-task-shell"><header class="supplier-task-head"><div><span class="supplier-task-eyebrow">Supplier Priority</span><h2 dir="auto">${esc(supplier)}</h2><p>Current purchase-priority products · ordered by the approved BO product priority.</p></div><button class="supplier-task-x" id="supplierTaskCloseX" type="button" aria-label="Close">&times;</button></header><div class="supplier-task-table-wrap"><table class="supplier-task-table"><thead><tr><th>#</th><th>Product</th><th>Unit</th><th>Stock / Reorder</th><th>Stock %</th><th>Rating</th><th>Price</th><th>Min Order</th><th>Max Order</th><th>Shortage Value</th><th>Supplier</th></tr></thead><tbody>${body||'<tr><td colspan="11" class="supplier-task-empty">No current purchase-priority products for this supplier.</td></tr>'}</tbody></table></div><footer class="supplier-task-footer"><div class="supplier-task-totals"><span><b>${fmt(rows.length,0)}</b> Products</span><span><b>SAR ${fmt(total,0)}</b> Total Shortage Value</span></div><div class="supplier-task-actions"><button class="btn" id="supplierTaskPrint" type="button" ${rows.length?'':'disabled'}><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v7H6z"></path></svg> Print</button><button class="btn primary" id="supplierTaskBack" type="button">Back to Tasks</button></div></footer></div>`;
+  $('supplierTaskCloseX').onclick=()=>d.close();
+  $('supplierTaskBack').onclick=()=>d.close();
+  $('supplierTaskPrint').onclick=()=>supplierTaskPrint(rows,supplier);
+  d.onclick=e=>{if(e.target===d)d.close();};
+  if(!d.open)d.showModal();
+}
 async function ta16OpenTask(task) {
   try {
     if(state.mode==='live')await loadLive();
     const current=(state.taskAssistant?.tasks||[]).find(t=>t.task_key===task.task_key&&t.status==='open');
     if(!current){toast('This task changed after a data update. Use the current task list.');return;}
+    if(current.focus==='suppliers'){openSupplierTaskPopup(current);return;}
     ta16OpenCodes(current.codes||[]);state.dailyFocus.task_key=current.task_key;
   } catch(e){toast('Task data could not be refreshed. Please try again.');}
 }
