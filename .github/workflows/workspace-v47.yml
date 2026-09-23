@@ -16,6 +16,7 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           ref: work/unified-recalculation-47
+          fetch-depth: 0
       - name: Apply guarded patch and regression tests
         run: |
           git show 51b35ae7b17db2d7033f88bd122c4f486f438c9f:index.html > index.before.html
