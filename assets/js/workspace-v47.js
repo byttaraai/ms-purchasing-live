@@ -62,6 +62,16 @@ function commitWorkspace(result,data) {
   render();renderTasksAssistant(data,result.model);updateInventoryLock();
   $('masterMaintenance')?.classList.toggle('hidden',state.role!=='admin');
 }
+function commitLockedSource(result,authority){
+  const changed=state.revision!==result.dataset.revision||state.upload?.id!==result.dataset.upload?.id;
+  Object.assign(state,result.dataset,{shortageCycles:result.cycles});
+  WORKSPACE_RUNTIME.derived=null;WORKSPACE_RUNTIME.day=result.day;WORKSPACE_RUNTIME.decisionsDirty=false;WORKSPACE_RUNTIME.authority=authority;
+  saveShortageStore();
+  if(changed){state.pendingInventory=null;state.pendingMaster=null;resetPreviews();}
+  populateSuppliers();
+  updateInventoryLock();
+  $('masterMaintenance')?.classList.toggle('hidden',state.role!=='admin');
+}
 async function loadLive() {
   if(state.mode!=='live'||!state.session)return;
   WORKSPACE_RUNTIME.pending=true;
@@ -84,6 +94,11 @@ async function loadLive() {
         state.shortageCycles=authority.cycles||{};WORKSPACE_RUNTIME.serverShortageReady=true;WORKSPACE_RUNTIME.authority=authority;saveShortageStore();
         const result=deriveWorkspace(raw);
         if(Number(authority.score)!==Math.round(result.model.score))throw Error('SERVER_SCORE_MISMATCH');
+        result.cycles=structuredClone(authority.cycles||state.shortageCycles);
+        if(!inventoryFreshnessFor(result.dataset.upload).fresh){
+          if(state.session?.user?.id!==owner||state.mode!=='live')return;
+          commitLockedSource(result,authority);$('globalError').classList.add('hidden');conflicts=0;return;
+        }
         let data;
         try {data=await rpc('purchasing_workspace_sync_v58',{payload:result.payload});}
         catch(e){
