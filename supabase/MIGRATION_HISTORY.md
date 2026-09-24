@@ -2,7 +2,7 @@
 
 Live project: `mpxpbbpqnvoinyjmuuvf`
 
-This manifest mirrors the migration history reported by the live project on 2026-09-24. Historical SQL before Build 57 was created before this repository tracked database source, so the names/versions are retained here but those old SQL bodies must not be invented. Build 57 onward must include the exact SQL file in `supabase/migrations/`.
+This manifest mirrors the migration history reported by the live project on 2026-09-24. Historical SQL before Build 57 was created before this repository tracked database source, so the names/versions are retained here but those old SQL bodies must not be invented. Build 57 onward must include the exact/canonical SQL file in `supabase/migrations/`.
 
 | Version | Name |
 | --- | --- |
@@ -46,3 +46,4 @@ This manifest mirrors the migration history reported by the live project on 2026
 | 20260923163141 | unify_unit_aliases_and_nonblocking_data_attention |
 | 20260923164554 | workspace_sync_use_blocking_review |
 | 20260924154106 | build57_workspace_security_and_validation |
+| 20260924161035 | build58_server_authoritative_score_foundation |

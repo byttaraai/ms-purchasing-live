@@ -1,8 +1,8 @@
-/* Build 47: one revision-coherent refresh pipeline. Score formula is unchanged. */
+/* Build 58: server-authoritative score/impact over the existing revision-coherent pipeline. Approved formulas are unchanged. */
 'use strict';
 const WORKSPACE_RUNTIME = {
   version: 'reactive_v1', pending: false, promise: null, sandbox: false,
-  derived: null, day: null, seq: 0, decisionsDirty: false
+  derived: null, day: null, seq: 0, decisionsDirty: false, serverShortageReady: false, authority: null
 };
 function workspaceDataset(d) {
   const rows=(d.rows||[]).map(r=>({...r}));
@@ -31,6 +31,15 @@ function combinedTaskImpact(model,tasks) {
   for(const task of tasks) for(const code of task.codes||[]) (task.focus==='data'?data:stock).add(code);
   const after=componentModel(state.rows,{excludeAccepted:true,resolvedCodes:stock,resolvedDataCodes:data,valueScale:model.meta.maxShortageValue});
   return Math.max(0,after.score-model.score);
+}
+function verifyServerAuthority(result,data){
+  const a=data?.authority;
+  if(!a||a.authority_version!=='server_v58')throw Error('Server authority acknowledgement is missing.');
+  const clientScore=Math.round(result.model.score),serverScore=Number(a.score);
+  if(!Number.isFinite(serverScore)||clientScore!==serverScore)throw Error('SERVER_SCORE_MISMATCH');
+  const open=new Map((data.tasks||[]).filter(t=>t.status==='open').map(t=>[t.task_key,t]));
+  for(const t of result.tasks){const s=open.get(t.task_key);if(s&&Math.abs(Number(s.score_impact||0)-Number(t.score_impact||0))>.001)throw Error('SERVER_SCORE_IMPACT_MISMATCH');}
+  return true;
 }
 function workspaceVisible() {return state.mode==='live'&&!!state.session&&!$('app').classList.contains('hidden');}
 function workspaceEditOpen() {
@@ -67,21 +76,28 @@ async function loadLive() {
         WORKSPACE_RUNTIME.pending=false;
         const raw=await rpc('purchasing_dashboard_v5');
         if(raw.schema_version!==5||!raw.seed_applied)throw Error('The approved V5 source data is not ready.');
+        if(!WORKSPACE_RUNTIME.serverShortageReady){state.shortageStoreLoaded=false;loadShortageStore();}
+        const authority=await rpc('purchasing_workspace_state_v58',{client_cycles:structuredClone(state.shortageCycles||{})});
+        if(authority.source&&(Number(authority.source.master_revision)!==Number(raw.master_revision)||authority.source.upload_id!==raw.upload?.id)){
+          if(conflicts++<3){WORKSPACE_RUNTIME.pending=true;continue;}throw Error('SOURCE_REVISION_CHANGED');
+        }
+        state.shortageCycles=authority.cycles||{};WORKSPACE_RUNTIME.serverShortageReady=true;WORKSPACE_RUNTIME.authority=authority;saveShortageStore();
         const result=deriveWorkspace(raw);
+        if(Number(authority.score)!==Math.round(result.model.score))throw Error('SERVER_SCORE_MISMATCH');
         let data;
-        try {data=await rpc('purchasing_workspace_sync_v47',{payload:result.payload});}
+        try {data=await rpc('purchasing_workspace_sync_v58',{payload:result.payload});}
         catch(e){
           if(/SOURCE_REVISION_CHANGED/.test(e.message)&&conflicts++<3){WORKSPACE_RUNTIME.pending=true;continue;}
           throw e;
         }
         if(data.source&&(data.source.master_revision!==result.dataset.revision||data.source.upload_id!==result.dataset.upload?.id))throw Error('Source acknowledgement does not match the calculation.');
+        verifyServerAuthority(result,data);
+        result.cycles=structuredClone(data.cycles||state.shortageCycles);WORKSPACE_RUNTIME.authority=data.authority;
         if(state.session?.user?.id!==owner||state.mode!=='live')return;
-        // A newer save queued during this request: do not publish an old result.
         if(WORKSPACE_RUNTIME.pending)continue;
         commitWorkspace(result,data);$('globalError').classList.add('hidden');conflicts=0;
       }
     } catch(e) {
-      // Keep the last coherent view; never replace it with a partial recalculation.
       showError('Recalculation not completed: '+e.message);
       throw e;
     } finally {
