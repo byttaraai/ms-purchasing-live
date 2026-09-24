@@ -27,7 +27,7 @@ jobs:
       - name: Static and workspace regression tests
         run: |
           test -s assets/css/app-v57.css
-          grep -q "Live Build 64" index.html
+          grep -q "Live Build 65" index.html
           grep -q "build57_workspace_security_and_validation" supabase/MIGRATION_HISTORY.md
           grep -q "revoke execute on function public.purchasing_tasks_sync_v5" supabase/migrations/20260924154106_build57_workspace_security_and_validation.sql
           grep -q "purchasing_workspace_sync_v58" supabase/migrations/20260924161035_build58_server_authoritative_score_foundation.sql
