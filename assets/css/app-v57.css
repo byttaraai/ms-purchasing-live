@@ -1137,16 +1137,15 @@ main.page.tasks-view{padding-top:14px}
 .overstock-risk-table td{padding:7px 4px;border-bottom:1px solid #edf0f5;font-size:10.5px;line-height:1.22;color:#263856;vertical-align:middle;overflow:hidden}
 .overstock-risk-table th:nth-child(1),.overstock-risk-table td:nth-child(1){width:3%;text-align:center}
 .overstock-risk-table th:nth-child(2),.overstock-risk-table td:nth-child(2){width:3%;text-align:center}
-.overstock-risk-table th:nth-child(3),.overstock-risk-table td:nth-child(3){width:20%;text-align:left}
-.overstock-risk-table th:nth-child(4),.overstock-risk-table td:nth-child(4){width:5%;text-align:left}
-.overstock-risk-table th:nth-child(5),.overstock-risk-table td:nth-child(5){width:10%;text-align:left}
+.overstock-risk-table th:nth-child(3),.overstock-risk-table td:nth-child(3){width:24%;text-align:left}
+.overstock-risk-table th:nth-child(4),.overstock-risk-table td:nth-child(4){width:6%;text-align:left}
+.overstock-risk-table th:nth-child(5),.overstock-risk-table td:nth-child(5){width:12%;text-align:left}
 .overstock-risk-table th:nth-child(6),.overstock-risk-table td:nth-child(6){width:6%;text-align:center}
 .overstock-risk-table th:nth-child(7),.overstock-risk-table td:nth-child(7){width:7%;text-align:center}
 .overstock-risk-table th:nth-child(8),.overstock-risk-table td:nth-child(8){width:7%;text-align:right}
-.overstock-risk-table th:nth-child(9),.overstock-risk-table td:nth-child(9){width:10%;text-align:right}
-.overstock-risk-table th:nth-child(10),.overstock-risk-table td:nth-child(10){width:8%;text-align:right}
-.overstock-risk-table th:nth-child(11),.overstock-risk-table td:nth-child(11){width:10%;text-align:right}
-.overstock-risk-table th:nth-child(12),.overstock-risk-table td:nth-child(12){width:11%;text-align:right}
+.overstock-risk-table th:nth-child(9),.overstock-risk-table td:nth-child(9){width:8%;text-align:right}
+.overstock-risk-table th:nth-child(10),.overstock-risk-table td:nth-child(10){width:10%;text-align:right}
+.overstock-risk-table th:nth-child(11),.overstock-risk-table td:nth-child(11){width:14%;text-align:right}
 .overstock-risk-table th:nth-child(8),.overstock-risk-table td:nth-child(8){border-left:1px solid #d8e0eb}
 .overstock-risk-table .product-cell{gap:5px;min-width:0}
 .overstock-risk-table .product-button-wrap{min-width:0;max-width:100%;align-items:flex-start}
@@ -1159,7 +1158,6 @@ main.page.tasks-view{padding-top:14px}
 .overstock-risk-table .money,.overstock-risk-table .order{white-space:nowrap;font-size:10px}
 .overstock-risk-select input{width:14px;height:14px;accent-color:#5b34fc;cursor:pointer}
 .overstock-risk-rank{color:#8a5a38!important;font-weight:800;font-variant-numeric:tabular-nums}
-.overstock-inventory-value{font-weight:800!important;color:#1d2e54!important}
 .overstock-excess-value{font-weight:800!important;color:#8f3b31!important}
 .overstock-risk-empty{text-align:center!important;padding:42px!important;color:#7f8ba0!important}
 .overstock-risk-footer{display:flex;justify-content:flex-end;gap:18px;padding:10px 15px;border-top:1px solid #e5eaf2;background:#fafbfe;color:#6c7890;font-size:10.5px;flex-wrap:wrap}
