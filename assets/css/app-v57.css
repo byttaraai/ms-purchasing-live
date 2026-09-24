@@ -1111,47 +1111,60 @@ main.page.tasks-view{padding-top:14px}
 [data-panel="recommendations"] .overstock-clickable{cursor:pointer;transition:transform .14s ease,box-shadow .14s ease,border-color .14s ease}
 [data-panel="recommendations"] .overstock-clickable:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(36,50,82,.10);border-color:#d8ccef}
 [data-panel="recommendations"] .overstock-clickable:focus-visible{outline:3px solid rgba(91,52,252,.18);outline-offset:2px}
-.overstock-risk-dialog{width:min(1540px,calc(100vw - 32px));max-width:none;height:min(88vh,900px);padding:0;border:1px solid #dfe5ef;border-radius:16px;overflow:hidden;background:#fff;color:var(--text);box-shadow:0 28px 90px rgba(18,31,65,.24)}
+.overstock-risk-dialog{width:min(1480px,calc(100vw - 72px));max-width:none;height:min(88vh,900px);margin:auto;padding:0;border:1px solid #dfe5ef;border-radius:16px;overflow:hidden;background:#fff;color:var(--text);box-shadow:0 28px 90px rgba(18,31,65,.24)}
 .overstock-risk-dialog::backdrop{background:rgba(15,24,49,.48);backdrop-filter:blur(2px)}
 .overstock-risk-shell{height:100%;display:grid;grid-template-rows:auto auto minmax(0,1fr) auto}
-.overstock-risk-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;padding:17px 20px 14px;border-bottom:1px solid #e8ecf3;background:#fff}
-.overstock-risk-head h2{margin:1px 0 2px;font-size:20px;line-height:1.25;color:#18284a}
-.overstock-risk-head p{margin:0;color:#77849b;font-size:11px}
+.overstock-risk-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;padding:15px 18px 12px;border-bottom:1px solid #e8ecf3;background:#fff}
+.overstock-risk-head h2{margin:1px 0 2px;font-size:19px;line-height:1.25;color:#18284a}
+.overstock-risk-head p{margin:0;color:#77849b;font-size:10.5px;line-height:1.35}
 .overstock-risk-eyebrow{font-size:9px;letter-spacing:.08em;color:#8a5a38;font-weight:800}
 .overstock-risk-x{width:32px;height:32px;border:1px solid #e0e5ee;border-radius:8px;background:#fff;color:#68758e;font-size:23px;line-height:1;display:grid;place-items:center}
-.overstock-risk-controls{display:flex;align-items:flex-end;gap:10px;padding:10px 18px;border-bottom:1px solid #e8ecf3;background:#fbfcfe}
-.overstock-risk-controls label{display:grid;gap:4px;min-width:210px}
-.overstock-risk-controls label span{font-size:9px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#7a879d}
-.overstock-risk-controls select,.overstock-risk-controls input[type="number"]{height:34px;border:1px solid #d9e0eb;border-radius:8px;background:#fff;color:#243758;font:inherit;font-size:11.5px;padding:0 10px;outline:none}
-.overstock-risk-controls select{padding-right:30px}
+.overstock-risk-controls{display:flex;align-items:flex-end;gap:8px;padding:9px 14px;border-bottom:1px solid #e8ecf3;background:#fbfcfe;flex-wrap:wrap}
+.overstock-risk-controls label{display:grid;gap:4px;min-width:145px;flex:0 1 185px}
+.overstock-risk-controls label span{font-size:8.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#7a879d}
+.overstock-risk-controls select,.overstock-risk-controls input[type="number"]{width:100%;height:32px;border:1px solid #d9e0eb;border-radius:8px;background:#fff;color:#243758;font:inherit;font-size:11px;padding:0 9px;outline:none}
+.overstock-risk-controls select{padding-right:25px}
 .overstock-risk-controls input[type="number"]{font-variant-numeric:tabular-nums}
 .overstock-risk-controls select:focus,.overstock-risk-controls input[type="number"]:focus{border-color:#8f7afc;box-shadow:0 0 0 3px rgba(91,52,252,.08)}
-.overstock-value-filter{min-width:180px!important}
-.overstock-print-btn{height:34px;border:1px solid #5b34fc;border-radius:8px;background:#5b34fc;color:#fff;font:inherit;font-size:11px;font-weight:800;padding:0 13px;cursor:pointer;white-space:nowrap}
+.overstock-value-filter{min-width:155px!important;flex-basis:170px!important}
+.overstock-print-btn{height:32px;border:1px solid #5b34fc;border-radius:8px;background:#5b34fc;color:#fff;font:inherit;font-size:10.5px;font-weight:800;padding:0 11px;cursor:pointer;white-space:nowrap}
 .overstock-print-btn span{font-variant-numeric:tabular-nums}
 .overstock-print-btn:disabled{border-color:#d9deea;background:#eef1f6;color:#99a3b5;cursor:not-allowed}
-.overstock-risk-count{margin-left:auto;color:#738199;font-size:10.5px;padding:0 2px 8px}
-.overstock-risk-table-wrap{overflow:auto;min-height:0;background:#fff}
-.overstock-risk-table{width:100%;min-width:1430px;table-layout:fixed;border-collapse:collapse}
-.overstock-risk-table th{position:sticky;top:0;z-index:2;height:39px;background:#f7f9fc;color:#40506a;font-size:10.5px;font-weight:700;padding:7px 8px;white-space:nowrap;border-bottom:1px solid #dfe5ee}
-.overstock-risk-table td{padding:10px 8px;border-bottom:1px solid #edf0f5;font-size:12px;color:#263856;vertical-align:middle}
-.overstock-risk-table th:nth-child(1),.overstock-risk-table td:nth-child(1){width:42px;text-align:center}
-.overstock-risk-table th:nth-child(2),.overstock-risk-table td:nth-child(2){width:38px;text-align:center}
-.overstock-risk-table th:nth-child(3),.overstock-risk-table td:nth-child(3){width:19%;text-align:left}
-.overstock-risk-table th:nth-child(4),.overstock-risk-table td:nth-child(4){width:6%;text-align:left}
+.overstock-risk-count{margin-left:auto;color:#738199;font-size:10px;padding:0 2px 7px;white-space:nowrap}
+.overstock-risk-table-wrap{overflow-y:auto;overflow-x:hidden;min-height:0;background:#fff}
+.overstock-risk-table{width:100%;min-width:0;table-layout:fixed;border-collapse:collapse}
+.overstock-risk-table th{position:sticky;top:0;z-index:2;height:37px;background:#f7f9fc;color:#40506a;font-size:9.5px;font-weight:700;padding:6px 4px;white-space:normal;overflow-wrap:anywhere;line-height:1.15;border-bottom:1px solid #dfe5ee}
+.overstock-risk-table td{padding:7px 4px;border-bottom:1px solid #edf0f5;font-size:10.5px;line-height:1.22;color:#263856;vertical-align:middle;overflow:hidden}
+.overstock-risk-table th:nth-child(1),.overstock-risk-table td:nth-child(1){width:3%;text-align:center}
+.overstock-risk-table th:nth-child(2),.overstock-risk-table td:nth-child(2){width:3%;text-align:center}
+.overstock-risk-table th:nth-child(3),.overstock-risk-table td:nth-child(3){width:20%;text-align:left}
+.overstock-risk-table th:nth-child(4),.overstock-risk-table td:nth-child(4){width:5%;text-align:left}
 .overstock-risk-table th:nth-child(5),.overstock-risk-table td:nth-child(5){width:10%;text-align:left}
-.overstock-risk-table th:nth-child(6),.overstock-risk-table td:nth-child(6),.overstock-risk-table th:nth-child(7),.overstock-risk-table td:nth-child(7){width:6%;text-align:center}
-.overstock-risk-table th:nth-child(8),.overstock-risk-table td:nth-child(8),.overstock-risk-table th:nth-child(9),.overstock-risk-table td:nth-child(9),.overstock-risk-table th:nth-child(10),.overstock-risk-table td:nth-child(10),.overstock-risk-table th:nth-child(11),.overstock-risk-table td:nth-child(11){width:9%;text-align:right}
-.overstock-risk-table th:nth-child(12),.overstock-risk-table td:nth-child(12){width:15%;text-align:right}
+.overstock-risk-table th:nth-child(6),.overstock-risk-table td:nth-child(6){width:6%;text-align:center}
+.overstock-risk-table th:nth-child(7),.overstock-risk-table td:nth-child(7){width:7%;text-align:center}
+.overstock-risk-table th:nth-child(8),.overstock-risk-table td:nth-child(8){width:7%;text-align:right}
+.overstock-risk-table th:nth-child(9),.overstock-risk-table td:nth-child(9){width:10%;text-align:right}
+.overstock-risk-table th:nth-child(10),.overstock-risk-table td:nth-child(10){width:8%;text-align:right}
+.overstock-risk-table th:nth-child(11),.overstock-risk-table td:nth-child(11){width:10%;text-align:right}
+.overstock-risk-table th:nth-child(12),.overstock-risk-table td:nth-child(12){width:11%;text-align:right}
 .overstock-risk-table th:nth-child(8),.overstock-risk-table td:nth-child(8){border-left:1px solid #d8e0eb}
-.overstock-risk-select input{width:15px;height:15px;accent-color:#5b34fc;cursor:pointer}
+.overstock-risk-table .product-cell{gap:5px;min-width:0}
+.overstock-risk-table .product-button-wrap{min-width:0;max-width:100%;align-items:flex-start}
+.overstock-risk-table .product-button{display:-webkit-box;width:100%;white-space:normal;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden;text-overflow:ellipsis;line-height:1.2;max-height:2.4em}
+.overstock-risk-table .overstock-cell-clamp{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden;line-height:1.2;max-height:2.4em;overflow-wrap:anywhere}
+.overstock-risk-table .stock-line{white-space:normal;flex-wrap:wrap;gap:2px 5px;line-height:1.15}
+.overstock-risk-table .rp-inline{white-space:nowrap;max-width:100%;font-size:9.5px}
+.overstock-risk-table .pill{min-width:0;padding:3px 5px;font-size:10px;max-width:100%}
+.overstock-risk-table .rating{min-width:0;font-size:10px}
+.overstock-risk-table .money,.overstock-risk-table .order{white-space:nowrap;font-size:10px}
+.overstock-risk-select input{width:14px;height:14px;accent-color:#5b34fc;cursor:pointer}
 .overstock-risk-rank{color:#8a5a38!important;font-weight:800;font-variant-numeric:tabular-nums}
 .overstock-inventory-value{font-weight:800!important;color:#1d2e54!important}
 .overstock-excess-value{font-weight:800!important;color:#8f3b31!important}
-.overstock-risk-empty{text-align:center!important;padding:50px!important;color:#7f8ba0!important}
-.overstock-risk-footer{display:flex;justify-content:flex-end;gap:24px;padding:12px 18px;border-top:1px solid #e5eaf2;background:#fafbfe;color:#6c7890;font-size:11px}
-.overstock-risk-footer b{color:#1d2e54;font-size:14px;font-variant-numeric:tabular-nums}
-@media(max-width:760px){.overstock-risk-dialog{width:calc(100vw - 16px);height:92vh;border-radius:12px}.overstock-risk-head{padding:13px}.overstock-risk-head h2{font-size:17px}.overstock-risk-controls{align-items:stretch;flex-wrap:wrap;padding:9px 12px}.overstock-risk-controls label{min-width:calc(50% - 5px);flex:1}.overstock-print-btn{flex:1}.overstock-risk-count{width:100%;margin-left:0;padding:0}.overstock-risk-footer{justify-content:space-between;gap:8px;flex-wrap:wrap}}
+.overstock-risk-empty{text-align:center!important;padding:42px!important;color:#7f8ba0!important}
+.overstock-risk-footer{display:flex;justify-content:flex-end;gap:18px;padding:10px 15px;border-top:1px solid #e5eaf2;background:#fafbfe;color:#6c7890;font-size:10.5px;flex-wrap:wrap}
+.overstock-risk-footer b{color:#1d2e54;font-size:13px;font-variant-numeric:tabular-nums}
+@media(max-width:900px){.overstock-risk-dialog{width:calc(100vw - 32px);height:92vh;border-radius:12px}.overstock-risk-head{padding:12px}.overstock-risk-head h2{font-size:17px}.overstock-risk-controls{align-items:stretch;padding:8px 10px}.overstock-risk-controls label{min-width:calc(50% - 5px);flex:1}.overstock-value-filter{min-width:calc(50% - 5px)!important}.overstock-print-btn{flex:1}.overstock-risk-count{width:100%;margin-left:0;padding:0}.overstock-risk-table th{font-size:8.5px;padding-inline:2px}.overstock-risk-table td{font-size:9.5px;padding-inline:2px}.overstock-risk-footer{justify-content:space-between;gap:7px}}
 
 /* Build 56: product detail stacks above overstock table */
 #detailDialog[open]{z-index:2147483647}
