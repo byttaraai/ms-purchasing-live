@@ -1,31 +1,37 @@
-name: Verify unified workspace v47
+name: Verify live main
 on:
   push:
-    branches: [work/unified-recalculation-47]
+    branches: [main]
     paths:
+      - 'index.html'
+      - 'assets/**'
+      - 'tests/**'
+      - 'supabase/**'
       - '.github/workflows/workspace-v47.yml'
-      - 'assets/js/workspace-v47.js'
-      - 'maintenance/patch47.py'
-      - 'tests/workspace-v47.cjs'
-      - 'tests/browser-v47.py'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'assets/**'
+      - 'tests/**'
+      - 'supabase/**'
+      - '.github/workflows/workspace-v47.yml'
 permissions:
-  contents: write
+  contents: read
 jobs:
-  test-and-integrate:
+  regression:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 6
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-        with:
-          ref: work/unified-recalculation-47
-          fetch-depth: 0
-      - name: Apply guarded patch and regression tests
+      - name: Static and workspace regression tests
         run: |
-          git show 51b35ae7b17db2d7033f88bd122c4f486f438c9f:index.html > index.before.html
-          python3 maintenance/patch47.py index.html
+          test -s assets/css/app-v57.css
+          grep -q "Live Build 57" index.html
+          grep -q "build57_workspace_security_and_validation" supabase/MIGRATION_HISTORY.md
+          grep -q "revoke execute on function public.purchasing_tasks_sync_v5" supabase/migrations/20260924154106_build57_workspace_security_and_validation.sql
           node --check assets/js/workspace-v47.js
           node tests/workspace-v47.cjs .
-          rm index.before.html
       - name: Browser smoke test with synthetic data only
         run: |
           python3 tests/browser-v47.py
@@ -43,12 +49,3 @@ jobs:
           print(m.group(1) if m else 'FAIL: browser test did not finish')
           assert m and m.group(1).startswith('PASS:'), 'Browser smoke test failed'
           PY
-      - name: Commit tested integration on review branch only
-        run: |
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add index.html
-          if ! git diff --cached --quiet; then
-            git commit -m 'Build 47: integrate tested revision-coherent workspace'
-            git push origin HEAD:work/unified-recalculation-47
-          fi
