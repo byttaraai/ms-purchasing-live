@@ -47,3 +47,4 @@ This manifest mirrors the migration history reported by the live project on 2026
 | 20260923164554 | workspace_sync_use_blocking_review |
 | 20260924154106 | build57_workspace_security_and_validation |
 | 20260924161035 | build58_server_authoritative_score_foundation |
+| 20260924162133 | build58_retire_public_v47_sync |
