@@ -1151,7 +1151,7 @@ main.page.tasks-view{padding-top:14px}
 .overstock-risk-table .product-cell{gap:5px;min-width:0}
 .overstock-risk-table .product-button-wrap{min-width:0;max-width:100%;align-items:flex-start}
 .overstock-risk-table .product-button{display:-webkit-box;width:100%;white-space:normal;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden;text-overflow:ellipsis;line-height:1.2;max-height:2.4em}
-.overstock-risk-table .overstock-cell-clamp{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden;line-height:1.2;max-height:2.4em;overflow-wrap:anywhere}
+.overstock-risk-table .overstock-cell-clamp{display:-webkit-box;white-space:normal;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden;line-height:1.2;max-height:2.4em;overflow-wrap:anywhere}
 .overstock-risk-table .stock-line{white-space:normal;flex-wrap:wrap;gap:2px 5px;line-height:1.15}
 .overstock-risk-table .rp-inline{white-space:nowrap;max-width:100%;font-size:9.5px}
 .overstock-risk-table .pill{min-width:0;padding:3px 5px;font-size:10px;max-width:100%}
