@@ -1,0 +1,29 @@
+/* Build 69: two-line Risk cells, shared card tags, same compact 300% popup. */
+.overstock-risk-table th:nth-child(1),.overstock-risk-table td:nth-child(1){width:3%;text-align:center}
+.overstock-risk-table th:nth-child(2),.overstock-risk-table td:nth-child(2){width:3%;text-align:center}
+.overstock-risk-table th:nth-child(3),.overstock-risk-table td:nth-child(3){width:21%;text-align:left}
+.overstock-risk-table th:nth-child(4),.overstock-risk-table td:nth-child(4){width:10%;text-align:center}
+.overstock-risk-table th:nth-child(5),.overstock-risk-table td:nth-child(5){width:5%;text-align:left}
+.overstock-risk-table th:nth-child(6),.overstock-risk-table td:nth-child(6){width:10%;text-align:left}
+.overstock-risk-table th:nth-child(7),.overstock-risk-table td:nth-child(7){width:6%;text-align:center}
+.overstock-risk-table th:nth-child(8),.overstock-risk-table td:nth-child(8){width:6%;text-align:center;border-left:0}
+.overstock-risk-table th:nth-child(9),.overstock-risk-table td:nth-child(9){width:7%;text-align:right;border-left:1px solid #d8e0eb}
+.overstock-risk-table th:nth-child(10),.overstock-risk-table td:nth-child(10){width:7%;text-align:right}
+.overstock-risk-table th:nth-child(11),.overstock-risk-table td:nth-child(11){width:9%;text-align:right}
+.overstock-risk-table th:nth-child(12),.overstock-risk-table td:nth-child(12){width:13%;text-align:right}
+.overstock-risk-cell{display:flex;flex-direction:column;align-items:center;gap:3px;line-height:1.2;font-variant-numeric:tabular-nums;white-space:nowrap}
+.overstock-risk-cell strong{font-size:11px;font-weight:800}
+.overstock-risk-cell small{font-size:9px;font-weight:500}
+.overstock-risk-cell.positive{color:#b82d43}
+.overstock-risk-cell.stable{color:#967016}
+.overstock-risk-cell.review{color:#738199}
+.kpi-overstock-rating.stable{background:#fff1d8;color:#967016}
+.kpi-overstock-rating.critical{background:#9b1931;color:white}
+.kpi-overstock-rating.review,.kpi-overstock-rating.empty{background:#edf0f5;color:#738199}
+.kpi-overstock-card.overstock-tone-stable{background:linear-gradient(115deg,#fff,#fff9ed)!important;border-color:#f3e5c5!important}
+.kpi-overstock-card.overstock-tone-critical{background:linear-gradient(115deg,#fff,#ffe8ed)!important;border-color:#eaa6b7!important}
+.kpi-overstock-card.overstock-tone-critical .kpi-overstock-icon{background:#9b1931!important;color:white!important}
+.kpi-overstock-card.overstock-tone-review,.kpi-overstock-card.overstock-tone-empty{background:#fafbfc!important;border-color:#e0e5ed!important}
+@media(max-width:900px){.overstock-risk-cell strong{font-size:9px}.overstock-risk-cell small{font-size:8px}}
+
+.kpi-overstock-coverage{font-size:8px;font-weight:600;margin-left:5px;color:#967016}
