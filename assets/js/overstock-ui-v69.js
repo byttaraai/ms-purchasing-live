@@ -60,10 +60,10 @@ function overstockVisualSar(r){
 }
 function overstockRiskCell(r){
  const review=r.risk_status==='review',stable=r.risk_status==='stable';
- const label=review?'Review':stable?'Stable':r.risk_share_pct<.005?'&lt;0.01%':fmt(r.risk_share_pct,2)+'%';
+ const label=review?'Review':stable?'Balanced':r.risk_share_pct<.005?'&lt;0.01%':fmt(r.risk_share_pct,2)+'%';
  const tone=review?'review':stable?'stable':'positive',visualSar=overstockVisualSar(r);
  const exact=Number.isFinite(visualSar)?(visualSar>0?'+':visualSar<0?'\u2212':'')+'SAR '+fmt(Math.abs(visualSar),2):'Not valued';
- const explanation=review?r.risk_reason:stable?'Stable offset shown as a positive visual SAR amount; card risk math is unchanged.':'Risk share is unchanged; the SAR amount is a visual inverse share of this product excess value and does not change card calculations.';
+ const explanation=review?r.risk_reason:stable?'Balanced offset shown as a positive visual SAR amount; card risk math is unchanged.':'Risk share is unchanged; the SAR amount is a visual inverse share of this product excess value and does not change card calculations.';
  return`<span class="overstock-risk-cell ${tone}" title="${esc(explanation+' '+exact)}"><strong>${label}</strong><small>${esc(overstockAmount(visualSar))}</small></span>`;
 }
 function overstockPrintDocument(rows,supplier,mode,scope){
@@ -103,11 +103,11 @@ function openOverstockRiskPopup(options={}){
  let d=$('overstockRiskDialog');
  if(!d){d=document.createElement('dialog');d.id='overstockRiskDialog';d.className='overstock-risk-dialog';document.body.append(d);}
  const supplierOptions=['<option value="">All Suppliers</option>',...suppliers.map(s=>`<option value="${esc(s)}" ${overstockRiskView.supplier===s?'selected':''}>${esc(s)}</option>`),`<option value="__none__" ${overstockRiskView.supplier==='__none__'?'selected':''}>Not assigned</option>`].join('');
- const riskShareOptions=`<option value="all" ${overstockRiskView.riskShareFilter==='all'?'selected':''}>All Risk Share</option><option value="stable" ${overstockRiskView.riskShareFilter==='stable'?'selected':''}>Stable</option><option value="risky_high" ${overstockRiskView.riskShareFilter==='risky_high'?'selected':''}>Risky High</option><option value="risky_low" ${overstockRiskView.riskShareFilter==='risky_low'?'selected':''}>Risky Low</option>`;
+ const riskShareOptions=`<option value="all" ${overstockRiskView.riskShareFilter==='all'?'selected':''}>All Risk Share</option><option value="stable" ${overstockRiskView.riskShareFilter==='stable'?'selected':''}>Balanced</option><option value="risky_high" ${overstockRiskView.riskShareFilter==='risky_high'?'selected':''}>High Share</option><option value="risky_low" ${overstockRiskView.riskShareFilter==='risky_low'?'selected':''}>Low Share</option>`;
  const rpOptions=`<option value="all" ${overstockRiskView.rpFilter==='all'?'selected':''}>All Overstock &gt;300%</option><option value="under10" ${overstockRiskView.rpFilter==='under10'?'selected':''}>Reorder Point &lt; 10</option>`;
  const sortOptions=`<option value="inventory_value_desc" ${overstockRiskView.sort==='inventory_value_desc'?'selected':''}>Inventory Value ↓</option><option value="risk_desc" ${overstockRiskView.sort==='risk_desc'?'selected':''}>Risk Share \u2193</option><option value="excess_value_desc" ${overstockRiskView.sort==='excess_value_desc'?'selected':''}>Excess Value ↓</option>`;
  const metric=(v,digits=0)=>C.finite(v)?fmt(v,digits):'—';
- const riskInfo="Risk Share % is this product's share of total positive risk contribution. The SAR amount is visual only: Risk rows show a minus inverse share of the product Excess Value; Stable rows keep their current offset as plus. Card risk calculations are unchanged.";
+ const riskInfo="Risk Share % is this product's share of total positive risk contribution. The SAR amount is visual only: Risk rows show a minus inverse share of the product Excess Value; Balanced rows keep their current offset as plus. Card risk calculations are unchanged.";
  const body=rows.map((r,i)=>`<tr><td class="overstock-risk-select"><input type="checkbox" data-overstock-select="${esc(r.product_code)}" aria-label="Select ${esc(r.product_name)} for printing" ${overstockRiskView.selected.has(r.product_code)?'checked':''}></td><td class="overstock-risk-rank">${i+1}</td><td><div class="product-cell">${productButton(r)}</div></td><td class="overstock-risk-share">${overstockRiskCell(r)}</td><td class="unit" title="${esc(r.purchase_unit||'')}"><span class="overstock-cell-clamp">${esc(r.purchase_unit||'—')}</span></td><td>${stockHtml(r)}</td><td>${pill(r.stock_ratio)}</td><td>${ratingHtml(r.profitability_class)}</td><td class="money">${fmt(r.purchase_price,1)}</td><td class="order">${metric(r.excess_qty,4)}</td><td class="money overstock-excess-value">${metric(r.excess_value,0)}</td><td class="supplier" title="${esc(r.supplier||'Not assigned')}"><span class="overstock-cell-clamp">${esc(r.supplier||'Not assigned')}</span></td></tr>`).join('');
  const emptyText='No matching overstock products in the current Reorder Point filter.';
  const footerExcess=`<span><b>${fmt(totalQty,0)}</b> Excess Qty</span><span><b>SAR ${fmt(totalExcessValue,0)}</b> Excess Value</span>`;
