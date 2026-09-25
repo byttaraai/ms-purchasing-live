@@ -34,3 +34,13 @@ The former Risk Priority sort is replaced by signed monetary Risk Contribution d
 No database migration, inventory mutation, permission change, server credential, task completion or badge write is introduced. Refreshing master data rerenders the card and any open overstock table while retaining scroll and valid selection. 48-hour stock locking and revision-safe workspace synchronization remain unchanged.
 
 Tests cover tag/band boundaries, Arabic normalization, positive-share conservation, stable/negative-net cases, missing valuations, filtered and printed scopes, live-save UI propagation using synthetic API fixtures, no false badge, and absence of old runtime overstock formulas.
+
+## Build 70 display-only amendment
+
+The canonical Build 69 risk calculations, product shares, card roll-up, rating thresholds and sort inputs are unchanged. Only the displayed SAR amount inside the Risk cell changes:
+
+- Positive risk rows keep the same Risk Share %. Their displayed SAR becomes a visual inverse fraction of that product's Excess Value: `- Excess Value x (1 - 1 / Risk Factor)`. The minus sign communicates downside visually.
+- Stable rows keep the existing offset magnitude `abs(risk_impact)`, but display it with a plus sign to communicate compensating/offsetting value.
+- Review rows remain Review with no fabricated amount.
+- The Risk header includes a compact information hint explaining this visual convention and explicitly states that card calculations are unchanged.
+- Product width is reduced slightly and Risk width increased; label/share and SAR are displayed on one line.
