@@ -1,4 +1,4 @@
-/* Build 74: Risk presentation plus compact From/To Excess Value range filter. */
+/* Build 77: Risk presentation plus compact quick tags for RP<10 and Excess Value sort. */
 .overstock-risk-table th:nth-child(1),.overstock-risk-table td:nth-child(1){width:3%;text-align:center}
 .overstock-risk-table th:nth-child(2),.overstock-risk-table td:nth-child(2){width:3%;text-align:center}
 .overstock-risk-table th:nth-child(3),.overstock-risk-table td:nth-child(3){width:18%;text-align:left}
@@ -23,6 +23,7 @@
 .overstock-risk-controls label.overstock-value-filter{flex:0 1 230px;min-width:210px}
 .overstock-value-range{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:6px}
 .overstock-value-range input{min-width:0}
+.overstock-quick-tags{display:flex;align-items:center;gap:6px;padding-bottom:1px;white-space:nowrap}.overstock-quick-tag{height:32px;padding:0 11px;border:1px solid #d9e0eb;border-radius:999px;background:#fff;color:#53627b;font:inherit;font-size:10px;font-weight:800;cursor:pointer;transition:.15s ease}.overstock-quick-tag:hover{border-color:#aeb8c9;color:#263a5d}.overstock-quick-tag.active{background:#f0ebff;border-color:#cfc2ff;color:#5b34fc;box-shadow:0 0 0 2px rgba(91,52,252,.06)}
 .kpi-overstock-rating.stable{background:#fff1d8;color:#967016}
 .kpi-overstock-rating.critical{background:#9b1931;color:white}
 .kpi-overstock-rating.review,.kpi-overstock-rating.empty{background:#edf0f5;color:#738199}
