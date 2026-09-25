@@ -37,9 +37,14 @@ test('net near zero does not inflate product shares; negative net does not inver
 test('all Stable rows and zero positive pool avoid division by zero',()=>{
  const m=calc([row('a',400,'High'),row('b',600,'Medium')]);assert.equal(m.positiveImpact,0);assert(m.rows.every(r=>r.risk_share_pct===null));assert.equal(m.rating.cls,'stable');
 });
-test('unpriced, blocked or invalid RP rows are Review, not zero-risk Stable',()=>{
- for(const patch of [{purchase_price:null},{purchase_price:0},{reorder_point:null},{reorder_point:0},{blocking_review:true},{stock_qty:null}]){
+test('unpriced or blocked valid-RP rows are Review, not zero-risk Stable',()=>{
+ for(const patch of [{purchase_price:null},{purchase_price:0},{blocking_review:true},{stock_qty:null}]){
   const m=calc([{...row('x',600),...patch}]);assert.equal(m.reviewCount,1);assert.equal(m.rows[0].risk_status,'review');assert.equal(m.rows[0].risk_impact,null);assert.equal(m.cardRiskPct,null);assert.equal(m.rating.cls,'review');
+ }
+});
+test('missing or zero Reorder Point is outside Overstock until master data is fixed',()=>{
+ for(const rp of [null,0]){
+  const m=calc([{...row('x',600),reorder_point:rp}]);assert.equal(m.productCount,0);assert.equal(m.reviewCount,0);assert.equal(m.rows.length,0);assert.equal(m.rawExcess,0);assert.equal(m.netImpact,0);assert.equal(m.rating.cls,'empty');
  }
 });
 test('partial valuations are marked and excluded consistently from both risk totals',()=>{
@@ -56,11 +61,13 @@ test('old parallel overstock risk models are removed from executable source',()=
  for(const term of ['overstockProfitRisk','adjustedOverstockPct','valueScore*.40+qtyScore*.35+profitRisk*.25'])assert(!html.includes(term)&&!ui.includes(term));
  assert(!html.includes('<th>Inventory Value</th>'));assert(ui.includes('Stable'));assert(ui.includes('overstockRiskCell(r)'));
 });
-test('Build 70 changes only the displayed SAR direction and keeps canonical risk math untouched',()=>{
+test('Build 71 removes No Reorder Point from the overstock popup while preserving visual SAR and canonical risk policy',()=>{
  const ui=fs.readFileSync('assets/js/overstock-ui-v69.js','utf8'),css=fs.readFileSync('assets/css/overstock-risk-v69.css','utf8');
  assert(ui.includes("r.risk_status==='positive'&&r.risk_factor>1")&&ui.includes("1-1/r.risk_factor"));
  assert(ui.includes("r.risk_status==='stable')return Math.abs(Number(r.risk_impact)||0)"));
  assert(ui.includes('overstock-risk-info')&&ui.includes('Card risk calculations are unchanged.'));
+ assert(!ui.includes('no_reorder')&&!ui.includes('overstockNoReorderRows')&&!ui.includes('No Reorder Point'));
+ assert(ui.includes('OVERSTOCK RISK REVIEW'));
  assert(css.includes('width:18%;text-align:left')&&css.includes('width:13%;text-align:center'));
  assert(css.includes('flex-direction:row'));
  assert.equal(R.POLICY.version,'overstock_uplift_v1');
