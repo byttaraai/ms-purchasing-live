@@ -47,9 +47,11 @@
       risk_status: 'review', risk_reason: reason};
   }
   function product(row, profitLabel) {
+    // A missing/zero Reorder Point cannot define overstock, so it is outside this model entirely.
+    if (!finite(row.reorder_point) || row.reorder_point <= 0) return null;
     if (!finite(row.stock_ratio) || row.stock_ratio <= POLICY.thresholdPct) return null;
-    if (row.blocking_review || !finite(row.stock_qty) || row.stock_qty <= 0 || !finite(row.reorder_point) || row.reorder_point <= 0)
-      return reviewRow(row, 'Stock, unit conversion or Reorder Point needs review.');
+    if (row.blocking_review || !finite(row.stock_qty) || row.stock_qty <= 0)
+      return reviewRow(row, 'Stock or unit conversion needs review.');
     const excessQty = Math.max(0, row.stock_qty - row.reorder_point * (POLICY.thresholdPct / 100));
     if (!(excessQty > 0) || !finite(excessQty)) return reviewRow(row, 'Stock percentage and excess quantity are inconsistent.');
     if (!finite(row.purchase_price) || row.purchase_price <= 0)
