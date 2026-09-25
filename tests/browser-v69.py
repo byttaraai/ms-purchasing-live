@@ -53,9 +53,12 @@ checks=r"""
   rp.value='under10';rp.dispatchEvent(new Event('change',{bubbles:true}));
   check(overstockRiskVisibleRows(overstockRiskSourceRows()).every(r=>Number(r.reorder_point)>0&&Number(r.reorder_point)<10),'RP under-10 filter failed');
   overstockRiskView.rpFilter='all';overstockRiskView.supplier='';openOverstockRiskPopup();
-  const threshold=document.getElementById('overstockValueAbove');threshold.value='5000';threshold.dispatchEvent(new Event('change',{bubbles:true}));
-  check(overstockRiskVisibleRows(overstockRiskSourceRows()).every(r=>r.excess_value>5000),'Excess value threshold failed');
-  overstockRiskView.minExcessValue='';openOverstockRiskPopup();
+  const valueFrom=document.getElementById('overstockValueFrom'),valueTo=document.getElementById('overstockValueTo');
+  valueFrom.value='1000';valueTo.value='12932';valueFrom.dispatchEvent(new Event('change',{bubbles:true}));
+  let ranged=overstockRiskVisibleRows(overstockRiskSourceRows());
+  check(ranged.length>0&&ranged.every(r=>r.excess_value>=1000&&r.excess_value<=12932),'Excess Value From/To range failed');
+  check(ranged.some(r=>r.excess_value===1000)&&ranged.some(r=>r.excess_value===12932),'Excess Value range boundaries must be inclusive');
+  overstockRiskView.minExcessValue='';overstockRiskView.maxExcessValue='';openOverstockRiskPopup();
   const top=overstockRiskScope().rows.find(r=>r.product_code==='Risk large');
   const printed=overstockPrintDocument([top],'Risk Supplier','All Overstock >300%',overstockRiskScope());
   check(printed.includes(overstockRiskCell(top))&&printed.includes('<th>Risk Share</th>'),'Print uses another risk calculation');
