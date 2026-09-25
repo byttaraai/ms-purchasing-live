@@ -32,6 +32,7 @@ checks=r"""
   check(d.querySelector('.overstock-risk-cell.review strong').textContent==='Review','Unpriced row displayed as Stable');
   check(d.querySelector('.overstock-risk-heading .overstock-risk-info'),'Risk information icon missing');
   const riskHeading=d.querySelector('.overstock-risk-heading');check(getComputedStyle(riskHeading).display==='table-cell','Risk header broke table-cell layout');check(getComputedStyle(riskHeading).whiteSpace==='nowrap','Risk header can wrap vertically');
+  check(riskHeading.textContent.includes('Risk Share'),'Risk Share header label missing');
   check(getComputedStyle(d.querySelector('.overstock-risk-cell')).flexDirection==='row','Risk cell is not single-line');
   check(wrap.scrollWidth<=wrap.clientWidth+1,'Popup horizontal overflow');
   check(d.getBoundingClientRect().left>8,'Popup side margin missing');
