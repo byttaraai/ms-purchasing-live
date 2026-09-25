@@ -44,3 +44,7 @@ The canonical Build 69 risk calculations, product shares, card roll-up, rating t
 - Review rows remain Review with no fabricated amount.
 - The Risk header includes a compact information hint explaining this visual convention and explicitly states that card calculations are unchanged.
 - Product width is reduced slightly and Risk width increased; label/share and SAR are displayed on one line.
+
+## Build 71 population clarification
+
+Products with a missing or zero Reorder Point are not Overstock candidates and are excluded from this model and popup entirely. They are not assigned a synthetic zero baseline and are not shown as Review inside Overstock. Once a valid Reorder Point is saved, the normal stock percentage, >300% eligibility, excess value and risk chain evaluates the product automatically. The existing `Reorder Point < 10` filter remains only for products that already have a valid positive Reorder Point and qualify as Overstock.
