@@ -1,4 +1,4 @@
-/* Build 72: single-line Risk cells; Risk header preserves table-cell layout with inline info icon. */
+/* Build 74: Risk presentation plus compact From/To Excess Value range filter. */
 .overstock-risk-table th:nth-child(1),.overstock-risk-table td:nth-child(1){width:3%;text-align:center}
 .overstock-risk-table th:nth-child(2),.overstock-risk-table td:nth-child(2){width:3%;text-align:center}
 .overstock-risk-table th:nth-child(3),.overstock-risk-table td:nth-child(3){width:18%;text-align:left}
@@ -20,6 +20,9 @@
 .overstock-risk-table th.overstock-risk-heading{text-align:center!important;white-space:nowrap!important}.overstock-risk-heading>span{vertical-align:middle}.overstock-risk-heading>span+span{margin-left:4px}
 .overstock-risk-info{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border:1px solid #c8d1df;border-radius:50%;font-size:9px;font-weight:800;line-height:1;color:#738199;background:#fff;cursor:help;flex:0 0 auto}
 .overstock-risk-info:hover,.overstock-risk-info:focus{border-color:#8d99ad;color:#40506a;outline:none;box-shadow:0 0 0 2px rgba(91,52,252,.08)}
+.overstock-risk-controls label.overstock-value-filter{flex:0 1 230px;min-width:210px}
+.overstock-value-range{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:6px}
+.overstock-value-range input{min-width:0}
 .kpi-overstock-rating.stable{background:#fff1d8;color:#967016}
 .kpi-overstock-rating.critical{background:#9b1931;color:white}
 .kpi-overstock-rating.review,.kpi-overstock-rating.empty{background:#edf0f5;color:#738199}
