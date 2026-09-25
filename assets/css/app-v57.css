@@ -1107,7 +1107,7 @@ main.page.tasks-view{padding-top:14px}
 .supplier-task-review-row:hover{background:#fffaf0}
 .supplier-task-selected{color:#7866a0}
 
-/* Build 55: clickable >200% KPI and overstock risk table */
+/* Build 68: clickable >300% KPI and overstock risk table */
 [data-panel="recommendations"] .overstock-clickable{cursor:pointer;transition:transform .14s ease,box-shadow .14s ease,border-color .14s ease}
 [data-panel="recommendations"] .overstock-clickable:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(36,50,82,.10);border-color:#d8ccef}
 [data-panel="recommendations"] .overstock-clickable:focus-visible{outline:3px solid rgba(91,52,252,.18);outline-offset:2px}
