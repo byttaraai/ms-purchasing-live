@@ -1,30 +1,21 @@
-/* Build 70: compact overstock UI; canonical risk math unchanged, display-only SAR visualization refined. */
+/* Build 71: overstock-only popup; missing/zero Reorder Point rows are outside this view. */
 'use strict';
 const overstockRiskView={supplier:'',sort:'inventory_value_desc',rpFilter:'all',minExcessValue:'',selected:new Set()};
 function overstockRiskScope(){return OverstockRisk.evaluate(state.filtered,C.profitLabel);}
 function overstockInventoryValue(r){return OverstockRisk.inventoryValue(r);}
 function overstockRiskRows(){return overstockRiskScope().rows;}
-function overstockNoReorderRows(){
- return state.filtered.filter(r=>{
-  if(!C.finite(r.stock_qty)||Number(r.stock_qty)<=0)return false;
-  return !C.finite(r.reorder_point)||Number(r.reorder_point)<=0;
- }).map(r=>({...OverstockRisk.reviewRow(r,'A valid Reorder Point is required.'),rp_review:true}));
-}
 function overstockRiskSourceRows(scope=overstockRiskScope()){
  const riskRows=scope.rows;
- if(overstockRiskView.rpFilter==='no_reorder')return overstockNoReorderRows();
  if(overstockRiskView.rpFilter==='under10')return riskRows.filter(r=>C.finite(r.reorder_point)&&Number(r.reorder_point)>0&&Number(r.reorder_point)<10);
  return riskRows;
 }
 function overstockRpModeLabel(){
- if(overstockRiskView.rpFilter==='no_reorder')return'No Reorder Point';
  if(overstockRiskView.rpFilter==='under10')return'Reorder Point < 10';
  return'All Overstock >300%';
 }
 function overstockRpModeNote(){
- if(overstockRiskView.rpFilter==='no_reorder')return'Missing or zero Reorder Point. Review rows only; they are not added to the >300% KPI or Risk calculation until a valid Reorder Point exists.';
  if(overstockRiskView.rpFilter==='under10')return'Only actual >300% overstock rows with a confirmed Reorder Point greater than 0 and below 10.';
- return'Risk shows each product\'s share of positive risk impact in the current BO scope. Stable rows reduce the net card risk.';
+ return'Risk shows each product\'s share of positive risk impact in the current BO scope. Products without a valid Reorder Point are outside this Overstock view.';
 }
 function overstockRiskVisibleRows(baseRows){
  const supplier=overstockRiskView.supplier;
@@ -93,21 +84,21 @@ function openOverstockRiskPopup(options={}){
  if(overstockRiskView.supplier&&overstockRiskView.supplier!=='__none__'&&!suppliers.includes(overstockRiskView.supplier))overstockRiskView.supplier='';
  const rows=overstockRiskVisibleRows(baseRows);
  const visibleCodes=rows.map(r=>r.product_code),selectedVisible=visibleCodes.filter(code=>overstockRiskView.selected.has(code));
- const allVisible=rows.length>0&&selectedVisible.length===rows.length,someVisible=selectedVisible.length>0,isRpReview=overstockRiskView.rpFilter==='no_reorder';
+ const allVisible=rows.length>0&&selectedVisible.length===rows.length,someVisible=selectedVisible.length>0;
  const totalQty=rows.reduce((n,r)=>n+(C.finite(r.excess_qty)?Number(r.excess_qty):0),0);
  const totalExcessValue=rows.reduce((n,r)=>n+(C.finite(r.excess_value)?Number(r.excess_value):0),0);
  const totalInventoryValue=rows.reduce((n,r)=>n+(C.finite(r.inventory_value)?Number(r.inventory_value):0),0);
  let d=$('overstockRiskDialog');
  if(!d){d=document.createElement('dialog');d.id='overstockRiskDialog';d.className='overstock-risk-dialog';document.body.append(d);}
  const supplierOptions=['<option value="">All Suppliers</option>',...suppliers.map(s=>`<option value="${esc(s)}" ${overstockRiskView.supplier===s?'selected':''}>${esc(s)}</option>`),`<option value="__none__" ${overstockRiskView.supplier==='__none__'?'selected':''}>Not assigned</option>`].join('');
- const rpOptions=`<option value="all" ${overstockRiskView.rpFilter==='all'?'selected':''}>All Overstock &gt;300%</option><option value="no_reorder" ${overstockRiskView.rpFilter==='no_reorder'?'selected':''}>No Reorder Point</option><option value="under10" ${overstockRiskView.rpFilter==='under10'?'selected':''}>Reorder Point &lt; 10</option>`;
+ const rpOptions=`<option value="all" ${overstockRiskView.rpFilter==='all'?'selected':''}>All Overstock &gt;300%</option><option value="under10" ${overstockRiskView.rpFilter==='under10'?'selected':''}>Reorder Point &lt; 10</option>`;
  const sortOptions=`<option value="inventory_value_desc" ${overstockRiskView.sort==='inventory_value_desc'?'selected':''}>Inventory Value ↓</option><option value="risk_desc" ${overstockRiskView.sort==='risk_desc'?'selected':''}>Risk Contribution \u2193</option><option value="excess_value_desc" ${overstockRiskView.sort==='excess_value_desc'?'selected':''}>Excess Value ↓</option>`;
  const metric=(v,digits=0)=>C.finite(v)?fmt(v,digits):'—';
  const riskInfo="Risk % is this product's share of total positive risk contribution. The SAR amount is visual only: Risk rows show a minus inverse share of the product Excess Value; Stable rows keep their current offset as plus. Card risk calculations are unchanged.";
  const body=rows.map((r,i)=>`<tr><td class="overstock-risk-select"><input type="checkbox" data-overstock-select="${esc(r.product_code)}" aria-label="Select ${esc(r.product_name)} for printing" ${overstockRiskView.selected.has(r.product_code)?'checked':''}></td><td class="overstock-risk-rank">${i+1}</td><td><div class="product-cell">${productButton(r)}</div></td><td class="overstock-risk-share">${overstockRiskCell(r)}</td><td class="unit" title="${esc(r.purchase_unit||'')}"><span class="overstock-cell-clamp">${esc(r.purchase_unit||'—')}</span></td><td>${stockHtml(r)}</td><td>${pill(r.stock_ratio)}</td><td>${ratingHtml(r.profitability_class)}</td><td class="money">${fmt(r.purchase_price,1)}</td><td class="order">${metric(r.excess_qty,4)}</td><td class="money overstock-excess-value">${metric(r.excess_value,0)}</td><td class="supplier" title="${esc(r.supplier||'Not assigned')}"><span class="overstock-cell-clamp">${esc(r.supplier||'Not assigned')}</span></td></tr>`).join('');
- const emptyText=isRpReview?'No products with stock and a missing / zero Reorder Point in the current filters.':'No matching products in the current Reorder Point filter.';
- const footerExcess=isRpReview?'':`<span><b>${fmt(totalQty,0)}</b> Excess Qty</span><span><b>SAR ${fmt(totalExcessValue,0)}</b> Excess Value</span>`;
- d.innerHTML=`<div class="overstock-risk-shell"><header class="overstock-risk-head"><div><span class="overstock-risk-eyebrow">OVERSTOCK / RP REVIEW</span><h2>Stock Above 300%</h2><p>${esc(overstockRpModeNote())}</p></div><button class="overstock-risk-x" id="overstockRiskClose" type="button" aria-label="Close">&times;</button></header><div class="overstock-risk-controls"><label><span>Supplier</span><select id="overstockSupplierFilter">${supplierOptions}</select></label><label><span>Reorder Point</span><select id="overstockRpFilter">${rpOptions}</select></label><label class="overstock-value-filter"><span>Excess Value Above</span><input id="overstockValueAbove" type="number" min="0" step="1" inputmode="decimal" placeholder="${isRpReview?'Unavailable without RP':'e.g. 50000'}" value="${esc(overstockRiskView.minExcessValue)}" ${isRpReview?'disabled':''}></label><label><span>Sort by</span><select id="overstockSortSelect">${sortOptions}</select></label><button class="overstock-print-btn" id="overstockPrintSelected" type="button" ${selectedVisible.length?'':'disabled'}>Print Selected <span>(${selectedVisible.length})</span></button><div class="overstock-risk-count">${fmt(rows.length,0)} of ${fmt(baseRows.length,0)} products</div></div><div class="overstock-risk-table-wrap"><table class="overstock-risk-table"><thead><tr><th class="overstock-risk-select"><input id="overstockSelectAll" type="checkbox" aria-label="Select all visible overstock products" ${allVisible?'checked':''}></th><th>#</th><th>Product</th><th class="overstock-risk-heading"><span>Risk</span><span class="overstock-risk-info" tabindex="0" aria-label="${esc(riskInfo)}" title="${esc(riskInfo)}">i</span></th><th>Unit</th><th>Stock / Reorder</th><th>Stock %</th><th>Rating</th><th>Price</th><th>Excess Qty</th><th>Excess Value</th><th>Supplier</th></tr></thead><tbody>${body||`<tr><td colspan="12" class="overstock-risk-empty">${esc(emptyText)}</td></tr>`}</tbody></table></div><footer class="overstock-risk-footer"><span><b>${fmt(rows.length,0)}</b> Products</span><span><b>SAR ${fmt(totalInventoryValue,0)}</b> Inventory Value</span>${footerExcess}</footer></div>`;
+ const emptyText='No matching overstock products in the current Reorder Point filter.';
+ const footerExcess=`<span><b>${fmt(totalQty,0)}</b> Excess Qty</span><span><b>SAR ${fmt(totalExcessValue,0)}</b> Excess Value</span>`;
+ d.innerHTML=`<div class="overstock-risk-shell"><header class="overstock-risk-head"><div><span class="overstock-risk-eyebrow">OVERSTOCK RISK REVIEW</span><h2>Stock Above 300%</h2><p>${esc(overstockRpModeNote())}</p></div><button class="overstock-risk-x" id="overstockRiskClose" type="button" aria-label="Close">&times;</button></header><div class="overstock-risk-controls"><label><span>Supplier</span><select id="overstockSupplierFilter">${supplierOptions}</select></label><label><span>Reorder Point</span><select id="overstockRpFilter">${rpOptions}</select></label><label class="overstock-value-filter"><span>Excess Value Above</span><input id="overstockValueAbove" type="number" min="0" step="1" inputmode="decimal" placeholder="e.g. 50000" value="${esc(overstockRiskView.minExcessValue)}"></label><label><span>Sort by</span><select id="overstockSortSelect">${sortOptions}</select></label><button class="overstock-print-btn" id="overstockPrintSelected" type="button" ${selectedVisible.length?'':'disabled'}>Print Selected <span>(${selectedVisible.length})</span></button><div class="overstock-risk-count">${fmt(rows.length,0)} of ${fmt(baseRows.length,0)} products</div></div><div class="overstock-risk-table-wrap"><table class="overstock-risk-table"><thead><tr><th class="overstock-risk-select"><input id="overstockSelectAll" type="checkbox" aria-label="Select all visible overstock products" ${allVisible?'checked':''}></th><th>#</th><th>Product</th><th class="overstock-risk-heading"><span>Risk</span><span class="overstock-risk-info" tabindex="0" aria-label="${esc(riskInfo)}" title="${esc(riskInfo)}">i</span></th><th>Unit</th><th>Stock / Reorder</th><th>Stock %</th><th>Rating</th><th>Price</th><th>Excess Qty</th><th>Excess Value</th><th>Supplier</th></tr></thead><tbody>${body||`<tr><td colspan="12" class="overstock-risk-empty">${esc(emptyText)}</td></tr>`}</tbody></table></div><footer class="overstock-risk-footer"><span><b>${fmt(rows.length,0)}</b> Products</span><span><b>SAR ${fmt(totalInventoryValue,0)}</b> Inventory Value</span>${footerExcess}</footer></div>`;
  function updateOverstockSelection(){
   const count=visibleCodes.filter(code=>overstockRiskView.selected.has(code)).length;
   for(const cb of d.querySelectorAll('[data-overstock-select]'))cb.checked=overstockRiskView.selected.has(cb.dataset.overstockSelect);
@@ -118,7 +109,7 @@ function openOverstockRiskPopup(options={}){
  $('overstockRiskClose').onclick=()=>d.close();
  $('overstockPrintSelected').onclick=overstockPrintSelected;
  $('overstockSupplierFilter').onchange=e=>{overstockRiskView.supplier=e.target.value;overstockRiskView.selected.clear();d.dataset.returnScroll='0';openOverstockRiskPopup({resetScroll:true});};
- $('overstockRpFilter').onchange=e=>{overstockRiskView.rpFilter=e.target.value;if(e.target.value==='no_reorder')overstockRiskView.minExcessValue='';overstockRiskView.supplier='';overstockRiskView.selected.clear();d.dataset.returnScroll='0';openOverstockRiskPopup({resetScroll:true});};
+ $('overstockRpFilter').onchange=e=>{overstockRiskView.rpFilter=e.target.value;overstockRiskView.supplier='';overstockRiskView.selected.clear();d.dataset.returnScroll='0';openOverstockRiskPopup({resetScroll:true});};
  const valueInput=$('overstockValueAbove');
  const applyValueFilter=()=>{const raw=valueInput.value.trim();overstockRiskView.minExcessValue=raw===''?'':String(Math.max(0,Number(raw)||0));overstockRiskView.selected.clear();d.dataset.returnScroll='0';openOverstockRiskPopup({resetScroll:true});};
  valueInput.onchange=applyValueFilter;

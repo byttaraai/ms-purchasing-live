@@ -44,9 +44,12 @@ checks=r"""
   check(overstockRiskScope().positiveImpact===baseDenom,'Popup filter silently changed denominator');
   const rows=overstockRiskVisibleRows(overstockRiskSourceRows());check(rows.every(r=>r.supplier==='Second supplier'),'Supplier filter failed');
   overstockRiskView.supplier='';overstockRiskView.sort='risk_desc';openOverstockRiskPopup();
-  const rp=document.getElementById('overstockRpFilter');rp.value='no_reorder';rp.dispatchEvent(new Event('change',{bubbles:true}));
-  check(document.getElementById('overstockValueAbove').disabled,'No-RP threshold should be disabled');
-  check(d.querySelector('.overstock-risk-cell.review'),'No-RP row needs Review');
+  const rp=document.getElementById('overstockRpFilter');
+  check(![...rp.options].some(o=>o.value==='no_reorder'),'No-Reorder filter should not exist in Overstock');
+  check(!overstockRiskScope().rows.some(r=>r.product_code==='Risk no RP'),'No-RP product leaked into Overstock population');
+  check(![...d.querySelectorAll('[data-code]')].some(x=>x.dataset.code==='Risk no RP'),'No-RP product leaked into Overstock popup');
+  rp.value='under10';rp.dispatchEvent(new Event('change',{bubbles:true}));
+  check(overstockRiskVisibleRows(overstockRiskSourceRows()).every(r=>Number(r.reorder_point)>0&&Number(r.reorder_point)<10),'RP under-10 filter failed');
   overstockRiskView.rpFilter='all';overstockRiskView.supplier='';openOverstockRiskPopup();
   const threshold=document.getElementById('overstockValueAbove');threshold.value='5000';threshold.dispatchEvent(new Event('change',{bubbles:true}));
   check(overstockRiskVisibleRows(overstockRiskSourceRows()).every(r=>r.excess_value>5000),'Excess value threshold failed');
@@ -69,5 +72,5 @@ checks=r"""
 # Use the actual minus character through a JavaScript escape, avoiding transcription ambiguity.
 checks=checks.replace("'\\u2212SAR'.replace('\\\\u2212','\\u2212')", "'\\u2212SAR'")
 assert s.count(anchor)==1;s=s.replace(anchor,checks+'\n'+anchor)
-s=s.replace('PASS: rendered workspace, supplier move, review repair and no false badge','PASS: workspace plus risk roll-up, filters, single-line risk display, selection, print, live master edit and preserved badges')
+s=s.replace('PASS: rendered workspace, supplier move, review repair and no false badge','PASS: workspace plus overstock-only risk population, filters, single-line risk display, selection, print, live master edit and preserved badges')
 Path('smoke.html').write_text(s)
