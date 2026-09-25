@@ -58,7 +58,7 @@ checks=r"""
   overstockRiskView.minExcessValue='';openOverstockRiskPopup();
   const top=overstockRiskScope().rows.find(r=>r.product_code==='Risk large');
   const printed=overstockPrintDocument([top],'Risk Supplier','All Overstock >300%',overstockRiskScope());
-  check(printed.includes(overstockRiskCell(top))&&printed.includes('<th>Risk</th>'),'Print uses another risk calculation');
+  check(printed.includes(overstockRiskCell(top))&&printed.includes('<th>Risk Share</th>'),'Print uses another risk calculation');
   check(!printed.includes('<th>Inventory Value</th>'),'Removed print column returned');
   d.querySelector('[data-code="Risk large"]').click();
   check(document.getElementById('detailDialog').open&&d.open,'Product detail must stack above popup');
