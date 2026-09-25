@@ -25,8 +25,8 @@ checks=r"""
   openOverstockRiskPopup();
   let d=document.getElementById('overstockRiskDialog'),wrap=d.querySelector('.overstock-risk-table-wrap');
   check(d.querySelectorAll('thead th').length===12,'Risk column missing');
-  check(d.querySelector('.overstock-risk-cell.stable strong').textContent==='Stable','Stable label missing');
-  check(d.querySelector('.overstock-risk-cell.stable small').textContent.startsWith('+SAR'),'Stable amount should display as positive offset');
+  check(d.querySelector('.overstock-risk-cell.stable strong').textContent==='Balanced','Balanced label missing');
+  check(d.querySelector('.overstock-risk-cell.stable small').textContent.startsWith('+SAR'),'Balanced amount should display as positive offset');
   check(!d.querySelector('.overstock-risk-cell.positive strong').textContent.includes('+'),'Percentage must not have a plus sign');
   check(d.querySelector('.overstock-risk-cell.positive small').textContent.startsWith('\u2212SAR'.replace('\\u2212','\u2212')),'Risk amount should display with a minus sign');
   check(d.querySelector('.overstock-risk-cell.review strong').textContent==='Review','Unpriced row displayed as Stable');
@@ -45,7 +45,7 @@ checks=r"""
   check(riskFiltered.length>0&&riskFiltered.every(r=>r.risk_status==='positive'&&r.risk_share_pct<=riskAvg),'Risky Low filter failed');
   document.getElementById('overstockRiskShareFilter').value='stable';document.getElementById('overstockRiskShareFilter').dispatchEvent(new Event('change',{bubbles:true}));
   riskFiltered=overstockRiskVisibleRows(overstockRiskSourceRows());
-  check(riskFiltered.length>0&&riskFiltered.every(r=>r.risk_status==='stable'),'Stable Risk Share filter failed');
+  check(riskFiltered.length>0&&riskFiltered.every(r=>r.risk_status==='stable'),'Balanced Risk Share filter failed');
   overstockRiskView.riskShareFilter='all';openOverstockRiskPopup();
   check(getComputedStyle(d.querySelector('.overstock-risk-cell')).flexDirection==='row','Risk cell is not single-line');
   check(wrap.scrollWidth<=wrap.clientWidth+1,'Popup horizontal overflow');

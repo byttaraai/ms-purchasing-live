@@ -59,7 +59,7 @@ test('product reclassification recomputes the entire roll-up without changing fa
 test('old parallel overstock risk models are removed from executable source',()=>{
  const ui=fs.readFileSync('assets/js/overstock-ui-v69.js','utf8');
  for(const term of ['overstockProfitRisk','adjustedOverstockPct','valueScore*.40+qtyScore*.35+profitRisk*.25'])assert(!html.includes(term)&&!ui.includes(term));
- assert(!html.includes('<th>Inventory Value</th>'));assert(ui.includes('Stable'));assert(ui.includes('overstockRiskCell(r)'));
+ assert(!html.includes('<th>Inventory Value</th>'));assert(ui.includes('Balanced'));assert(ui.includes('overstockRiskCell(r)'));
 });
 test('Build 71 removes No Reorder Point from the overstock popup while preserving visual SAR and canonical risk policy',()=>{
  const ui=fs.readFileSync('assets/js/overstock-ui-v69.js','utf8'),css=fs.readFileSync('assets/css/overstock-risk-v69.css','utf8');
