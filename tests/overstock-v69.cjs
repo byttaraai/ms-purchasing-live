@@ -56,6 +56,16 @@ test('old parallel overstock risk models are removed from executable source',()=
  for(const term of ['overstockProfitRisk','adjustedOverstockPct','valueScore*.40+qtyScore*.35+profitRisk*.25'])assert(!html.includes(term)&&!ui.includes(term));
  assert(!html.includes('<th>Inventory Value</th>'));assert(ui.includes('Stable'));assert(ui.includes('overstockRiskCell(r)'));
 });
+test('Build 70 changes only the displayed SAR direction and keeps canonical risk math untouched',()=>{
+ const ui=fs.readFileSync('assets/js/overstock-ui-v69.js','utf8'),css=fs.readFileSync('assets/css/overstock-risk-v69.css','utf8');
+ assert(ui.includes("r.risk_status==='positive'&&r.risk_factor>1")&&ui.includes("1-1/r.risk_factor"));
+ assert(ui.includes("r.risk_status==='stable')return Math.abs(Number(r.risk_impact)||0)"));
+ assert(ui.includes('overstock-risk-info')&&ui.includes('Card risk calculations are unchanged.'));
+ assert(css.includes('width:18%;text-align:left')&&css.includes('width:13%;text-align:center'));
+ assert(css.includes('flex-direction:row'));
+ const bytes=fs.readFileSync('assets/js/overstock-risk-v69.js');const sha=crypto.createHash('sha1').update(Buffer.from('blob '+bytes.length+'\\0')).update(bytes).digest('hex');
+ assert.equal(sha,'55245ceccd8bcf07e6048ae567817a39c9e73370');
+});
 test('new model has no IO, persistence, task completion or badge side effects',()=>{
  const code=fs.readFileSync('assets/js/overstock-risk-v69.js','utf8');
  for(const pattern of [/\bfetch\s*\(/,/\brpc\s*\(/,/localStorage/,/sessionStorage/,/document\./,/badge_awarded/])assert(!pattern.test(code));
