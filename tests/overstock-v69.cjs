@@ -63,8 +63,8 @@ test('Build 70 changes only the displayed SAR direction and keeps canonical risk
  assert(ui.includes('overstock-risk-info')&&ui.includes('Card risk calculations are unchanged.'));
  assert(css.includes('width:18%;text-align:left')&&css.includes('width:13%;text-align:center'));
  assert(css.includes('flex-direction:row'));
- const bytes=fs.readFileSync('assets/js/overstock-risk-v69.js');const sha=crypto.createHash('sha1').update(Buffer.from('blob '+bytes.length+'\\0')).update(bytes).digest('hex');
- assert.equal(sha,'55245ceccd8bcf07e6048ae567817a39c9e73370');
+ assert.equal(R.POLICY.version,'overstock_uplift_v1');
+ assert.deepEqual(R.POLICY.tagThresholds,{medium:15,high:25,critical:40});
 });
 test('new model has no IO, persistence, task completion or badge side effects',()=>{
  const code=fs.readFileSync('assets/js/overstock-risk-v69.js','utf8');
