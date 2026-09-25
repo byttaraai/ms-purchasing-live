@@ -17,7 +17,7 @@
 .overstock-risk-cell.positive{color:#b82d43}
 .overstock-risk-cell.stable{color:#967016}
 .overstock-risk-cell.review{color:#738199}
-.overstock-risk-heading{text-align:center!important;white-space:nowrap}.overstock-risk-heading>span{vertical-align:middle}.overstock-risk-heading>span+span{margin-left:4px}
+.overstock-risk-table th.overstock-risk-heading{text-align:center!important;white-space:nowrap!important}.overstock-risk-heading>span{vertical-align:middle}.overstock-risk-heading>span+span{margin-left:4px}
 .overstock-risk-info{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border:1px solid #c8d1df;border-radius:50%;font-size:9px;font-weight:800;line-height:1;color:#738199;background:#fff;cursor:help;flex:0 0 auto}
 .overstock-risk-info:hover,.overstock-risk-info:focus{border-color:#8d99ad;color:#40506a;outline:none;box-shadow:0 0 0 2px rgba(91,52,252,.08)}
 .kpi-overstock-rating.stable{background:#fff1d8;color:#967016}
