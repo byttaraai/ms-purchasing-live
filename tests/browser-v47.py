@@ -16,6 +16,10 @@ window.fetch=async(url,options)=>{
  else if(String(url).endsWith('purchasing_workspace_revision_v47'))value={master_revision:browserFixture.master_revision,upload_id:browserFixture.upload.id};
  else if(String(url).endsWith('purchasing_workspace_state_v58')){const a=deriveWorkspace(browserFixture);value={cycles:a.cycles,score:Math.round(a.model.score),authority_version:'server_v58',source:{master_revision:browserFixture.master_revision,upload_id:browserFixture.upload.id}};}
  else if(String(url).endsWith('purchasing_workspace_sync_v58'))value={ok:true,cycle:{id:'test-cycle',upload_id:browserFixture.upload.id},tasks:p.tasks.map(t=>({...t,id:t.task_key,status:'open',badge_awarded:false})),cycles:structuredClone(state.shortageCycles||{}),authority:{score:p.score,authority_version:'server_v58'},badge_total:0,recent_badges:[],professional_rank:'Builder',rank_metrics:{history_count:1},source:{master_revision:p.master_revision,upload_id:p.upload_id}};
+ else if(String(url).endsWith('purchasing_supplier_action_v78')){
+   if(p?.action==='record'){window.browserSupplierAction={recorded:true,task_id:p.task_id,recorded_at:new Date().toISOString(),codes:p.codes||[],supplier:'Supplier B'};value=window.browserSupplierAction;}
+   else value=window.browserSupplierAction||{recorded:false,task_id:p?.task_id};
+ }
  else throw Error('Unexpected network URL in test');
  return new Response(JSON.stringify(value),{status:200,headers:{'Content-Type':'application/json'}});
 };
@@ -36,8 +40,27 @@ addEventListener('load',async()=>{
   await msAudit.loadLive();
   if(msAudit.getState().taskAssistant.tasks.some(t=>t.focus==='data'))throw Error('Stale master review');
   if(document.getElementById('tasksBadgeTotal').textContent!=='0')throw Error('False badge');
+  const supplierTask=msAudit.getState().taskAssistant.tasks.find(t=>t.focus==='suppliers'&&t.target==='Supplier B');
+  if(!supplierTask)throw Error('Supplier task missing for UI test');
+  await ta16OpenTask(supplierTask);
+  const sd=document.getElementById('supplierTaskDialog');
+  if(!sd?.open)throw Error('Supplier task popup did not open');
+  if(sd.querySelectorAll('thead th').length!==11)throw Error('Supplier column was not removed');
+  if(!sd.querySelector('.supplier-task-summary')||!document.getElementById('supplierTaskSeverity')||!document.getElementById('supplierTaskRating'))throw Error('Supplier task summary/filters missing');
+  if(sd.querySelector('.supplier-task-table-wrap').scrollWidth>sd.querySelector('.supplier-task-table-wrap').clientWidth+1)throw Error('Supplier task has horizontal overflow');
+  document.getElementById('supplierTaskSeverity').value='critical';document.getElementById('supplierTaskSeverity').dispatchEvent(new Event('change',{bubbles:true}));
+  if(![...sd.querySelectorAll('.supplier-task-table tbody tr')].every(tr=>{const txt=tr.children[5]?.textContent||'';return !txt||parseFloat(txt)<10;}))throw Error('Critical supplier filter failed');
+  SupplierTaskUI.severity='all';renderSupplierTaskPopupV78(supplierTask,undefined,SupplierTaskUI.actionState);
+  document.getElementById('supplierTaskSortValue').click();
+  if(SupplierTaskUI.sort!=='shortage_value_desc')throw Error('Supplier shortage value quick sort failed');
+  if(document.getElementById('supplierTaskRecord').disabled)throw Error('Supplier action button should be enabled for selected purchase lines');
+  await document.getElementById('supplierTaskRecord').onclick();
+  if(!sd.querySelector('.supplier-task-status')||!sd.querySelector('.supplier-task-status').textContent.includes('Pending verification'))throw Error('Supplier action pending-verification status missing');
+  if(msAudit.getState().taskAssistant.tasks.find(t=>t.task_key===supplierTask.task_key)?.status!=='open')throw Error('Recording supplier action completed the task');
+  if(document.getElementById('tasksBadgeTotal').textContent!=='0')throw Error('Supplier action awarded an unverified badge');
+  sd.close();
   if(browserErrors.length)throw Error(browserErrors.join('; '));
-  report.textContent='PASS: rendered workspace, supplier move, review repair and no false badge';
+  report.textContent='PASS: rendered workspace, supplier task UI/action pending verification, supplier move, review repair and no false badge';
  }catch(e){report.textContent='FAIL: '+e.message;}
 });
 '''
