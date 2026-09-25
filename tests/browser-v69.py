@@ -31,6 +31,7 @@ checks=r"""
   check(d.querySelector('.overstock-risk-cell.positive small').textContent.startsWith('\u2212SAR'.replace('\\u2212','\u2212')),'Risk amount should display with a minus sign');
   check(d.querySelector('.overstock-risk-cell.review strong').textContent==='Review','Unpriced row displayed as Stable');
   check(d.querySelector('.overstock-risk-heading .overstock-risk-info'),'Risk information icon missing');
+  const riskHeading=d.querySelector('.overstock-risk-heading');check(getComputedStyle(riskHeading).display==='table-cell','Risk header broke table-cell layout');check(getComputedStyle(riskHeading).whiteSpace==='nowrap','Risk header can wrap vertically');
   check(getComputedStyle(d.querySelector('.overstock-risk-cell')).flexDirection==='row','Risk cell is not single-line');
   check(wrap.scrollWidth<=wrap.clientWidth+1,'Popup horizontal overflow');
   check(d.getBoundingClientRect().left>8,'Popup side margin missing');
@@ -72,5 +73,5 @@ checks=r"""
 # Use the actual minus character through a JavaScript escape, avoiding transcription ambiguity.
 checks=checks.replace("'\\u2212SAR'.replace('\\\\u2212','\\u2212')", "'\\u2212SAR'")
 assert s.count(anchor)==1;s=s.replace(anchor,checks+'\n'+anchor)
-s=s.replace('PASS: rendered workspace, supplier move, review repair and no false badge','PASS: workspace plus overstock-only risk population, filters, single-line risk display, selection, print, live master edit and preserved badges')
+s=s.replace('PASS: rendered workspace, supplier move, review repair and no false badge','PASS: workspace plus overstock-only risk population, horizontal Risk header, single-line risk display, selection, print, live master edit and preserved badges')
 Path('smoke.html').write_text(s)
