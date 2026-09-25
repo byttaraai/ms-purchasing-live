@@ -49,3 +49,4 @@ This manifest mirrors the migration history reported by the live project on 2026
 | 20260924161035 | build58_server_authoritative_score_foundation |
 | 20260924162133 | build58_retire_public_v47_sync |
 | 20260924172132 | build60_optimize_server_recalculation |
+| 20260925220857 | build78_supplier_action_tracking |
