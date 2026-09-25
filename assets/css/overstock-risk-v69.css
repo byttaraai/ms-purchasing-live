@@ -1,8 +1,8 @@
-/* Build 69: two-line Risk cells, shared card tags, same compact 300% popup. */
+/* Build 70: single-line Risk cells, wider Risk column, compact inline explanation icon. */
 .overstock-risk-table th:nth-child(1),.overstock-risk-table td:nth-child(1){width:3%;text-align:center}
 .overstock-risk-table th:nth-child(2),.overstock-risk-table td:nth-child(2){width:3%;text-align:center}
-.overstock-risk-table th:nth-child(3),.overstock-risk-table td:nth-child(3){width:21%;text-align:left}
-.overstock-risk-table th:nth-child(4),.overstock-risk-table td:nth-child(4){width:10%;text-align:center}
+.overstock-risk-table th:nth-child(3),.overstock-risk-table td:nth-child(3){width:18%;text-align:left}
+.overstock-risk-table th:nth-child(4),.overstock-risk-table td:nth-child(4){width:13%;text-align:center}
 .overstock-risk-table th:nth-child(5),.overstock-risk-table td:nth-child(5){width:5%;text-align:left}
 .overstock-risk-table th:nth-child(6),.overstock-risk-table td:nth-child(6){width:10%;text-align:left}
 .overstock-risk-table th:nth-child(7),.overstock-risk-table td:nth-child(7){width:6%;text-align:center}
@@ -11,12 +11,15 @@
 .overstock-risk-table th:nth-child(10),.overstock-risk-table td:nth-child(10){width:7%;text-align:right}
 .overstock-risk-table th:nth-child(11),.overstock-risk-table td:nth-child(11){width:9%;text-align:right}
 .overstock-risk-table th:nth-child(12),.overstock-risk-table td:nth-child(12){width:13%;text-align:right}
-.overstock-risk-cell{display:flex;flex-direction:column;align-items:center;gap:3px;line-height:1.2;font-variant-numeric:tabular-nums;white-space:nowrap}
+.overstock-risk-cell{display:inline-flex;flex-direction:row;align-items:baseline;justify-content:center;gap:6px;line-height:1.2;font-variant-numeric:tabular-nums;white-space:nowrap;max-width:100%}
 .overstock-risk-cell strong{font-size:11px;font-weight:800}
-.overstock-risk-cell small{font-size:9px;font-weight:500}
+.overstock-risk-cell small{font-size:9px;font-weight:500;opacity:.72}
 .overstock-risk-cell.positive{color:#b82d43}
 .overstock-risk-cell.stable{color:#967016}
 .overstock-risk-cell.review{color:#738199}
+.overstock-risk-heading{display:flex;align-items:center;justify-content:center;gap:4px}
+.overstock-risk-info{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border:1px solid #c8d1df;border-radius:50%;font-size:9px;font-weight:800;line-height:1;color:#738199;background:#fff;cursor:help;flex:0 0 auto}
+.overstock-risk-info:hover,.overstock-risk-info:focus{border-color:#8d99ad;color:#40506a;outline:none;box-shadow:0 0 0 2px rgba(91,52,252,.08)}
 .kpi-overstock-rating.stable{background:#fff1d8;color:#967016}
 .kpi-overstock-rating.critical{background:#9b1931;color:white}
 .kpi-overstock-rating.review,.kpi-overstock-rating.empty{background:#edf0f5;color:#738199}
