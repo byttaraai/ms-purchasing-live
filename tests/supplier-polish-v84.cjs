@@ -32,7 +32,7 @@ test('current location, changed data, unsaved draft and reviewed are separate vi
  assert(source.includes('Stage review saved. This does not complete the supplier task.'));
 });
 test('Build 84 follows the unchanged split layer and labels the new release',()=>{
- const index=read('index.html');assert(index.includes('Live Build 90'));
+ const index=read('index.html');assert(index.includes('Live Build 91'));
  assert(index.indexOf('supplier-polish-v84.js')>index.indexOf('supplier-layout-v83.js'));
  assert(index.indexOf('supplier-polish-v84.css')>index.indexOf('supplier-layout-v83.css'));
 });
