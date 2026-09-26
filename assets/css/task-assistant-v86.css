@@ -1,0 +1,104 @@
+/* Build 86: task-focused Tasks Assistant and top-level Output Lists. UI only. */
+[data-panel="tasks-assistant"] .tasks-assistant-page.ta86-focus{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 318px;
+  grid-template-areas:"head rail" "inventory rail" "board rail";
+  align-items:start;
+  gap:14px 16px;
+}
+.ta86-page-head{grid-area:head;display:flex;align-items:flex-end;justify-content:space-between;gap:16px;min-width:0;padding:2px 2px 0}
+.ta86-page-head h2{margin:0;color:#14274d;font-size:25px;line-height:1.15;letter-spacing:-.35px}
+.ta86-page-head p{margin:5px 0 0;color:#6e7d96;font-size:11px;line-height:1.4}
+.ta86-head-actions{display:flex;align-items:center;gap:8px}
+.ta86-head-actions .ta15-counter{min-height:38px;padding:7px 11px}
+.ta86-head-actions .ta15-counter b{font-size:18px}
+[data-panel="tasks-assistant"] .ta16-inventory{grid-area:inventory}
+[data-panel="tasks-assistant"] .tasks-overview-strip.v3.ta86-rail{
+  grid-area:rail;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  position:sticky;
+  top:calc(var(--topbar-height,70px) + 14px);
+  align-self:start;
+}
+[data-panel="tasks-assistant"] .tasks-overview-strip.v3.ta86-rail .ta15-card{
+  width:100%;
+  height:auto;
+  min-height:132px;
+}
+[data-panel="tasks-assistant"] .tasks-overview-strip.v3.ta86-rail .ta15-performance{min-height:150px}
+[data-panel="tasks-assistant"] .tasks-overview-strip.v3.ta86-rail .ta15-rank{min-height:156px}
+[data-panel="tasks-assistant"] .tasks-overview-strip.v3.ta86-rail .ta15-achievements{min-height:150px}
+.ta86-badge-summary{margin-left:auto;font-size:9px;color:#7b879c}
+[data-panel="tasks-assistant"] .ta16-board.ta86-board{
+  grid-area:board;
+  display:grid;
+  grid-template-columns:minmax(0,47fr) minmax(0,53fr);
+  grid-template-rows:auto auto;
+  gap:14px;
+  align-items:start;
+}
+[data-panel="tasks-assistant"] .ta86-board .ta16-suppliers{grid-column:1;grid-row:1 / span 2}
+[data-panel="tasks-assistant"] .ta86-board .ta16-products{grid-column:2;grid-row:1}
+[data-panel="tasks-assistant"] .ta86-board .ta16-master{grid-column:2;grid-row:2}
+.ta86-supplier-head-actions{display:flex;align-items:center;gap:7px;flex:none}
+.ta86-view-all{min-height:29px!important;padding:4px 8px!important;font-size:10px!important;border-radius:8px!important}
+.ta86-supplier-hidden{display:none!important}
+.ta86-task-state{color:#315fb8;background:#eef4ff;border-radius:999px;padding:1px 6px;font-size:9px;font-weight:750;white-space:nowrap}
+[data-panel="tasks-assistant"] .ta16-event p{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+[data-panel="tasks-assistant"] .ta86-master-compact .ta16-column-head{padding-bottom:8px}
+[data-panel="tasks-assistant"] .ta86-master-compact .ta16-notice{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:5px 12px;
+  align-items:center;
+  margin-bottom:9px;
+  padding:10px 12px;
+}
+[data-panel="tasks-assistant"] .ta86-master-compact .ta16-notice .ta16-eyebrow,
+[data-panel="tasks-assistant"] .ta86-master-compact .ta16-notice strong,
+[data-panel="tasks-assistant"] .ta86-master-compact .ta16-notice p{grid-column:1}
+[data-panel="tasks-assistant"] .ta86-master-compact .ta16-notice p{margin:1px 0;font-size:10px}
+[data-panel="tasks-assistant"] .ta86-master-compact .ta16-notice .btn{grid-column:2;grid-row:1 / span 3;align-self:center}
+[data-panel="tasks-assistant"] .ta86-master-compact .ta16-body{padding-bottom:11px}
+[data-panel="tasks-assistant"] .ta86-master-compact .ta16-master-caption{margin-bottom:6px}
+
+.ta86-output-nav{position:relative}
+.ta86-output-count{display:inline-grid;place-items:center;min-width:17px;height:17px;margin-left:3px;padding:0 4px;border-radius:999px;background:#e9475d;color:#fff;font-size:8px;font-weight:850;line-height:1}
+.ta86-output-count.hidden{display:none}
+.ta86-output-page{display:flex;flex-direction:column;gap:14px}
+.ta86-output-page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px}
+.ta86-output-page-head span{display:block;color:#7762c1;font-size:9px;font-weight:850;letter-spacing:.08em}
+.ta86-output-page-head h2{margin:3px 0 0;color:#15284d;font-size:25px}
+.ta86-output-page-head p{margin:5px 0 0;color:#71809a;font-size:11px;line-height:1.45}
+[data-panel="output-lists"] #supplierQuestOutputs{margin:0}
+[data-panel="output-lists"] .sq-output-header h3{font-size:18px}
+#supplierQuestPageTabs.hidden{display:none!important}
+
+@media(max-width:1180px){
+  [data-panel="tasks-assistant"] .tasks-assistant-page.ta86-focus{
+    grid-template-columns:minmax(0,1fr);
+    grid-template-areas:"head" "rail" "inventory" "board";
+  }
+  [data-panel="tasks-assistant"] .tasks-overview-strip.v3.ta86-rail{
+    position:static;
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+  }
+  [data-panel="tasks-assistant"] .tasks-overview-strip.v3.ta86-rail .ta15-card{min-height:136px}
+}
+@media(max-width:900px){
+  [data-panel="tasks-assistant"] .tasks-overview-strip.v3.ta86-rail{grid-template-columns:1fr 1fr}
+  [data-panel="tasks-assistant"] .tasks-overview-strip.v3.ta86-rail .ta15-achievements{grid-column:1/-1}
+  [data-panel="tasks-assistant"] .ta16-board.ta86-board{grid-template-columns:minmax(0,1fr)}
+  [data-panel="tasks-assistant"] .ta86-board .ta16-suppliers,
+  [data-panel="tasks-assistant"] .ta86-board .ta16-products,
+  [data-panel="tasks-assistant"] .ta86-board .ta16-master{grid-column:auto;grid-row:auto}
+}
+@media(max-width:640px){
+  .ta86-page-head{align-items:flex-start;flex-direction:column}
+  [data-panel="tasks-assistant"] .tasks-overview-strip.v3.ta86-rail{grid-template-columns:1fr}
+  [data-panel="tasks-assistant"] .tasks-overview-strip.v3.ta86-rail .ta15-achievements{grid-column:auto}
+  .ta86-supplier-head-actions{align-items:flex-end;flex-direction:column}
+}

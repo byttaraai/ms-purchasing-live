@@ -20,6 +20,7 @@ test('business/risk assets are byte-for-byte unchanged',()=>{
 });
 test('index changes are limited to UI assets and build labels',()=>{
  let html=fs.readFileSync(path.join(root,'index.html'),'utf8');
+ html=html.replace('\n<link rel="stylesheet" href="assets/css/task-assistant-v86.css?v=86">','').replace('<script src="assets/js/task-assistant-v86.js?v=86"></script>','').replaceAll('Live Build 86','Live Build 85').replaceAll('Build 86 |','Build 85 |');
  html=html.replace('\n<link rel="stylesheet" href="assets/css/supplier-toolbar-v85.css?v=85">','').replace('<script src="assets/js/supplier-toolbar-v85.js?v=85"></script>','').replaceAll('Live Build 85','Live Build 84').replaceAll('Build 85 |','Build 84 |');
  html=html.replace('\n<link rel="stylesheet" href="assets/css/supplier-polish-v84.css?v=84">','').replace('<script src="assets/js/supplier-polish-v84.js?v=84"></script>','').replaceAll('Live Build 84','Live Build 83').replaceAll('Build 84 |','Build 83 |');
  html=html.replace('\n<link rel="stylesheet" href="assets/css/supplier-layout-v83.css?v=83">','').replace('<script src="assets/js/supplier-layout-v83.js?v=83"></script>','').replaceAll('Live Build 83','Live Build 82').replaceAll('Build 83 |','Build 82 |');
