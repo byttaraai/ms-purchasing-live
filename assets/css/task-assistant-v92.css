@@ -1,0 +1,176 @@
+/* Build 92: compact Master Data Review card. UI only. */
+[data-panel="tasks-assistant"] .ta16-master.ta92-master-card .ta16-column-head{
+  padding-bottom:7px;
+}
+[data-panel="tasks-assistant"] .ta16-master.ta92-master-card > .ta16-column-head .ta16-open-count{
+  padding:4px 8px;
+  font-size:9px;
+}
+[data-panel="tasks-assistant"] .ta16-master .ta16-notice.ta92-master-summary{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  grid-template-areas:
+    "label action"
+    "total action"
+    "chips chips"
+    "cycle cycle";
+  align-items:center;
+  gap:4px 10px;
+  margin-bottom:8px;
+  padding:9px 10px;
+}
+.ta92-master-label{
+  grid-area:label;
+  position:relative;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  width:max-content;
+  max-width:100%;
+}
+.ta92-master-label .ta16-eyebrow{margin:0}
+.ta92-master-info{
+  display:inline-grid;
+  place-items:center;
+  width:18px;
+  height:18px;
+  padding:0;
+  border:1px solid #e1c98e;
+  border-radius:50%;
+  background:#fff;
+  color:#9a6817;
+  font:800 10px/1 system-ui,sans-serif;
+  cursor:pointer;
+}
+.ta92-master-info:hover,.ta92-master-info:focus-visible{
+  border-color:#c99532;
+  background:#fff9ec;
+  outline:none;
+}
+.ta92-master-popover{
+  display:none;
+  position:absolute;
+  z-index:30;
+  top:24px;
+  left:0;
+  width:min(330px,72vw);
+  padding:9px 10px;
+  border:1px solid #ead9b2;
+  border-radius:9px;
+  background:#fff;
+  color:#6e6044;
+  font-size:10px;
+  line-height:1.45;
+  box-shadow:0 8px 24px rgba(67,49,18,.14);
+}
+.ta92-master-label.open .ta92-master-popover,
+.ta92-master-label:focus-within .ta92-master-popover{display:block}
+
+[data-panel="tasks-assistant"] .ta16-master .ta92-master-total{
+  grid-area:total;
+  margin:0;
+  line-height:1.2;
+}
+[data-panel="tasks-assistant"] .ta16-master .ta92-master-total b{
+  font-size:23px;
+  margin-right:5px;
+}
+[data-panel="tasks-assistant"] .ta16-master .ta92-master-view-all{
+  grid-area:action;
+  align-self:center;
+  min-height:29px;
+  padding:4px 9px;
+  font-size:10px;
+  white-space:nowrap;
+}
+[data-panel="tasks-assistant"] .ta16-master .ta92-master-chips{
+  grid-area:chips;
+  display:flex;
+  align-items:center;
+  gap:5px;
+  flex-wrap:wrap;
+  margin-top:3px;
+}
+.ta92-master-chip{
+  display:inline-flex;
+  align-items:center;
+  gap:3px;
+  min-height:21px;
+  padding:2px 6px;
+  border:1px solid #eadfcb;
+  border-radius:999px;
+  background:#fff;
+  color:#77684f;
+  font-size:9px;
+  line-height:1.2;
+  white-space:nowrap;
+}
+.ta92-master-chip b{
+  color:#4d3d25;
+  font-size:9px;
+  font-variant-numeric:tabular-nums;
+}
+.ta92-master-chip.ta92-master{border-color:#e4d9ff;color:#6e54b5}
+.ta92-master-chip.ta92-master b{color:#5b34fc}
+
+[data-panel="tasks-assistant"] .ta16-master .ta92-master-cycle-note{
+  grid-area:cycle;
+  margin:1px 0 0;
+  color:#8a7c63;
+  font-size:9.5px;
+}
+[data-panel="tasks-assistant"] .ta16-master .ta92-master-caption{
+  margin-bottom:5px;
+  padding:0 1px;
+}
+[data-panel="tasks-assistant"] .ta16-master .ta92-master-caption strong{
+  font-size:9px;
+  letter-spacing:.06em;
+  color:#7c6a9a;
+}
+[data-panel="tasks-assistant"] .ta16-master .ta92-master-caption span{
+  font-size:9px;
+}
+
+[data-panel="tasks-assistant"] .ta16-master .ta16-task.ta92-master-task{
+  padding:8px 10px;
+}
+[data-panel="tasks-assistant"] .ta16-master .ta92-master-task .ta16-task-line{
+  align-items:center;
+}
+[data-panel="tasks-assistant"] .ta16-master .ta92-master-task .ta16-task-meta{
+  margin-top:4px;
+  gap:5px 8px;
+  min-height:20px;
+}
+[data-panel="tasks-assistant"] .ta16-master .ta92-master-task .ta92-inline-badge{
+  margin:0;
+  padding:1px 6px;
+  border-radius:999px;
+  background:#f4f1ff;
+  color:#7562a4;
+  font-size:9px;
+  line-height:1.55;
+  white-space:nowrap;
+}
+[data-panel="tasks-assistant"] .ta16-master .ta92-master-task .ta92-inline-badge svg{
+  width:10px;
+  height:10px;
+}
+[data-panel="tasks-assistant"] .ta16-master .ta92-master-task .tasks-open-task{
+  min-height:28px;
+  padding:4px 8px;
+}
+[data-panel="tasks-assistant"] .ta16-master .ta16-task-list{gap:6px}
+
+@media(max-width:640px){
+  [data-panel="tasks-assistant"] .ta16-master .ta16-notice.ta92-master-summary{
+    grid-template-columns:minmax(0,1fr);
+    grid-template-areas:"label" "total" "chips" "cycle" "action";
+  }
+  [data-panel="tasks-assistant"] .ta16-master .ta92-master-view-all{
+    justify-self:start;
+    margin-top:2px;
+  }
+  .ta92-master-popover{width:min(290px,84vw)}
+}
