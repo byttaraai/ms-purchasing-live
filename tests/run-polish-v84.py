@@ -85,7 +85,11 @@ def main():
                 # Unknown price gets an explanatory hint; no zero is substituted.
                 page.evaluate("()=>{qaQuest.current_stage='10_50';supplierQuestRender(SupplierQuestUI.task,{quest:qaQuest,master_revision:1,stale_stages:[]});}")
                 missing=page.locator('.sq84-missing-price');assert missing.count()==1
-                missing.focus();assert page.locator('#sq84Tooltip').inner_text()=='Purchase price missing'
+                missing.focus()
+                # Focus scrolling can be queued after focusin. The keyboard hint must survive.
+                page.locator('#supplierQuestContent').evaluate('(el)=>el.dispatchEvent(new Event("scroll"))')
+                page.wait_for_timeout(60)
+                assert page.locator('#sq84Tooltip').inner_text()=='Purchase price missing'
                 assert missing.inner_text()=='\u2014'
                 if args.screenshots:
                     out=Path(args.screenshots);out.mkdir(parents=True,exist_ok=True)
