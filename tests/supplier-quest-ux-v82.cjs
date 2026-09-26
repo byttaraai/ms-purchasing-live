@@ -20,6 +20,7 @@ test('business/risk assets are byte-for-byte unchanged',()=>{
 });
 test('index changes are limited to UI assets and build labels',()=>{
  let html=fs.readFileSync(path.join(root,'index.html'),'utf8');
+ html=html.replace('\n<link rel="stylesheet" href="assets/css/supplier-layout-v83.css?v=83">','').replace('<script src="assets/js/supplier-layout-v83.js?v=83"></script>','').replaceAll('Live Build 83','Live Build 82').replaceAll('Build 83 |','Build 82 |');
  html=html.replaceAll('supplier-task-v82.css?v=82','supplier-task-v80.css?v=80').replaceAll('supplier-task-v82.js?v=82','supplier-task-v81.js?v=81').replaceAll('Live Build 82','Live Build 81').replaceAll('Build 82 |','Build 81 |');
  assert.equal(crypto.createHash('sha256').update(html).digest('hex'),protectedFiles.index);
 });

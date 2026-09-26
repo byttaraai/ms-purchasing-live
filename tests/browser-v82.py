@@ -75,7 +75,15 @@ addEventListener('load',async()=>{
   const bounds=dialog.getBoundingClientRect(),footer=dialog.querySelector('.sq-footer').getBoundingClientRect();
   check(bounds.left>=0&&bounds.right<=innerWidth+1,'Dialog outside viewport');
   check(footer.bottom<=innerHeight+1,'Footer outside viewport');
-  check(dialog.querySelector('.sq-steps').getBoundingClientRect().top<dialog.querySelector('.sq-stage').getBoundingClientRect().top,'Responsive stepper moved below content');
+  // Build 83 intentionally moves the stepper to the right, freeing table height.
+  if(dialog.classList.contains('sq83')){
+    check(dialog.querySelector('.sq83-controls').contains(dialog.querySelector('.sq-steps')),'Stages not in control panel');
+    check(dialog.querySelector('.sq83-workspace').contains(content),'Table not in workspace');
+    if(innerWidth>=980){
+      check(content.getBoundingClientRect().right<=dialog.querySelector('.sq83-controls').getBoundingClientRect().left+1,'Control panel overlaps table');
+      check(content.clientHeight>bounds.height*.8,'Table height still consumed by controls');
+    }
+  }else check(dialog.querySelector('.sq-steps').getBoundingClientRect().top<dialog.querySelector('.sq-stage').getBoundingClientRect().top,'Responsive stepper moved below content');
   if(innerWidth>=1200)check(content.scrollWidth<=content.clientWidth+1,'Desktop horizontal overflow');
   content.scrollTop=130;const scroll=content.scrollTop;
   choose('Critical A');choose('Critical B');
