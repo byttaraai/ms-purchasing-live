@@ -35,7 +35,7 @@ test('responsive layouts keep tasks usable on tablet and mobile',()=>{
   assert(css.includes('@media(max-width:640px)'));
 });
 test('Build 86 loads after Build 85 and labels the release',()=>{
-  assert(html.includes('Live Build 90'));
+  assert(html.includes('Live Build 91'));
   assert(html.indexOf('task-assistant-v86.js?v=86')>html.indexOf('supplier-toolbar-v85.js?v=85'));
   assert(html.indexOf('task-assistant-v86.css?v=86')>html.indexOf('supplier-toolbar-v85.css?v=85'));
 });

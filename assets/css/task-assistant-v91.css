@@ -1,0 +1,45 @@
+/* Build 91: compact Profit Recovery task cards. UI only. */
+[data-panel="tasks-assistant"] .ta16-profit .ta16-task.ta91-profit-card{
+  padding:8px 10px;
+}
+[data-panel="tasks-assistant"] .ta16-profit .ta91-profit-card .ta16-task-line{
+  align-items:center;
+}
+[data-panel="tasks-assistant"] .ta16-profit .ta91-profit-card .ta16-task-meta{
+  margin-top:4px;
+  gap:5px 8px;
+  min-height:20px;
+}
+[data-panel="tasks-assistant"] .ta16-profit .ta91-profit-card .ta91-inline-badge{
+  margin:0;
+  padding:1px 6px;
+  border-radius:999px;
+  background:#f4f1ff;
+  color:#7562a4;
+  font-size:9px;
+  line-height:1.55;
+  white-space:nowrap;
+}
+[data-panel="tasks-assistant"] .ta16-profit .ta91-profit-card .ta91-inline-badge svg{
+  width:10px;
+  height:10px;
+}
+[data-panel="tasks-assistant"] .ta16-profit .ta91-profit-card .tasks-open-task{
+  min-height:28px;
+  padding:4px 8px;
+}
+[data-panel="tasks-assistant"] .ta16-profit .ta16-task-list{
+  gap:6px;
+}
+[data-panel="tasks-assistant"] .ta16-profit .ta16-section + .ta16-section{
+  margin-top:7px;
+}
+[data-panel="tasks-assistant"] .ta16-profit .ta16-subhead{
+  margin-bottom:5px;
+}
+
+@media(max-width:640px){
+  [data-panel="tasks-assistant"] .ta16-profit .ta91-profit-card .ta16-task-meta{
+    gap:4px 6px;
+  }
+}
