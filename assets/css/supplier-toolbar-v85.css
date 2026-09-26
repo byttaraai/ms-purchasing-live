@@ -1,0 +1,40 @@
+/* Build 85: table tools share the existing title row; no extra toolbar height. */
+#supplierTaskDialog.sq85 .sq83-workspace>.sq-stage{position:relative;z-index:3;padding:8px 18px}
+#supplierTaskDialog.sq85 .sq-stage-title{position:relative;align-items:center;justify-content:flex-start;flex-wrap:nowrap;gap:12px;min-width:0}
+#supplierTaskDialog.sq85 .sq85-identity{display:flex;align-items:center;gap:9px;min-width:0;flex:0 1 auto}
+#supplierTaskDialog.sq85 .sq85-identity>div{min-width:0}
+#supplierTaskDialog.sq85 .sq85-identity h3{white-space:nowrap;margin:0}
+#supplierTaskDialog.sq85 .sq85-identity>.sq-chip{flex:none;font-size:11px;padding:4px 7px;font-variant-numeric:tabular-nums}
+#supplierTaskDialog.sq85 .sq85-filtered-count{background:#f2edff;color:#6042bb;border-color:#dbd1f7}
+#supplierTaskDialog.sq85 .sq-stage-title>.sq-tools{display:flex;flex:1 1 auto;align-items:center;justify-content:flex-end;flex-wrap:nowrap;gap:10px;padding:0;margin:0 0 0 auto;border:0;min-width:0}
+#supplierTaskDialog.sq85 .sq-stage-title .sq-search{position:relative;width:auto;min-width:174px;max-width:250px;flex:1 1 200px}
+#supplierTaskDialog.sq85 .sq-stage-title input[type="search"]{min-height:34px;height:34px;padding:6px 30px 6px 10px;font-size:12px;background:#fafbfe;border-color:#dce3ee;color:#213759}
+#supplierTaskDialog.sq85 .sq-stage-title input[type="search"]::-webkit-search-cancel-button{display:none}
+#supplierTaskDialog.sq85 .sq-stage-title .sq-toggle{font-size:12px;white-space:nowrap;gap:6px;min-height:34px;flex:none;color:#536581}
+#supplierTaskDialog.sq85 .sq-stage-title .sq-toggle input{margin:0;width:16px;height:16px}
+#supplierTaskDialog.sq85 .sq-stage-title .sq-tools>.sq-link{font-size:12px;white-space:nowrap;min-height:34px;padding:4px 5px;flex:none}
+#supplierTaskDialog.sq85 .sq-stage-title .sq-segment{flex:none;padding:2px}
+#supplierTaskDialog.sq85 .sq-stage-title .sq-segment .sq-btn{font-size:11px;min-height:28px;padding:4px 7px;white-space:nowrap}
+#supplierTaskDialog.sq85 .sq85-search-clear{position:absolute;right:3px;top:3px;width:28px;height:28px;min-height:28px;padding:0;border:0;background:transparent;color:#647591;font-size:20px;font-weight:400;line-height:1}
+#supplierTaskDialog.sq85 .sq85-search-clear:hover{background:#ece9f7;color:#593dbc}
+#supplierTaskDialog.sq85 .sq85-filter-toggle{flex:none;min-height:34px;padding:5px 9px;font-size:11px;white-space:nowrap;background:#fafbff;color:#556686;border-color:#dce3ee}
+#supplierTaskDialog.sq85 .sq85-filter-toggle.sq85-filtered{color:#593abb;border-color:#cbbcf2;background:#f5f0ff}
+#supplierTaskDialog.sq85 .sq85-filter-toggle.sq85-filtered::before{content:"";width:5px;height:5px;border-radius:50%;background:currentColor}
+#supplierTaskDialog.sq85 .sq-stage-title [hidden]{display:none!important}
+#supplierTaskDialog.sq85 .sq85-compact>.sq85-identity{flex:1 1 auto}
+#supplierTaskDialog.sq85 .sq85-compact>.sq-tools{position:absolute;right:0;top:calc(100% + 8px);z-index:4;display:flex;flex-wrap:wrap;justify-content:flex-start;gap:10px;width:min(460px,100%);max-height:min(300px,calc(100dvh - 170px));overflow:auto;overscroll-behavior:contain;margin:0;padding:12px;background:#fff;border:1px solid #dce3ee;border-radius:10px;box-shadow:0 8px 24px #15203924}
+#supplierTaskDialog.sq85 .sq85-compact .sq-tools .sq-search{flex:1 0 100%;width:100%;max-width:none;min-width:0}
+#supplierTaskDialog.sq85 .sq85-compact .sq-tools>.sq-link{margin-left:auto}
+#supplierTaskDialog.sq85 .sq-stage-title>.sq83-controls-toggle{flex:none;min-height:34px;margin:0;font-size:11px;padding:5px 9px}
+@media(max-width:979px){
+ #supplierTaskDialog.sq85 .sq-stage-title{gap:7px}
+ #supplierTaskDialog.sq85 .sq85-identity{gap:5px;flex-wrap:wrap}
+ #supplierTaskDialog.sq85 .sq85-identity h3{white-space:normal;font-size:16px}
+ #supplierTaskDialog.sq85 .sq85-identity>.sq-chip{font-size:10px;padding:3px 6px}
+}
+@media(max-width:560px){
+ #supplierTaskDialog.sq85 .sq-stage-title{gap:5px}
+ #supplierTaskDialog.sq85 .sq85-filter-toggle{font-size:10px;padding:5px 6px;max-width:79px;white-space:normal;line-height:1.2}
+ #supplierTaskDialog.sq85 .sq-stage-title>.sq83-controls-toggle{font-size:10px;padding:5px 6px}
+ #supplierTaskDialog.sq85 .sq85-identity h3{font-size:14px;line-height:1.3}
+}
