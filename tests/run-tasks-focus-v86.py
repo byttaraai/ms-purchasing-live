@@ -26,6 +26,8 @@ def main():
                 else: page.goto(args.base_url+'/quest-qa.html',wait_until='load')
                 page.evaluate('''async()=>{
                   await msAudit.loadLive();
+                  go('tasks-assistant');
+                  await syncTasksAssistant();
                   const base=state.taskAssistant.tasks.find(t=>t.focus==='suppliers');
                   if(base){
                     const other=state.taskAssistant.tasks.filter(t=>t.focus!=='suppliers');
@@ -33,7 +35,6 @@ def main():
                     state.taskAssistant={...state.taskAssistant,tasks:[...suppliers,...other]};
                     renderTasksAssistant(state.taskAssistant,boHealthModel());
                   }
-                  go('tasks-assistant');
                 }''')
                 assert page.locator('#ta86PageHeading').count()==1
                 assert page.locator('#ta86HeadingActions #tasksOpenJump').count()==1
