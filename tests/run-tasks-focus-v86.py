@@ -52,6 +52,17 @@ def main():
                 page.locator('#ta86SupplierToggle').click()
                 assert sum(1 for i in range(cards.count()) if cards.nth(i).is_visible())==7
                 assert page.locator('#supplierQuestPageTabs').count()==0
+                if width>=1100:
+                    prod=page.locator('#tasksPriorityList .ta16-products').bounding_box()
+                    master=page.locator('#tasksPriorityList .ta16-master').bounding_box()
+                    supplier=page.locator('#tasksPriorityList .ta16-suppliers').bounding_box()
+                    rail=page.locator('#ta86RightRail').bounding_box()
+                    assert prod and master and supplier and rail
+                    assert abs(prod['x']-master['x'])<2
+                    assert master['y']>=prod['y']+prod['height']-2
+                    assert supplier['x']<prod['x']<rail['x']
+                if width<=390:
+                    assert page.evaluate('document.documentElement.scrollWidth<=innerWidth+2')
                 page.evaluate('''()=>supplierQuestRenderOutputs([{id:1,quest_id:1,task_id:'x',supplier:'QA Supplier',output_type:'branch_reallocation',created_at:new Date().toISOString(),payload:{items:[{product_code:'P1',product_name:'Product One',unit:'Piece',stock_pct:250,rating:'High',stock_value:100}]}}])''')
                 assert page.locator('#outputListsNavCount').inner_text()=='1'
                 page.locator('nav [data-tab="output-lists"]').click()
@@ -59,16 +70,6 @@ def main():
                 assert page.locator('[data-panel="tasks-assistant"]').evaluate('el=>el.classList.contains("hidden")')
                 assert page.locator('#outputListsHost #supplierQuestOutputs').count()==1
                 assert page.locator('#supplierQuestOutputs .sq-output-header h3').inner_text()=='Output Lists'
-                if width>=1100:
-                    prod=page.locator('#tasksPriorityList .ta16-products').bounding_box()
-                    master=page.locator('#tasksPriorityList .ta16-master').bounding_box()
-                    supplier=page.locator('#tasksPriorityList .ta16-suppliers').bounding_box()
-                    rail=page.locator('#ta86RightRail').bounding_box()
-                    assert abs(prod['x']-master['x'])<2
-                    assert master['y']>=prod['y']+prod['height']-2
-                    assert supplier['x']<prod['x']<rail['x']
-                if width<=390:
-                    assert page.evaluate('document.documentElement.scrollWidth<=innerWidth+2')
                 assert not errors,errors
                 print(f'{width}x{height}: PASS task focus, top-5 suppliers, right rail and Output Lists tab',flush=True)
                 context.close()
