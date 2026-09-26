@@ -7,7 +7,13 @@
   const updateCount = window.sqUpdateContentCount;
   const bound = new WeakSet();
   let current = null;
-  const observer = typeof ResizeObserver === 'function' ? new ResizeObserver(() => layout()) : null;
+  let layoutFrame = 0;
+  function queueLayout() {
+    // Resize callbacks must not mutate the observed layout in the same delivery cycle.
+    if (layoutFrame) return;
+    layoutFrame = requestAnimationFrame(() => { layoutFrame = 0; layout(); });
+  }
+  const observer = typeof ResizeObserver === 'function' ? new ResizeObserver(queueLayout) : null;
 
   function button(id, text, className) {
     const el = document.createElement('button');
@@ -130,7 +136,7 @@
     current = {dialog, row, tools, count, toggle, search, clearSearch, key, kind:supplierQuestCurrentStageDef().kind, compact:null, open:Boolean(previousOpen)};
     toggle.onclick = () => setOpen(!current.open, !current.open);
     bind(dialog); layout(); sync();
-    observer?.observe(row);
+    observer?.observe(dialog.querySelector('.sq83-workspace'));
   }
   window.supplierQuestRender = function (...args) {
     const result = render.apply(this, args);
