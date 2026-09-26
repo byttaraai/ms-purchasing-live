@@ -50,3 +50,5 @@ This manifest mirrors the migration history reported by the live project on 2026
 | 20260924162133 | build58_retire_public_v47_sync |
 | 20260924172132 | build60_optimize_server_recalculation |
 | 20260925220857 | build78_supplier_action_tracking |
+
+- 20260926000018 `build79_supplier_quest_workspace` — staged Supplier Quest progress/output capture; no task completion or badge award side effects.
