@@ -20,9 +20,9 @@ jobs:
               for path,expected in files.items():
                   assert hashlib.sha256(Path(path).read_bytes()).hexdigest()==expected,path
           verify({
-              'assets/js/supplier-toolbar-v85.js':'399307a35f4d4af7f4780b48735fa6aab98e92491ba62cafcf2585f18ada867d',
+              'assets/js/supplier-toolbar-v85.js':'0880ec8332672dbaf8db12a60034ded82e09bab9e3164a4011cdff7f2187e0cc',
               'assets/css/supplier-toolbar-v85.css':'6fe58d7d92d0ac5825047571a7de003945c03bb031ec76ca23a79f57f4e97e54',
-              'tests/run-toolbar-v85.py':'0a5b4fa2e23c0250548ee07f254f0aadba539dd47c24b07ea5c28f801dee812e',
+              'tests/run-toolbar-v85.py':'1394a21a998945eaa1a4aa3c631d4efe8143796367d737c6adbda8a925c25647',
               'tests/supplier-toolbar-v85.cjs':'7306c6b0dfbbbf0366c34213a29bdecff07b1bab4803daad3ce35abc07ac15bc',
               'docs/BUILD85_TABLE_TOOLBAR.md':'d2333b00d8c5e2456a4940f38a24d1eaebe49e87081de0286f379fa18d67f165'
           })
