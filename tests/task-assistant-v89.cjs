@@ -34,6 +34,6 @@ test('both tasks retain the Profit Protector badge',()=>{
   assert(migration.includes("when 'profit_recovery_80_150' then 'Profit Protector'"));
 });
 test('Build 89 is wired after Build 88',()=>{
-  assert(html.includes('Live Build 89'));
+  assert(html.includes('Live Build 90'));
   assert(html.indexOf('task-assistant-v89.css?v=89')>html.indexOf('task-assistant-v88.css?v=88'));
 });
