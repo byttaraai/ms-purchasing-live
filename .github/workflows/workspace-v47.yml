@@ -27,7 +27,7 @@ jobs:
       - name: Static and workspace regression tests
         run: |
           test -s assets/css/app-v57.css
-          grep -q "Live Build 86" index.html
+          grep -q "Live Build 87" index.html
           grep -q "build57_workspace_security_and_validation" supabase/MIGRATION_HISTORY.md
           grep -q "revoke execute on function public.purchasing_tasks_sync_v5" supabase/migrations/20260924154106_build57_workspace_security_and_validation.sql
           grep -q "purchasing_workspace_sync_v58" supabase/migrations/20260924161035_build58_server_authoritative_score_foundation.sql
@@ -52,6 +52,7 @@ jobs:
           node --check assets/js/supplier-polish-v84.js
           node --check assets/js/supplier-toolbar-v85.js
           node --check assets/js/task-assistant-v86.js
+          node --check assets/js/task-assistant-v87.js
           node tests/workspace-v47.cjs .
           node --test tests/overstock-v69.cjs
           node --test tests/supplier-quest-v79.cjs
@@ -62,6 +63,7 @@ jobs:
           node --test tests/supplier-polish-v84.cjs
           node --test tests/supplier-toolbar-v85.cjs
           node --test tests/task-assistant-v86.cjs
+          node --test tests/task-assistant-v87.cjs
       - name: Browser smoke and full Supplier Quest journey - synthetic data only
         run: |
           python3 -m pip install --disable-pip-version-check 'playwright==1.57.0' 'pyee==13.0.1' 'greenlet==3.5.1'
