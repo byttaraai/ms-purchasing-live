@@ -102,7 +102,7 @@
     if(!card){
       card=document.createElement('section');card.id='ta86Budget';card.className='ta86-budget-card';
       card.innerHTML='<div class="ta86-budget-head"><div><span class="ta15-eyebrow">Budget Performance</span><small>Current inventory</small></div><button class="ta15-info" type="button" id="ta86BudgetInfo" aria-label="Budget performance details">i</button></div><strong id="ta86BudgetValue">SAR —</strong><div class="ta86-budget-meta"><span>Total Shortage Value</span><b id="ta86BudgetPct">—</b></div><div class="ta86-budget-track" aria-hidden="true"><span id="ta86BudgetFill"></span></div><small id="ta86BudgetInventory">Inventory value: —</small>';
-      document.getElementById('ta86BudgetInfo').onclick=()=>{
+      card.querySelector('#ta86BudgetInfo').onclick=()=>{
         if(typeof ta16ShowDetails==='function')ta16ShowDetails('Budget Performance','<p>This card reuses the approved Total Shortage Value and current inventory value. It does not introduce a new budget, purchasing, score or risk calculation.</p>');
       };
     }
