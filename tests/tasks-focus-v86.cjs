@@ -1,0 +1,28 @@
+const fs=require('fs'),assert=require('assert/strict');
+const root=process.argv[2]||'.';
+const html=fs.readFileSync(root+'/index.html','utf8');
+const js=fs.readFileSync(root+'/assets/js/tasks-focus-v86.js','utf8');
+const css=fs.readFileSync(root+'/assets/css/tasks-focus-v86.css','utf8');
+
+assert(html.includes('Live Build 86'));
+assert(html.includes('data-tab="output-lists"'));
+assert(html.includes('data-panel="output-lists"'));
+assert(html.includes('id="outputListsHost"'));
+assert(html.includes('tasks-focus-v86.js?v=86'));
+assert(html.includes('tasks-focus-v86.css?v=86'));
+assert(js.includes("supplierQuestEnsureOutputsPanel=function"));
+assert(js.includes("supplierQuestRenderOutputs"));
+assert(js.includes("View All '+total"));
+assert(js.includes("Budget Performance"));
+assert(js.includes("supplierExpanded"));
+assert(js.includes("In progress"));
+assert(css.includes('.ta86-workspace'));
+assert(css.includes('grid-template-columns:minmax(0,1fr) 330px'));
+assert(css.includes('.ta86-workspace .ta16-master{grid-column:2;grid-row:2}'));
+assert(css.includes('.ta86-right-rail'));
+assert(css.includes('#supplierQuestPageTabs{display:none!important}'));
+assert(!js.includes("purchasing_tasks_v5"));
+assert(!js.includes("purchasing_badges"));
+assert(!js.includes("score_impact="));
+assert(!js.includes("purchase_price="));
+console.log('PASS Build 86 task-focus static contract');

@@ -134,14 +134,14 @@ addEventListener('load',async()=>{
   check(state.taskAssistant.tasks.find(t=>t.task_key===task.task_key).status==='open','Review closed the supplier task');
   check(document.getElementById('tasksBadgeTotal').textContent==='0','Review awarded false badge');
   document.getElementById('supplierTaskCloseX').click();
-  document.getElementById('sqReviewOutputs').click();await supplierQuestLoadOutputs();
+  document.querySelector('nav [data-tab="output-lists"]').click();await supplierQuestLoadOutputs();
   const view=document.querySelector('[data-view-output]');check(view,'Saved worklist cannot be opened');view.click();
   check(document.getElementById('supplierQuestOutputDialog').open,'Output list dialog missing');
   document.getElementById('sqOutputPrint').click();check(finalPrint===qaPrints.at(-1),'Final BO and saved-list BO printing diverged');
   document.getElementById('sqOutputClose').click();
   check(qaCalls.filter(x=>x.path==='purchasing_supplier_quest_v81'&&x.p.action==='finish').length===1,'Duplicate submission');
   check(!qaErrors.length,qaErrors.join('; '));
-  report.textContent='PASS: Build 82 full supplier journey, draft recovery, selected printing, all 5 BO batches, decisions, output tabs, canonical BO print, no task closure or badge';
+  report.textContent='PASS: Build 86 full supplier journey, draft recovery, selected printing, all 5 BO batches, decisions, top-level Output Lists, canonical BO print, no task closure or badge';
  }catch(e){report.textContent='FAIL: '+e.message;}
 });
 '''
