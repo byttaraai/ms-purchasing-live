@@ -135,7 +135,7 @@ function renderSupplierQuest(task,quest){
   for(const b of d.querySelectorAll('.quest-open-product'))b.onclick=()=>detail(b.dataset.code);
   for(const select of d.querySelectorAll('.quest-decision'))select.onchange=()=>{SupplierQuestUI.decisions[select.dataset.code]=select.value;const count=$('supplierQuestDecisionCount');if(count)count.textContent=rows.filter(r=>SupplierQuestUI.decisions[r.product_code]).length;const btn=$('supplierQuestPrimary');if(btn)btn.disabled=rows.length>0&&!rows.every(r=>SupplierQuestUI.decisions[r.product_code]);};
   const print=$('supplierQuestPrint');if(print)print.onclick=()=>supplierQuestPrintStage(task,stageKey);const printBo=$('supplierQuestPrintBo');if(printBo)printBo.onclick=()=>supplierQuestPrintBo(task);
-  const primary=$('supplierQuestPrimary');if(primary&&!primary.disabled)primary.onclick=async()=>{SupplierQuestUI.busy=true;primary.disabled=true;try{let saved;
+  const primary=$('supplierQuestPrimary');if(primary)primary.onclick=async()=>{if(primary.disabled)return;SupplierQuestUI.busy=true;primary.disabled=true;try{let saved;
     if(stage.kind==='summary')saved=await supplierQuestRpc(task,{action:'finish'});
     else if(stage.kind==='decision')saved=await supplierQuestRpc(task,{action:'save_stage',stage:stageKey,decisions:SupplierQuestUI.decisions});
     else saved=await supplierQuestRpc(task,{action:'save_stage',stage:stageKey,codes:[...SupplierQuestUI.selected]});
