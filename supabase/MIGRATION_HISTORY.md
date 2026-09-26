@@ -52,3 +52,5 @@ This manifest mirrors the migration history reported by the live project on 2026
 | 20260925220857 | build78_supplier_action_tracking |
 
 - 20260926000018 `build79_supplier_quest_workspace` — staged Supplier Quest progress/output capture; no task completion or badge award side effects.
+
+- 20260926004934 `build80_supplier_quest_reliability` — editable Supplier Quest drafts, explicit no-action review, stage snapshots/reconfirmation, authenticated downstream worklists, and supporting indexes; no task-completion or badge side effects.
