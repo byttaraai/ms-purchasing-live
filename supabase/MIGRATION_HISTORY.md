@@ -60,3 +60,5 @@ This manifest mirrors the migration history reported by the live project on 2026
 - 20260926094306 `build81_supplier_quest_stage_specific_reconfirm` — stage-specific Supplier Quest reconfirmation from saved source snapshots; unrelated master revisions no longer invalidate completed stages.
 
 - 20260926163215 `build89_profit_recovery_two_bands` — adds the second Super/High Profit Recovery band (80–150%), keeps the existing below-80 band, validates both server-side, and verifies the new band at 150%+ on a later inventory upload.
+
+- 20260926231715 `build93_master_review_popup` — restricted authenticated Master Data Review save RPC for current task targets only; no direct task completion or badge side effects.
