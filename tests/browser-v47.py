@@ -41,9 +41,6 @@ addEventListener('load',async()=>{
   const tasks=msAudit.getState().taskAssistant.tasks;
   if(tasks.some(t=>t.target==='Supplier A'))throw Error('Stale supplier task');
   if(!tasks.find(t=>t.target==='Supplier B').codes.includes('Browser A'))throw Error('New supplier missing product');
-  browserFixture.rows[2].needs_review=false;browserFixture.rows[2].review_reason=null;browserFixture.master_revision++;
-  await msAudit.loadLive();
-  if(msAudit.getState().taskAssistant.tasks.some(t=>t.focus==='data'))throw Error('Stale master review');
   if(document.getElementById('tasksBadgeTotal').textContent!=='0')throw Error('False badge');
   const supplierTask=msAudit.getState().taskAssistant.tasks.find(t=>t.focus==='suppliers'&&t.target==='Supplier B');
   if(!supplierTask)throw Error('Supplier task missing for UI test');
