@@ -36,7 +36,7 @@ def main():
                 }""")
                 assert page.locator('#supplierTaskDialog').is_visible()
                 assert page.locator('.sq83-controls .sq-steps [data-quest-stage]').count()==9
-                assert page.locator('.sq83-controls #supplierQuestSearch').count()==1
+                assert page.locator('.sq83-workspace .sq-stage-title #supplierQuestSearch').count()==1
                 for stage in ['data','lt10','200_300','gt300','summary']:
                     page.evaluate("""key=>{qaQuest.current_stage=key;supplierQuestRender(SupplierQuestUI.task,{quest:qaQuest,master_revision:qaFixture.master_revision,stale_stages:[]});}""",stage)
                     geometry=page.evaluate("""()=>{
@@ -68,13 +68,19 @@ def main():
                     assert page.locator('.sq83-controls').is_visible()
                     assert page.locator('.sq83-workspace').evaluate('(el)=>el.inert')
                     assert page.locator('.sq83-controls .sq-footer').count()==1
-                page.locator('#supplierQuestSearch').fill('Critical A')
-                assert page.locator('#supplierQuestContent [data-quest-select]').count()==1
                 if width<980:
                     page.keyboard.press('Escape')
-                    assert page.locator('#supplierTaskDialog').is_visible()
                     assert page.locator('.sq83-controls').evaluate('(el)=>el.inert')
                     assert page.locator('#supplierQuestControlsToggle').evaluate('(el)=>el===document.activeElement')
+                toggle=page.locator('#supplierQuestFilterToggle')
+                if toggle.is_visible(): toggle.click()
+                page.locator('#supplierQuestSearch').fill('Critical A')
+                assert page.locator('#supplierQuestContent [data-quest-select]').count()==1
+                if toggle.is_visible():
+                    page.keyboard.press('Escape')
+                    assert page.locator('#supplierTaskDialog').is_visible()
+                    assert page.locator('#supplierQuestTableTools').evaluate('(el)=>el.inert')
+                    assert toggle.evaluate('(el)=>el===document.activeElement')
                 page.locator('#supplierQuestContent [data-quest-select]').check()
                 assert 'Add 1 to BO' in page.locator('#supplierQuestPrimary').inner_text()
                 # Bottom actions do not move when the table scrolls.
