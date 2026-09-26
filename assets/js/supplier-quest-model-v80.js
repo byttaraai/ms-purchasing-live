@@ -62,8 +62,9 @@
     return STAGES.filter(s=>s.kind!=='summary').filter(s=>{
       const saved=stageRecord(stageData,s.key);
       if(!Object.keys(saved).length)return false;
-      const savedRevision=Number(saved.master_revision);
-      return Number.isFinite(savedRevision)&&savedRevision!==revision;
+      const raw=saved.master_revision;
+      const savedRevision=raw===null||raw===undefined||raw===''?NaN:Number(raw);
+      return !Number.isFinite(savedRevision)||savedRevision!==revision;
     }).map(s=>s.key);
   }
   function decisionOptions(profit){
