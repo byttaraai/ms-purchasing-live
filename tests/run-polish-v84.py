@@ -68,8 +68,8 @@ def main():
                 assert page.locator('.sq84-meta').evaluate('(el)=>el.scrollWidth<=el.clientWidth+1')
                 if width>=980 and height>=720:
                     assert page.locator('.sq83-control-body').evaluate('(el)=>el.scrollHeight<=el.clientHeight+1'),'tools still need scroll'
-                    assert page.locator('[data-quest-stage="summary"]').bounding_box()['y']<page.locator('#supplierQuestSearch').bounding_box()['y']
-                    assert page.locator('#supplierQuestSearch').bounding_box()['y']+32<page.locator('.sq-footer').bounding_box()['y']
+                    assert page.locator('.sq83-workspace .sq-stage-title #supplierQuestSearch').count()==1
+                    assert page.locator('.sq83-controls #supplierQuestSearch').count()==0
                 if width<980:page.locator('#supplierQuestControlsBack').click()
                 # Make a real pointer selection and keep the short action and count in sync.
                 page.locator('[data-quest-select="Critical A"]').check()
