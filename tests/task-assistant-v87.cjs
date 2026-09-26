@@ -26,7 +26,7 @@ test('Inventory Snapshot is the first Tasks Assistant row on desktop and compact
   assert(css.includes('#ta86TasksHead{display:none!important}'));
 });
 test('Build 87 loads after Build 86 and labels the release',()=>{
-  assert(html.includes('Live Build 88'));
+  assert(html.includes('Live Build 89'));
   assert(html.indexOf('task-assistant-v87.js?v=87')>html.indexOf('task-assistant-v86.js?v=86'));
   assert(html.indexOf('task-assistant-v87.css?v=87')>html.indexOf('task-assistant-v86.css?v=86'));
 });

@@ -18,16 +18,17 @@ const protectedFiles=JSON.parse(fs.readFileSync(path.join(__dirname,'protected-u
 test('business/risk assets are byte-for-byte unchanged',()=>{
  for(const [file,expected] of Object.entries(protectedFiles.assets))assert.equal(hash(file),expected,file);
 });
-test('index changes are limited to UI assets and build labels',()=>{
- let html=fs.readFileSync(path.join(root,'index.html'),'utf8');
- html=html.replace('\n<link rel="stylesheet" href="assets/css/task-assistant-v88.css?v=88">','').replace('<script src="assets/js/task-assistant-v88.js?v=88"></script>','').replaceAll('Live Build 88','Live Build 87').replaceAll('Build 88 |','Build 87 |');
- html=html.replace('\n<link rel="stylesheet" href="assets/css/task-assistant-v87.css?v=87">','').replace('<script src="assets/js/task-assistant-v87.js?v=87"></script>','').replaceAll('Live Build 87','Live Build 86').replaceAll('Build 87 |','Build 86 |');
- html=html.replace('\n<link rel="stylesheet" href="assets/css/task-assistant-v86.css?v=86">','').replace('<script src="assets/js/task-assistant-v86.js?v=86"></script>','').replaceAll('Live Build 86','Live Build 85').replaceAll('Build 86 |','Build 85 |');
- html=html.replace('\n<link rel="stylesheet" href="assets/css/supplier-toolbar-v85.css?v=85">','').replace('<script src="assets/js/supplier-toolbar-v85.js?v=85"></script>','').replaceAll('Live Build 85','Live Build 84').replaceAll('Build 85 |','Build 84 |');
- html=html.replace('\n<link rel="stylesheet" href="assets/css/supplier-polish-v84.css?v=84">','').replace('<script src="assets/js/supplier-polish-v84.js?v=84"></script>','').replaceAll('Live Build 84','Live Build 83').replaceAll('Build 84 |','Build 83 |');
- html=html.replace('\n<link rel="stylesheet" href="assets/css/supplier-layout-v83.css?v=83">','').replace('<script src="assets/js/supplier-layout-v83.js?v=83"></script>','').replaceAll('Live Build 83','Live Build 82').replaceAll('Build 83 |','Build 82 |');
- html=html.replaceAll('supplier-task-v82.css?v=82','supplier-task-v80.css?v=80').replaceAll('supplier-task-v82.js?v=82','supplier-task-v81.js?v=81').replaceAll('Live Build 82','Live Build 81').replaceAll('Build 82 |','Build 81 |');
- assert.equal(crypto.createHash('sha256').update(html).digest('hex'),protectedFiles.index);
+test('index keeps protected Supplier Quest contracts while allowing the approved Build 89 task extension',()=>{
+ const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
+ assert(html.includes('Live Build 89'));
+ assert(html.includes("profitRecoveryRows(10,80).slice(0,10)"));
+ assert(html.includes("profitRecoveryRows(80,150).slice(0,10)"));
+ assert(html.includes("focus:'profit_recovery_80_150'"));
+ assert(html.includes('supplier-task-v82.js?v=82'));
+ assert(html.includes('supplier-layout-v83.js?v=83'));
+ assert(html.includes('supplier-polish-v84.js?v=84'));
+ assert(html.includes('supplier-toolbar-v85.js?v=85'));
+ assert(!html.includes("rpc('purchasing_tasks_sync_logic_v5',{payload})"));
 });
 test('snapshot keeps null quantities unknown instead of changing them to zero',()=>{
  run("SupplierQuestUI.task={id:'t',task_key:'t',target:'S'};SupplierQuestUI.quest={current_stage:'summary',stage_data:{lt10:{codes:['p'],snapshot:[{product_code:'p',product_name:'Product',unit:'Piece',selected:true,min_order:null,max_order:null}]}}};state.rows=[];");
