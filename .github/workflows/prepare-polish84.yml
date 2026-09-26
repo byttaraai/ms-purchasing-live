@@ -1,0 +1,69 @@
+name: Prepare verified polish84 wiring
+on:
+  push:
+    branches: [work/supplier-ui-polish-84]
+    paths: [.github/workflows/prepare-polish84.yml]
+permissions:
+  contents: write
+jobs:
+  prepare:
+    if: github.ref == 'refs/heads/work/supplier-ui-polish-84'
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Verify exact locally tested sources and apply presentation-only wiring
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib
+          for name,expected in {
+            'assets/js/supplier-polish-v84.js':'92167340f0150f2d8185a64899459ce993693c44',
+            'assets/css/supplier-polish-v84.css':'1da42ac39e2dd1a5373a4a8bdaa76f1229665a24',
+            'tests/supplier-polish-v84.cjs':'2c494afe9179ace0721e28b3ba2b3d032e63868d',
+            'tests/run-polish-v84.py':'65580c1bb4038eeb5aacf448959151c2bdaf2605',
+          }.items():
+            data=Path(name).read_bytes()
+            actual=hashlib.sha1(('blob '+str(len(data))+'\0').encode()+data).hexdigest()
+            assert actual==expected,(name,actual,expected)
+          def change(path,old,new):
+            p=Path(path);s=p.read_text();assert s.count(old)==1,(path,old,s.count(old));p.write_text(s.replace(old,new))
+          p=Path('index.html');s=p.read_text()
+          css='<link rel="stylesheet" href="assets/css/supplier-layout-v83.css?v=83">'
+          js='<script src="assets/js/supplier-layout-v83.js?v=83"></script>'
+          assert s.count(css)==1 and s.count(js)==1 and 'Live Build 83' in s
+          s=s.replace(css,css+'\n<link rel="stylesheet" href="assets/css/supplier-polish-v84.css?v=84">')
+          s=s.replace(js,js+'<script src="assets/js/supplier-polish-v84.js?v=84"></script>')
+          p.write_text(s.replace('Live Build 83','Live Build 84').replace('Build 83 |','Build 84 |'))
+          old=" let html=fs.readFileSync(path.join(root,'index.html'),'utf8');"
+          new=old+"\n html=html.replace('\\n<link rel=\"stylesheet\" href=\"assets/css/supplier-polish-v84.css?v=84\">','').replace('<script src=\"assets/js/supplier-polish-v84.js?v=84\"></script>','').replaceAll('Live Build 84','Live Build 83').replaceAll('Build 84 |','Build 83 |');"
+          change('tests/supplier-quest-ux-v82.cjs',old,new)
+          change('tests/supplier-layout-v83.cjs',"assert(index.includes('Live Build 83'));","assert(index.includes('Live Build 84'));")
+          change('tests/workspace-v47.cjs',"assert(html.includes('Live Build 83'));","assert(html.includes('Live Build 84'));")
+          old="document.getElementById('supplierQuestPrint').textContent==='Print Data Review'"
+          new="(document.getElementById('supplierQuestPrint').getAttribute('aria-label')||document.getElementById('supplierQuestPrint').textContent)==='Print Data Review'"
+          change('tests/browser-v82.py',old,new)
+          PY
+      - name: Verify protected sources and full employee journeys before committing
+        run: |
+          node --check assets/js/supplier-polish-v84.js
+          node tests/workspace-v47.cjs .
+          node --test tests/overstock-v69.cjs tests/supplier-quest-v79.cjs tests/supplier-quest-v80.cjs tests/supplier-quest-v81.cjs tests/supplier-quest-ux-v82.cjs tests/supplier-layout-v83.cjs tests/supplier-polish-v84.cjs
+          python3 -m pip install --disable-pip-version-check 'playwright==1.57.0' 'pyee==13.0.1' 'greenlet==3.5.1'
+          python3 tests/browser-v69.py
+          python3 tests/browser-v82.py
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/polish84-http.log 2>&1 &
+          SERVER=$!
+          trap 'kill $SERVER; rm -f smoke.html quest-smoke.html quest-qa.html' EXIT
+          sleep 1
+          python3 tests/run-browser-v82.py
+          python3 tests/run-layout-v83.py
+          python3 tests/run-polish-v84.py
+      - name: Commit only verified wiring and remove this temporary workflow
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git rm .github/workflows/prepare-polish84.yml
+          git add index.html tests/supplier-quest-ux-v82.cjs tests/supplier-layout-v83.cjs tests/workspace-v47.cjs tests/browser-v82.py
+          git commit -m 'Build 84: wire verified UI polish and retain protected business source'
+          git push origin HEAD:work/supplier-ui-polish-84
