@@ -1,0 +1,72 @@
+name: Prepare approved layout83 wiring
+on:
+  push:
+    branches: [work/supplier-split-layout-83]
+    paths: ['.github/workflows/prepare-layout83.yml']
+permissions:
+  contents: write
+jobs:
+  prepare:
+    if: github.repository == 'byttaraai/ms-purchasing-live' && github.ref == 'refs/heads/work/supplier-split-layout-83'
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Apply guarded presentation-only entrypoint and test changes
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          def change(path, old, new):
+              p=Path(path);s=p.read_text()
+              assert s.count(old)==1, (path,old,s.count(old))
+              p.write_text(s.replace(old,new))
+          p=Path('index.html');s=p.read_text()
+          css='<link rel="stylesheet" href="assets/css/supplier-task-v82.css?v=82">'
+          js='<script src="assets/js/supplier-task-v82.js?v=82"></script>'
+          assert s.count(css)==1 and s.count(js)==1 and 'Live Build 82' in s
+          s=s.replace(css,css+'\n<link rel="stylesheet" href="assets/css/supplier-layout-v83.css?v=83">')
+          s=s.replace(js,js+'<script src="assets/js/supplier-layout-v83.js?v=83"></script>')
+          p.write_text(s.replace('Live Build 82','Live Build 83').replace('Build 82 |','Build 83 |'))
+          old=" let html=fs.readFileSync(path.join(root,'index.html'),'utf8');"
+          new=old+"\n html=html.replace('\\n<link rel=\"stylesheet\" href=\"assets/css/supplier-layout-v83.css?v=83\">','').replace('<script src=\"assets/js/supplier-layout-v83.js?v=83\"></script>','').replaceAll('Live Build 83','Live Build 82').replaceAll('Build 83 |','Build 82 |');"
+          change('tests/supplier-quest-ux-v82.cjs',old,new)
+          old="  check(dialog.querySelector('.sq-steps').getBoundingClientRect().top<dialog.querySelector('.sq-stage').getBoundingClientRect().top,'Responsive stepper moved below content');"
+          new="""  // Build 83 intentionally moves the stepper to the right, freeing table height.
+            if(dialog.classList.contains('sq83')){
+              check(dialog.querySelector('.sq83-controls').contains(dialog.querySelector('.sq-steps')),'Stages not in control panel');
+              check(dialog.querySelector('.sq83-workspace').contains(content),'Table not in workspace');
+              if(innerWidth>=980){
+                check(content.getBoundingClientRect().right<=dialog.querySelector('.sq83-controls').getBoundingClientRect().left+1,'Control panel overlaps table');
+                check(content.clientHeight>bounds.height*.8,'Table height still consumed by controls');
+              }
+            }else check(dialog.querySelector('.sq-steps').getBoundingClientRect().top<dialog.querySelector('.sq-stage').getBoundingClientRect().top,'Responsive stepper moved below content');"""
+          change('tests/browser-v82.py',old,new)
+          change('tests/workspace-v47.cjs',"assert(html.includes('Live Build 82'));", "assert(html.includes('Live Build 83'));assert(html.includes('supplier-layout-v83.js?v=83'));assert(html.includes('supplier-layout-v83.css?v=83'));")
+          wf='.github/workflows/workspace-v47.yml'
+          change(wf,'grep -q "Live Build 82" index.html','grep -q "Live Build 83" index.html')
+          change(wf,'          node --check assets/js/supplier-task-v82.js','          node --check assets/js/supplier-task-v82.js\n          node --check assets/js/supplier-layout-v83.js')
+          change(wf,'          node --test tests/supplier-quest-ux-v82.cjs','          node --test tests/supplier-quest-ux-v82.cjs\n          node --test tests/supplier-layout-v83.cjs')
+          change(wf,'          python3 tests/run-browser-v82.py','          python3 tests/run-browser-v82.py\n          python3 tests/run-layout-v83.py')
+          PY
+      - name: Verify protected logic and complete synthetic browser journeys
+        run: |
+          node --check assets/js/supplier-layout-v83.js
+          node tests/workspace-v47.cjs .
+          node --test tests/overstock-v69.cjs tests/supplier-quest-v79.cjs tests/supplier-quest-v80.cjs tests/supplier-quest-v81.cjs tests/supplier-quest-ux-v82.cjs tests/supplier-layout-v83.cjs
+          python3 -m pip install --disable-pip-version-check 'playwright==1.57.0' 'pyee==13.0.1' 'greenlet==3.5.1'
+          python3 tests/browser-v69.py
+          python3 tests/browser-v82.py
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/layout83-http.log 2>&1 &
+          SERVER=$!
+          trap 'kill $SERVER; rm -f smoke.html quest-smoke.html quest-qa.html' EXIT
+          sleep 1
+          python3 tests/run-browser-v82.py
+          python3 tests/run-layout-v83.py
+      - name: Commit verified wiring and remove this temporary workflow
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git rm .github/workflows/prepare-layout83.yml
+          git add index.html tests/supplier-quest-ux-v82.cjs tests/browser-v82.py tests/workspace-v47.cjs .github/workflows/workspace-v47.yml
+          git commit -m 'Build 83: wire verified split layout and keep protected business source unchanged'
+          git push origin HEAD:work/supplier-split-layout-83
