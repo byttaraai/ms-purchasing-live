@@ -1,0 +1,41 @@
+/* Build 89: separate Profit Recovery card above Product Recovery & Reviews. */
+[data-panel="tasks-assistant"] .ta86-board.ta86-board{
+  grid-template-rows:auto auto auto;
+}
+[data-panel="tasks-assistant"] .ta86-board .ta16-suppliers{
+  grid-column:1;
+  grid-row:1 / span 3;
+}
+[data-panel="tasks-assistant"] .ta86-board .ta16-profit{
+  grid-column:2;
+  grid-row:1;
+}
+[data-panel="tasks-assistant"] .ta86-board .ta16-products{
+  grid-column:2;
+  grid-row:2;
+}
+[data-panel="tasks-assistant"] .ta86-board .ta16-master{
+  grid-column:2;
+  grid-row:3;
+}
+[data-panel="tasks-assistant"] .ta16-profit .ta16-body{
+  padding-top:0;
+}
+[data-panel="tasks-assistant"] .ta16-profit .ta16-section:first-child{
+  padding-top:0;
+}
+[data-panel="tasks-assistant"] .ta16-profit .ta16-section + .ta16-section{
+  margin-top:10px;
+}
+[data-panel="tasks-assistant"] .ta16-profit .ta16-subhead{
+  color:#3f2f6f;
+}
+@media(max-width:900px){
+  [data-panel="tasks-assistant"] .ta86-board .ta16-suppliers,
+  [data-panel="tasks-assistant"] .ta86-board .ta16-profit,
+  [data-panel="tasks-assistant"] .ta86-board .ta16-products,
+  [data-panel="tasks-assistant"] .ta86-board .ta16-master{
+    grid-column:auto;
+    grid-row:auto;
+  }
+}
