@@ -71,7 +71,7 @@
       nav.addEventListener('click',()=>{moveOutputsPanel();if(typeof supplierQuestLoadOutputs==='function')void supplierQuestLoadOutputs();});
     }
     moveOutputsPanel();
-    updateOutputBadge(window.SupplierQuestUI?.outputs||[]);
+    updateOutputBadge(typeof SupplierQuestUI!=='undefined'?(SupplierQuestUI.outputs||[]):[]);
   }
 
   function ensureHeading(page){
@@ -88,11 +88,11 @@
   }
 
   function budgetMetrics(){
-    const rows=Array.isArray(window.state?.rows)?state.rows:[];
+    const rows=typeof state!=='undefined'&&Array.isArray(state.rows)?state.rows:[];
     let shortage=0,inventory=0;
     for(const r of rows){
       if(typeof averageShortageValue==='function')shortage+=Number(averageShortageValue(r)||0);
-      if(window.C?.finite?.(r.total_value)&&Number(r.total_value)>0)inventory+=Number(r.total_value);
+      if(typeof C!=='undefined'&&C.finite(r.total_value)&&Number(r.total_value)>0)inventory+=Number(r.total_value);
     }
     const pct=inventory>0?shortage/inventory*100:null;
     return{shortage,inventory,pct};
