@@ -20,6 +20,7 @@ test('business/risk assets are byte-for-byte unchanged',()=>{
 });
 test('index changes are limited to UI assets and build labels',()=>{
  let html=fs.readFileSync(path.join(root,'index.html'),'utf8');
+ html=html.replace('\n<link rel="stylesheet" href="assets/css/task-assistant-v89.css?v=89">','').replaceAll('Live Build 89','Live Build 88').replaceAll('Build 89 |','Build 88 |');
  html=html.replace('\n<link rel="stylesheet" href="assets/css/task-assistant-v88.css?v=88">','').replace('<script src="assets/js/task-assistant-v88.js?v=88"></script>','').replaceAll('Live Build 88','Live Build 87').replaceAll('Build 88 |','Build 87 |');
  html=html.replace('\n<link rel="stylesheet" href="assets/css/task-assistant-v87.css?v=87">','').replace('<script src="assets/js/task-assistant-v87.js?v=87"></script>','').replaceAll('Live Build 87','Live Build 86').replaceAll('Build 87 |','Build 86 |');
  html=html.replace('\n<link rel="stylesheet" href="assets/css/task-assistant-v86.css?v=86">','').replace('<script src="assets/js/task-assistant-v86.js?v=86"></script>','').replaceAll('Live Build 86','Live Build 85').replaceAll('Build 86 |','Build 85 |');
