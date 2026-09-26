@@ -1,0 +1,76 @@
+/* Build 84: compact two-line heading, distinct stage states and single-row actions. */
+#supplierTaskDialog.sq84 .sq83-workspace>.sq-stage{padding:12px 18px}
+#supplierTaskDialog.sq84 .sq-table th,#supplierTaskDialog.sq84 .sq-table td{ text-align:left; padding:8px 10px; vertical-align:middle }
+#supplierTaskDialog.sq84 .sq-table .num{ text-align:left; font-variant-numeric:tabular-nums }
+#supplierTaskDialog.sq84 .sq-table .sq-check-cell{ text-align:center; padding:0 3px }
+#supplierTaskDialog.sq84 .sq-table th small{display:block;text-align:left}
+#supplierTaskDialog.sq84 .sq-table .rating,#supplierTaskDialog.sq84 .overstock-risk-cell{justify-content:flex-start;text-align:left}
+#supplierTaskDialog.sq84 .sq-product small{margin-top:2px;font-size:11px;color:#71819a}
+#supplierTaskDialog.sq84 .sq-purchase th:nth-child(2){width:30%}
+#supplierTaskDialog.sq84 .sq-purchase th:nth-child(3){width:11%}
+#supplierTaskDialog.sq84 .sq-purchase th:nth-child(4){width:9%}
+#supplierTaskDialog.sq84 .sq-purchase th:nth-child(5){width:8%}
+#supplierTaskDialog.sq84 .sq-purchase th:nth-child(6){width:11%}
+#supplierTaskDialog.sq84 .sq-purchase th:nth-child(7),#supplierTaskDialog.sq84 .sq-purchase th:nth-child(8){width:13%}
+#supplierTaskDialog.sq84 .sq-table tr.selected td{background:#f8f6ff}
+#supplierTaskDialog.sq84 .sq-table tr.selected:hover td{background:#f1edff}
+#supplierTaskDialog.sq84 .sq84-missing-price{display:inline-flex;align-items:center;min-height:24px;min-width:24px;border-bottom:1px dotted #a5aec2;cursor:help}
+#supplierTaskDialog.sq84 .sq83-controls>.sq-header{display:block;margin:0;padding:10px 12px 9px}
+#supplierTaskDialog.sq84 .sq84-meta{display:flex;align-items:center;gap:6px;min-width:0;margin-bottom:6px}
+#supplierTaskDialog.sq84 .sq84-meta .sq-eyebrow{margin:0;font-size:9px;letter-spacing:.06em;flex-shrink:0;color:#b4c4e4}
+#supplierTaskDialog.sq84 .sq84-meta>.sq-chip{padding:3px 6px;border-radius:5px;font-size:9px;font-weight:500;min-width:0;white-space:nowrap;line-height:1.3}
+#supplierTaskDialog.sq84 .sq84-meta .sq-header-actions{display:flex;flex-direction:row;gap:4px;margin-left:auto;flex-shrink:0}
+#supplierTaskDialog.sq84 .sq84-meta .sq-header-actions .sq-btn{width:28px;height:28px;min-height:28px;padding:0;border:1px solid #3c4b65;border-radius:7px;color:#d6e1f6;background:#1d2c44}
+#supplierTaskDialog.sq84 .sq84-meta .sq-header-actions .sq-btn:hover{background:#2a3c57;border-color:#8a9ebb}
+#supplierTaskDialog.sq84 .sq-title-row{display:block}
+#supplierTaskDialog.sq84 .sq-header h2{font-size:18px;line-height:1.4;margin:0;color:#f6f8ff;overflow-wrap:anywhere}
+#supplierTaskDialog.sq84 .sq83-control-body{padding:6px 12px 8px;scrollbar-gutter:stable}
+#supplierTaskDialog.sq84 nav.sq-steps{gap:2px!important;margin-bottom:7px}
+#supplierTaskDialog.sq84 .supplier-quest-step{grid-template-columns:22px minmax(0,1fr) auto;min-height:30px;padding:3px 8px!important;gap:8px!important;font-size:12px!important;border-radius:7px;border-color:transparent;background:transparent;color:#c1cee5;box-shadow:none}
+#supplierTaskDialog.sq84 .supplier-quest-step[data-sq84-state]{background:transparent;border-color:transparent;color:#c1cee5}
+#supplierTaskDialog.sq84 .supplier-quest-step[data-sq84-state] .sq-step-icon{width:22px;height:22px;background:#20314b;color:#adbed9;border-color:#40516e;font-size:10px}
+#supplierTaskDialog.sq84 .supplier-quest-step small{padding:1px 4px;color:#b6c7e0;background:#21304a;min-width:17px;text-align:center;font-size:10px;font-weight:500}
+#supplierTaskDialog.sq84 .sq84-step-meta{display:flex;align-items:center;justify-content:flex-end;gap:6px;min-width:0}
+#supplierTaskDialog.sq84 .sq84-step-flag{display:inline-flex;align-items:center;font-size:9px;font-weight:600;line-height:1.4;padding:1px 5px;border-radius:4px;color:#edc17c;background:#ead09812}
+#supplierTaskDialog.sq84 [data-sq84-state="draft"] .sq84-step-flag{color:#a6c9f7;background:#a6c9f714}
+#supplierTaskDialog.sq84 [data-sq84-state="draft"] .sq84-step-flag::before{content:"";width:4px;height:4px;border-radius:50%;background:currentColor;margin-right:4px}
+#supplierTaskDialog.sq84 .supplier-quest-step[data-sq84-state="reviewed"] .sq-step-icon{color:#83d1b7;background:#193b3d;border-color:#305951}
+#supplierTaskDialog.sq84 [data-sq84-state="pending"]:not(.sq84-current){color:#a6b6cf}
+#supplierTaskDialog.sq84 .supplier-quest-step:not(:disabled):hover{background:#202e48;border-color:#445472}
+#supplierTaskDialog.sq84 .supplier-quest-step.sq84-current{background:#2f2c5b;color:#fff;border-color:#635891;box-shadow:inset 3px 0 #a18bfb}
+#supplierTaskDialog.sq84 .supplier-quest-step.sq84-current .sq-step-icon{color:#fff;background:#7554d8;border-color:#9a80ed}
+#supplierTaskDialog.sq84 .supplier-quest-step.sq84-current small{background:#453c76;color:#e9e2ff}
+#supplierTaskDialog.sq84 .sq83-controls .sq-tools{padding:8px 0;gap:5px}
+#supplierTaskDialog.sq84 .sq83-controls .sq-search input{min-height:32px;padding:6px 9px}
+#supplierTaskDialog.sq84 .sq83-controls .sq-toggle{min-height:26px;font-size:11px}
+#supplierTaskDialog.sq84 .sq83-controls .sq-tools>.sq-link{min-height:26px;padding:3px 5px}
+#supplierTaskDialog.sq84 .sq83-help{padding:7px 9px}
+#supplierTaskDialog.sq84 .sq83-controls .sq-notice.warning{background:#1e2c43;border-color:#574c38;border-left:3px solid #bd934f;color:#e8cf9c}
+#supplierTaskDialog.sq84 .sq-footer{padding:8px 12px;gap:6px;display:flex;flex-direction:column;align-items:stretch}
+#supplierTaskDialog.sq84 .sq-footer-status{display:flex;flex-direction:row;align-items:center;flex-wrap:wrap;gap:4px 6px;font-size:10px;line-height:1.4}
+#supplierTaskDialog.sq84 .sq-save-status{font-size:10px;white-space:nowrap}
+#supplierTaskDialog.sq84 #supplierQuestTotals{min-width:0}
+#supplierTaskDialog.sq84 #supplierQuestTotals::before{content:"\00b7";margin-right:6px;opacity:.6}
+#supplierTaskDialog.sq84 .sq-save-status[data-sq84-feedback="draft"]{color:#bed0ed}
+#supplierTaskDialog.sq84 .sq-save-status[data-sq84-feedback="saved"]{color:#8dd4bc}
+#supplierTaskDialog.sq84 .sq-save-status[data-sq84-feedback="changed"]{color:#edc17c}
+#supplierTaskDialog.sq84 .sq-save-status[data-sq84-feedback="error"]{color:#ffa5a5}
+#supplierTaskDialog.sq84 .sq-footer-actions{display:grid;grid-template-columns:34px minmax(0,1fr) 34px;gap:6px;align-items:center;width:100%}
+#supplierTaskDialog.sq84 #supplierQuestPrevious{grid-column:1;grid-row:1}
+#supplierTaskDialog.sq84 .sq-footer-actions>.sq-primary{grid-column:2;grid-row:1;min-width:0;min-height:36px;height:36px;padding:6px 8px;font-size:11px;line-height:1.25;white-space:nowrap;gap:5px;background:#6944ec;border-color:#8970ee;box-shadow:none}
+#supplierTaskDialog.sq84 #supplierQuestPrint,#supplierTaskDialog.sq84 #supplierQuestPrintBo{grid-column:3;grid-row:1}
+#supplierTaskDialog.sq84 .sq-footer-actions>.sq84-icon-button{width:34px;height:36px;min-height:36px;padding:0;min-width:0;border-radius:8px}
+#supplierTaskDialog.sq84 .sq-primary:hover{background:#7655f0}
+#supplierTaskDialog.sq84 .sq-primary.sq84-saving{cursor:wait}
+#supplierTaskDialog.sq84 .sq-primary.sq84-saving .sq84-icon{display:none}
+#supplierTaskDialog.sq84 .sq84-icon{width:17px;height:17px;stroke:currentColor;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round;flex:none}
+#supplierTaskDialog.sq84 .sq84-tooltip{position:fixed;z-index:30;max-width:min(280px,calc(100vw - 24px));padding:7px 10px;font:11px/1.45 Arial,sans-serif;font-weight:400;background:#091326;color:#eef4ff;border:1px solid #4e607c;border-radius:7px;box-shadow:0 3px 14px #0b132c44;pointer-events:none;white-space:normal}
+@media(max-width:979px){
+ #supplierTaskDialog.sq84 .sq83-controls>.sq-header{padding-top:47px}
+ #supplierTaskDialog.sq84 .sq83-workspace>.sq-footer{padding:8px 12px}
+ #supplierTaskDialog.sq84 .sq83-workspace .sq-save-status[data-sq84-feedback="draft"]{color:#536580}
+ #supplierTaskDialog.sq84 .sq83-workspace .sq-save-status[data-sq84-feedback="saved"]{color:#246c53}
+ #supplierTaskDialog.sq84 .sq83-workspace .sq-save-status[data-sq84-feedback="changed"]{color:#8a5612}
+ #supplierTaskDialog.sq84 .sq83-workspace .sq-save-status[data-sq84-feedback="error"]{color:#a43636}
+ #supplierTaskDialog.sq84 .sq83-workspace>.sq-stage{padding:10px 12px}
+}

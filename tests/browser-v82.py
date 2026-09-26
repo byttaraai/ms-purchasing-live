@@ -61,13 +61,19 @@ addEventListener('load',async()=>{
   const task=state.taskAssistant.tasks.find(t=>t.focus==='suppliers'&&t.target==='QA Supplier');check(task,'Supplier task missing');
   await openSupplierTaskPopup(task);
   check(document.getElementById('supplierQuestPrimary').disabled,'Blocking data gate lost');
-  check(document.getElementById('supplierQuestPrint').textContent==='Print Data Review','Data print label is incorrect');
+  check((document.getElementById('supplierQuestPrint').getAttribute('aria-label')||document.getElementById('supplierQuestPrint').textContent)==='Print Data Review','Data print label is incorrect');
   check(!document.getElementById('supplierQuestNoAction'),'Two-action checkbox returned');
   const edit=[...document.querySelectorAll('[data-edit]')].find(x=>x.dataset.edit==='Data Attention');edit.click();
   check(document.activeElement.id==='editPurchasePrice','Data action did not focus purchase price');
   document.getElementById('editPurchasePrice').value='25';updateEditPreview();await saveProductEdit();
   document.getElementById('closeDetail').click();
-  await new Promise(r=>setTimeout(r,15));
+  // Wait for the editor's actual automatic refresh, not an arbitrary 15ms delay,
+  // before introducing the next independent fixture edit.
+  const refreshedBy=performance.now()+5000;
+  while(SupplierQuestUI.busy||SupplierQuestUI.masterRevision!==qaFixture.master_revision){
+    check(performance.now()<refreshedBy,'Product editor refresh did not finish');
+    await new Promise(r=>setTimeout(r,10));
+  }
   const blocking=qaFixture.rows.find(r=>r.product_code==='Data Blocking');blocking.blocking_review=false;blocking.needs_review=false;blocking.review_reason=null;Object.assign(qaFixture.master.find(r=>r.product_code==='Data Blocking'),blocking);qaFixture.master_revision++;
   await refreshSupplierQuest(task.task_key);check(!document.getElementById('supplierQuestPrimary').disabled,'Resolved blocking gate still locked');
   await save();check(supplierQuestStage()==='lt10','Did not reach first purchase band');
