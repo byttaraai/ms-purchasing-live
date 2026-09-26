@@ -1,0 +1,35 @@
+/* Build 87: Tasks Assistant starts at Inventory Snapshot; open-task count lives in the top tab. UI only. */
+[data-panel="tasks-assistant"] .tasks-assistant-page.ta86-focus{
+  grid-template-areas:"inventory rail" "board rail";
+}
+#ta86TasksHead{display:none!important}
+.ta87-source-counter{display:none!important}
+
+.topbar nav [data-tab="tasks-assistant"]{position:relative}
+.ta87-task-count{
+  display:inline-grid;
+  place-items:center;
+  min-width:18px;
+  height:18px;
+  margin-left:3px;
+  padding:0 5px;
+  border-radius:999px;
+  background:#6545d8;
+  color:#fff;
+  font-size:9px;
+  font-weight:850;
+  line-height:1;
+  font-variant-numeric:tabular-nums;
+  box-shadow:0 0 0 2px #f7f8fc;
+}
+.topbar nav [data-tab="tasks-assistant"].active .ta87-task-count{
+  background:#5b34fc;
+  box-shadow:0 0 0 2px #fff;
+}
+.ta87-task-count.hidden{display:none!important}
+
+@media(max-width:1180px){
+  [data-panel="tasks-assistant"] .tasks-assistant-page.ta86-focus{
+    grid-template-areas:"inventory" "rail" "board";
+  }
+}
