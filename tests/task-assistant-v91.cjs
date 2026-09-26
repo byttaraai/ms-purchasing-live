@@ -21,7 +21,7 @@ test('Profit Recovery cards use compact two-row spacing',()=>{
   assert(css.includes(".ta16-profit .ta16-task-list"));
 });
 test('Build 91 loads after Build 90',()=>{
-  assert(html.includes('Live Build 91'));
+  assert(html.includes('Live Build 92'));
   assert(html.indexOf('task-assistant-v91.js?v=91')>html.indexOf('task-assistant-v88.js?v=88'));
   assert(html.indexOf('task-assistant-v91.css?v=91')>html.indexOf('task-assistant-v90.css?v=90'));
 });
