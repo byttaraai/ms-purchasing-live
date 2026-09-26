@@ -27,7 +27,7 @@ jobs:
       - name: Static and workspace regression tests
         run: |
           test -s assets/css/app-v57.css
-          grep -q "Live Build 88" index.html
+          grep -q "Live Build 89" index.html
           grep -q "build57_workspace_security_and_validation" supabase/MIGRATION_HISTORY.md
           grep -q "revoke execute on function public.purchasing_tasks_sync_v5" supabase/migrations/20260924154106_build57_workspace_security_and_validation.sql
           grep -q "purchasing_workspace_sync_v58" supabase/migrations/20260924161035_build58_server_authoritative_score_foundation.sql
@@ -39,6 +39,8 @@ jobs:
           grep -q "saved_rev is null or saved_rev<>current_revision" supabase/migrations/20260926005528_build80_supplier_quest_legacy_reconfirm.sql
           grep -q "supplier_quest_stage_stale_v81" supabase/migrations/20260926094306_build81_supplier_quest_stage_specific_reconfirm.sql
           grep -q "Unrelated master revisions do not invalidate completed stages" supabase/migrations/20260926094306_build81_supplier_quest_stage_specific_reconfirm.sql
+          grep -q "profit_recovery_80_150" supabase/migrations/20260926163215_build89_profit_recovery_two_bands.sql
+          grep -q "recovery|profit-80-150" supabase/migrations/20260926163215_build89_profit_recovery_two_bands.sql
           node --check assets/js/workspace-v47.js
           node --check assets/js/supplier-task-v78.js
           node --check assets/js/supplier-quest-model-v79.js
@@ -66,6 +68,7 @@ jobs:
           node --test tests/task-assistant-v86.cjs
           node --test tests/task-assistant-v87.cjs
           node --test tests/task-assistant-v88.cjs
+          node --test tests/task-assistant-v89.cjs
       - name: Browser smoke and full Supplier Quest journey - synthetic data only
         run: |
           python3 -m pip install --disable-pip-version-check 'playwright==1.57.0' 'pyee==13.0.1' 'greenlet==3.5.1'
