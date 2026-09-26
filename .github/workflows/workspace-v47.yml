@@ -30,7 +30,8 @@ jobs:
           test -s assets/css/task-assistant-v90.css
           test -s assets/css/task-assistant-v91.css
           test -s assets/css/task-assistant-v92.css
-          grep -q "Live Build 92" index.html
+          test -s assets/css/task-assistant-v93.css
+          grep -q "Live Build 93" index.html
           grep -q "build57_workspace_security_and_validation" supabase/MIGRATION_HISTORY.md
           grep -q "revoke execute on function public.purchasing_tasks_sync_v5" supabase/migrations/20260924154106_build57_workspace_security_and_validation.sql
           grep -q "purchasing_workspace_sync_v58" supabase/migrations/20260924161035_build58_server_authoritative_score_foundation.sql
@@ -44,6 +45,8 @@ jobs:
           grep -q "Unrelated master revisions do not invalidate completed stages" supabase/migrations/20260926094306_build81_supplier_quest_stage_specific_reconfirm.sql
           grep -q "profit_recovery_80_150" supabase/migrations/20260926163215_build89_profit_recovery_two_bands.sql
           grep -q "recovery|profit-80-150" supabase/migrations/20260926163215_build89_profit_recovery_two_bands.sql
+          grep -q "purchasing_master_review_save_v93" supabase/migrations/20260926231715_build93_master_review_popup.sql
+          grep -q "build93_master_review_popup" supabase/MIGRATION_HISTORY.md
           node --check assets/js/workspace-v47.js
           node --check assets/js/supplier-task-v78.js
           node --check assets/js/supplier-quest-model-v79.js
@@ -61,6 +64,7 @@ jobs:
           node --check assets/js/task-assistant-v88.js
           node --check assets/js/task-assistant-v91.js
           node --check assets/js/task-assistant-v92.js
+          node --check assets/js/task-assistant-v93.js
           node tests/workspace-v47.cjs .
           node --test tests/overstock-v69.cjs
           node --test tests/supplier-quest-v79.cjs
@@ -77,6 +81,7 @@ jobs:
           node --test tests/task-assistant-v90.cjs
           node --test tests/task-assistant-v91.cjs
           node --test tests/task-assistant-v92.cjs
+          node --test tests/task-assistant-v93.cjs
       - name: Browser smoke and full Supplier Quest journey - synthetic data only
         run: |
           python3 -m pip install --disable-pip-version-check 'playwright==1.57.0' 'pyee==13.0.1' 'greenlet==3.5.1'
