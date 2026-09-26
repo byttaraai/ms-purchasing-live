@@ -36,6 +36,7 @@ jobs:
           grep -q "purchasing_supplier_quest_v79" supabase/migrations/20260926000018_build79_supplier_quest_workspace.sql
           grep -q "purchasing_supplier_quest_v80" supabase/migrations/20260926004934_build80_supplier_quest_reliability.sql
           grep -q "purchasing_supplier_quest_outputs_v80" supabase/migrations/20260926004934_build80_supplier_quest_reliability.sql
+          grep -q "saved_rev is null or saved_rev<>current_revision" supabase/migrations/20260926005528_build80_supplier_quest_legacy_reconfirm.sql
           node --check assets/js/workspace-v47.js
           node --check assets/js/supplier-task-v78.js
           node --check assets/js/supplier-quest-model-v79.js
