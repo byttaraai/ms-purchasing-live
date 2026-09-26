@@ -14,6 +14,6 @@ test('obsolete View All / Show Top 5 control is hidden while open count remains 
 });
 test('Build 90 is presentation-only and loaded after Build 89',()=>{
   assert(!/\brpc\s*\(|\bfetch\s*\(|localStorage|sessionStorage|purchase_price|reorder_point|score_impact|badge_awarded/.test(css));
-  assert(html.includes('Live Build 90'));
+  assert(html.includes('Live Build 91'));
   assert(html.indexOf('task-assistant-v90.css?v=90')>html.indexOf('task-assistant-v89.css?v=89'));
 });
