@@ -1,0 +1,7 @@
+/* Build 90: Supplier Priorities always shows the full ranked Top 10. UI only. */
+[data-panel="tasks-assistant"] .ta16-suppliers .ta16-task.ta86-supplier-hidden{
+  display:block!important;
+}
+[data-panel="tasks-assistant"] #ta86SupplierToggle{
+  display:none!important;
+}
