@@ -16,8 +16,8 @@ window.fetch=async(url,options)=>{
  else if(String(url).endsWith('purchasing_workspace_revision_v47'))value={master_revision:browserFixture.master_revision,upload_id:browserFixture.upload.id};
  else if(String(url).endsWith('purchasing_workspace_state_v58')){const a=deriveWorkspace(browserFixture);value={cycles:a.cycles,score:Math.round(a.model.score),authority_version:'server_v58',source:{master_revision:browserFixture.master_revision,upload_id:browserFixture.upload.id}};}
  else if(String(url).endsWith('purchasing_workspace_sync_v58'))value={ok:true,cycle:{id:'test-cycle',upload_id:browserFixture.upload.id},tasks:p.tasks.map(t=>({...t,id:t.task_key,status:'open',badge_awarded:false})),cycles:structuredClone(state.shortageCycles||{}),authority:{score:p.score,authority_version:'server_v58'},badge_total:0,recent_badges:[],professional_rank:'Builder',rank_metrics:{history_count:1},source:{master_revision:p.master_revision,upload_id:p.upload_id}};
- else if(String(url).endsWith('purchasing_supplier_quest_v80')){
-   if(!window.browserQuest)window.browserQuest={id:1,task_id:p.task_id,upload_id:browserFixture.upload.id,supplier:'Supplier B',current_stage:'data',status:'in_progress',stage_data:{_quest_version:80,_initial_data_codes:['Browser Review'],_initial_blocking_codes:['Browser Review'],_initial_attention_codes:[]},finished_at:null};
+ else if(String(url).endsWith('purchasing_supplier_quest_v81')){
+   if(!window.browserQuest)window.browserQuest={id:1,task_id:p.task_id,upload_id:browserFixture.upload.id,supplier:'Supplier B',current_stage:'data',status:'in_progress',stage_data:{_quest_version:81,_initial_data_codes:['Browser Review'],_initial_blocking_codes:['Browser Review'],_initial_attention_codes:[]},finished_at:null};
    if(p?.action==='save_stage'){
      const snap=(browserFixture.rows||[]).filter(r=>r.supplier==='Supplier B').map(r=>({product_code:r.product_code,product_name:r.product_name,unit:r.purchase_unit,stock_pct:r.stock_ratio,rating:r.profitability_class,price:r.purchase_price,min_order:r.min_order_qty,max_order:r.max_order_qty,stock_value:r.total_value,selected:(p.codes||[]).includes(r.product_code),decision:(p.decisions||{})[r.product_code],master_revision:browserFixture.master_revision}));
      window.browserQuest.stage_data[p.stage]=p.stage==='gt300'
@@ -66,6 +66,9 @@ addEventListener('load',async()=>{
   if(document.getElementById('supplierQuestPrimary').disabled)throw Error('Purchase stage did not enable after selection');
   await document.getElementById('supplierQuestPrimary').onclick();
   if(SupplierQuestUI.quest.current_stage!=='10_50')throw Error('Single confirm action did not advance purchase stage');
+  browserFixture.master_revision++;
+  await refreshSupplierQuest(supplierTask.task_key);
+  if(sd.querySelector('.supplier-quest-step.stale'))throw Error('Unrelated master revision incorrectly invalidated completed stages');
   const stepBack=sd.querySelector('[data-quest-stage="lt10"]');
   if(!stepBack)throw Error('Completed stage is not reopenable');
   await stepBack.onclick();
@@ -79,7 +82,7 @@ addEventListener('load',async()=>{
   if(document.getElementById('tasksBadgeTotal').textContent!=='0')throw Error('Supplier Quest awarded an unverified badge');
   sd.close();
   if(browserErrors.length)throw Error(browserErrors.join('; '));
-  report.textContent='PASS: rendered Build 80 Supplier Quest, blocking-data gate, editable batch, explicit no-action, supplier move and no false badge';
+  report.textContent='PASS: rendered Build 81 Supplier Quest, stage-specific reconfirmation, editable batch, explicit no-action, supplier move and no false badge';
  }catch(e){report.textContent='FAIL: '+e.message;}
 });
 '''

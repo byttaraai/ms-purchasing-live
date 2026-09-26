@@ -56,3 +56,5 @@ This manifest mirrors the migration history reported by the live project on 2026
 - 20260926004934 `build80_supplier_quest_reliability` — editable Supplier Quest drafts, explicit no-action review, stage snapshots/reconfirmation, authenticated downstream worklists, and supporting indexes; no task-completion or badge side effects.
 
 - 20260926005528 `build80_supplier_quest_legacy_reconfirm` — server-side defense-in-depth: legacy Supplier Quest stages without a saved master revision must be reconfirmed before Finish.
+
+- 20260926094306 `build81_supplier_quest_stage_specific_reconfirm` — stage-specific Supplier Quest reconfirmation from saved source snapshots; unrelated master revisions no longer invalidate completed stages.
