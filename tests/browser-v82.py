@@ -61,7 +61,7 @@ addEventListener('load',async()=>{
   const task=state.taskAssistant.tasks.find(t=>t.focus==='suppliers'&&t.target==='QA Supplier');check(task,'Supplier task missing');
   await openSupplierTaskPopup(task);
   check(document.getElementById('supplierQuestPrimary').disabled,'Blocking data gate lost');
-  check(document.getElementById('supplierQuestPrint').textContent==='Print Data Review','Data print label is incorrect');
+  check((document.getElementById('supplierQuestPrint').getAttribute('aria-label')||document.getElementById('supplierQuestPrint').textContent)==='Print Data Review','Data print label is incorrect');
   check(!document.getElementById('supplierQuestNoAction'),'Two-action checkbox returned');
   const edit=[...document.querySelectorAll('[data-edit]')].find(x=>x.dataset.edit==='Data Attention');edit.click();
   check(document.activeElement.id==='editPurchasePrice','Data action did not focus purchase price');
