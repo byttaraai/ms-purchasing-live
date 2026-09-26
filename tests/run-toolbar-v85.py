@@ -7,13 +7,14 @@ inline_fixture=runpy.run_path(str(ROOT/'tests/run-browser-v82.py'))['inline_fixt
 
 
 def tools(page):
+    page.evaluate('()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))')
     toggle=page.locator('#supplierQuestFilterToggle')
     if toggle.is_visible() and toggle.get_attribute('aria-expanded')!='true': toggle.click()
     expect(page.locator('#supplierQuestSearch')).to_be_visible()
 
 
 def stage(page,key):
-    page.evaluate('''key=>{qaQuest.current_stage=key;supplierQuestRender(SupplierQuestUI.task,{quest:qaQuest,master_revision:qaFixture.master_revision,stale_stages:[]});}''',key)
+    page.evaluate('''async key=>{qaQuest.current_stage=key;supplierQuestRender(SupplierQuestUI.task,{quest:qaQuest,master_revision:qaFixture.master_revision,stale_stages:[]});await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));}''',key)
 
 
 def main():
