@@ -25,7 +25,7 @@ test('only Supplier Priorities cards are compacted',()=>{
   assert(!source.includes('.ta16-products .ta16-task'));
 });
 test('Build 88 loads after Build 87',()=>{
-  assert(html.includes('Live Build 88'));
+  assert(html.includes('Live Build 89'));
   assert(html.indexOf('task-assistant-v88.js?v=88')>html.indexOf('task-assistant-v87.js?v=87'));
   assert(html.indexOf('task-assistant-v88.css?v=88')>html.indexOf('task-assistant-v87.css?v=87'));
 });
