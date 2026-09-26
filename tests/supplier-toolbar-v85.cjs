@@ -42,7 +42,7 @@ test('styling is scoped to the toolbar without changing table values or printing
  assert(css.includes('#supplierTaskDialog.sq85'));
 });
 test('Build 85 follows the unchanged Build 84 layer and declares its release',()=>{
- const index=read('index.html');assert(index.includes('Live Build 89'));
+ const index=read('index.html');assert(index.includes('Live Build 90'));
  assert(index.indexOf('supplier-toolbar-v85.js')>index.indexOf('supplier-polish-v84.js'));
  assert(index.indexOf('supplier-toolbar-v85.css')>index.indexOf('supplier-polish-v84.css'));
 });
