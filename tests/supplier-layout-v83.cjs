@@ -36,5 +36,5 @@ test('Build 83 is loaded after the verified Build 82 engine and styles',()=>{
  const index=read('index.html');
  assert(index.indexOf('supplier-layout-v83.js')>index.indexOf('supplier-task-v82.js'));
  assert(index.indexOf('supplier-layout-v83.css')>index.indexOf('supplier-task-v82.css'));
- assert(index.includes('Live Build 91'));
+ assert(index.includes('Live Build 92'));
 });
