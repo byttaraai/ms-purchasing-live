@@ -66,8 +66,10 @@
 .ta92-master-label.open .ta92-master-popover,
 .ta92-master-label:focus-within .ta92-master-popover{display:block}
 
-[data-panel="tasks-assistant"] .ta16-master .ta92-master-total{
+[data-panel="tasks-assistant"] .ta86-master-compact .ta16-notice.ta92-master-summary .ta92-master-total{
   grid-area:total;
+  grid-column:1;
+  grid-row:2;
   margin:0;
   line-height:1.2;
 }
@@ -75,8 +77,10 @@
   font-size:23px;
   margin-right:5px;
 }
-[data-panel="tasks-assistant"] .ta16-master .ta92-master-view-all{
+[data-panel="tasks-assistant"] .ta86-master-compact .ta16-notice.ta92-master-summary .ta92-master-view-all{
   grid-area:action;
+  grid-column:2;
+  grid-row:1 / span 2;
   align-self:center;
   min-height:29px;
   padding:4px 9px;
@@ -85,6 +89,8 @@
 }
 [data-panel="tasks-assistant"] .ta16-master .ta92-master-chips{
   grid-area:chips;
+  grid-column:1 / -1;
+  grid-row:3;
   display:flex;
   align-items:center;
   gap:5px;
@@ -113,8 +119,10 @@
 .ta92-master-chip.ta92-master{border-color:#e4d9ff;color:#6e54b5}
 .ta92-master-chip.ta92-master b{color:#5b34fc}
 
-[data-panel="tasks-assistant"] .ta16-master .ta92-master-cycle-note{
+[data-panel="tasks-assistant"] .ta86-master-compact .ta16-notice.ta92-master-summary .ta92-master-cycle-note{
   grid-area:cycle;
+  grid-column:1 / -1;
+  grid-row:4;
   margin:1px 0 0;
   color:#8a7c63;
   font-size:9.5px;
@@ -168,9 +176,14 @@
     grid-template-columns:minmax(0,1fr);
     grid-template-areas:"label" "total" "chips" "cycle" "action";
   }
-  [data-panel="tasks-assistant"] .ta16-master .ta92-master-view-all{
+  [data-panel="tasks-assistant"] .ta86-master-compact .ta16-notice.ta92-master-summary .ta92-master-view-all{
+    grid-column:1;
+    grid-row:5;
     justify-self:start;
     margin-top:2px;
   }
+  [data-panel="tasks-assistant"] .ta86-master-compact .ta16-notice.ta92-master-summary .ta92-master-total{grid-row:2}
+  [data-panel="tasks-assistant"] .ta16-master .ta92-master-chips{grid-row:3}
+  [data-panel="tasks-assistant"] .ta86-master-compact .ta16-notice.ta92-master-summary .ta92-master-cycle-note{grid-row:4}
   .ta92-master-popover{width:min(290px,84vw)}
 }
