@@ -1,0 +1,59 @@
+name: Prepare verified UI82 sources
+on:
+  push:
+    branches: [work/supplier-quest-ui-82]
+    paths: ['.github/workflows/prepare-ui82.yml']
+permissions:
+  contents: write
+jobs:
+  prepare:
+    if: github.repository == 'byttaraai/ms-purchasing-live' && github.ref == 'refs/heads/work/supplier-quest-ui-82'
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Verify and materialize reviewed frontend source bundle
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import base64,hashlib,json,lzma,subprocess
+          allowed={
+            'assets/js/supplier-task-v82.js',
+            'assets/css/supplier-task-v82.css',
+            'tests/browser-v82.py',
+            'tests/supplier-quest-ux-v82.cjs',
+            'tests/protected-ui82.json',
+            'tests/browser-v47.py',
+            'tests/workspace-v47.cjs',
+            'docs/BUILD82_UI_UX.md',
+          }
+          packed=base64.b64decode(''.join(Path(f'maintenance/ui82.part{i}').read_text().strip() for i in range(1,6)),validate=True)
+          assert hashlib.sha256(packed).hexdigest()=='8fd2b8cf0386144d6b967623acb97f539ce7715c4636bc01b65221dc340e340a','Bundle checksum mismatch'
+          files=json.loads(lzma.decompress(packed))
+          assert set(files)==allowed,'Unexpected source path'
+          index=Path('index.html').read_bytes()
+          assert hashlib.sha1(b'blob '+str(len(index)).encode()+b'\0'+index).hexdigest()=='8082d4d06a928ae6452c959a8ef508d53f39a2b6','Base index changed'
+          for name,content in files.items():
+              assert isinstance(content,str)
+              Path(name).parent.mkdir(parents=True,exist_ok=True)
+              Path(name).write_text(content,encoding='utf-8')
+          html=index.decode('utf-8')
+          for old,new in [('supplier-task-v80.css?v=80','supplier-task-v82.css?v=82'),('supplier-task-v81.js?v=81','supplier-task-v82.js?v=82'),('Live Build 81','Live Build 82'),('Build 81 |','Build 82 |')]:
+              html=html.replace(old,new)
+          Path('index.html').write_text(html,encoding='utf-8')
+          changed=set(subprocess.check_output(['git','diff','--name-only'],text=True).splitlines())
+          assert changed<=allowed|{'index.html'},'Unexpected tracked change'
+          print('Verified source bundle; frontend-only files:',', '.join(sorted(allowed)))
+          PY
+      - name: Recheck source and unchanged purchasing formulas
+        run: |
+          node --check assets/js/supplier-task-v82.js
+          node tests/workspace-v47.cjs .
+          node --test tests/overstock-v69.cjs tests/supplier-quest-v79.cjs tests/supplier-quest-v80.cjs tests/supplier-quest-v81.cjs tests/supplier-quest-ux-v82.cjs
+      - name: Commit only verified frontend files to isolated work branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- index.html assets/js/supplier-task-v82.js assets/css/supplier-task-v82.css tests/browser-v82.py tests/supplier-quest-ux-v82.cjs tests/protected-ui82.json tests/browser-v47.py tests/workspace-v47.cjs docs/BUILD82_UI_UX.md
+          git commit -m 'Build 82: apply verified Supplier Quest UI and full journey tests'
+          git push origin HEAD:refs/heads/work/supplier-quest-ui-82
