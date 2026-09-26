@@ -20,6 +20,9 @@ test('business/risk assets are byte-for-byte unchanged',()=>{
 });
 test('index changes are limited to UI assets and build labels',()=>{
  let html=fs.readFileSync(path.join(root,'index.html'),'utf8');
+ html=html.replace('\n<link rel="stylesheet" href="assets/css/tasks-focus-v86.css?v=86">','').replace('<script src="assets/js/tasks-focus-v86.js?v=86"></script>','').replaceAll('Live Build 86','Live Build 85').replaceAll('Build 86 |','Build 85 |');
+ html=html.replace('<button class="" data-tab="output-lists"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5"></path></svg> Output Lists <span class="ta86-nav-count" id="outputListsNavCount" hidden>0</span></button>','');
+ html=html.replace(/\n<section class="hidden" data-panel="output-lists">[\s\S]*?<\/section>(?=\n<div class="inventory-lock-overlay)/,'');
  html=html.replace('\n<link rel="stylesheet" href="assets/css/supplier-toolbar-v85.css?v=85">','').replace('<script src="assets/js/supplier-toolbar-v85.js?v=85"></script>','').replaceAll('Live Build 85','Live Build 84').replaceAll('Build 85 |','Build 84 |');
  html=html.replace('\n<link rel="stylesheet" href="assets/css/supplier-polish-v84.css?v=84">','').replace('<script src="assets/js/supplier-polish-v84.js?v=84"></script>','').replaceAll('Live Build 84','Live Build 83').replaceAll('Build 84 |','Build 83 |');
  html=html.replace('\n<link rel="stylesheet" href="assets/css/supplier-layout-v83.css?v=83">','').replace('<script src="assets/js/supplier-layout-v83.js?v=83"></script>','').replaceAll('Live Build 83','Live Build 82').replaceAll('Build 83 |','Build 82 |');
