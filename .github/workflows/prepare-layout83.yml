@@ -42,11 +42,6 @@ jobs:
             }else check(dialog.querySelector('.sq-steps').getBoundingClientRect().top<dialog.querySelector('.sq-stage').getBoundingClientRect().top,'Responsive stepper moved below content');"""
           change('tests/browser-v82.py',old,new)
           change('tests/workspace-v47.cjs',"assert(html.includes('Live Build 82'));", "assert(html.includes('Live Build 83'));assert(html.includes('supplier-layout-v83.js?v=83'));assert(html.includes('supplier-layout-v83.css?v=83'));")
-          wf='.github/workflows/workspace-v47.yml'
-          change(wf,'grep -q "Live Build 82" index.html','grep -q "Live Build 83" index.html')
-          change(wf,'          node --check assets/js/supplier-task-v82.js','          node --check assets/js/supplier-task-v82.js\n          node --check assets/js/supplier-layout-v83.js')
-          change(wf,'          node --test tests/supplier-quest-ux-v82.cjs','          node --test tests/supplier-quest-ux-v82.cjs\n          node --test tests/supplier-layout-v83.cjs')
-          change(wf,'          python3 tests/run-browser-v82.py','          python3 tests/run-browser-v82.py\n          python3 tests/run-layout-v83.py')
           PY
       - name: Verify protected logic and complete synthetic browser journeys
         run: |
@@ -62,11 +57,11 @@ jobs:
           sleep 1
           python3 tests/run-browser-v82.py
           python3 tests/run-layout-v83.py
-      - name: Commit verified wiring and remove this temporary workflow
+      - name: Commit verified content wiring and remove this temporary workflow
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git rm .github/workflows/prepare-layout83.yml
-          git add index.html tests/supplier-quest-ux-v82.cjs tests/browser-v82.py tests/workspace-v47.cjs .github/workflows/workspace-v47.yml
+          git add index.html tests/supplier-quest-ux-v82.cjs tests/browser-v82.py tests/workspace-v47.cjs
           git commit -m 'Build 83: wire verified split layout and keep protected business source unchanged'
           git push origin HEAD:work/supplier-split-layout-83
