@@ -27,7 +27,7 @@ jobs:
       - name: Static and workspace regression tests
         run: |
           test -s assets/css/app-v57.css
-          grep -q "Live Build 80" index.html
+          grep -q "Live Build 81" index.html
           grep -q "build57_workspace_security_and_validation" supabase/MIGRATION_HISTORY.md
           grep -q "revoke execute on function public.purchasing_tasks_sync_v5" supabase/migrations/20260924154106_build57_workspace_security_and_validation.sql
           grep -q "purchasing_workspace_sync_v58" supabase/migrations/20260924161035_build58_server_authoritative_score_foundation.sql
@@ -37,16 +37,21 @@ jobs:
           grep -q "purchasing_supplier_quest_v80" supabase/migrations/20260926004934_build80_supplier_quest_reliability.sql
           grep -q "purchasing_supplier_quest_outputs_v80" supabase/migrations/20260926004934_build80_supplier_quest_reliability.sql
           grep -q "saved_rev is null or saved_rev<>current_revision" supabase/migrations/20260926005528_build80_supplier_quest_legacy_reconfirm.sql
+          grep -q "supplier_quest_stage_stale_v81" supabase/migrations/20260926094306_build81_supplier_quest_stage_specific_reconfirm.sql
+          grep -q "Unrelated master revisions do not invalidate completed stages" supabase/migrations/20260926094306_build81_supplier_quest_stage_specific_reconfirm.sql
           node --check assets/js/workspace-v47.js
           node --check assets/js/supplier-task-v78.js
           node --check assets/js/supplier-quest-model-v79.js
           node --check assets/js/supplier-task-v79.js
           node --check assets/js/supplier-quest-model-v80.js
           node --check assets/js/supplier-task-v80.js
+          node --check assets/js/supplier-quest-model-v81.js
+          node --check assets/js/supplier-task-v81.js
           node tests/workspace-v47.cjs .
           node --test tests/overstock-v69.cjs
           node --test tests/supplier-quest-v79.cjs
           node --test tests/supplier-quest-v80.cjs
+          node --test tests/supplier-quest-v81.cjs
       - name: Browser smoke test with synthetic data only
         run: |
           python3 tests/browser-v69.py
