@@ -53,7 +53,7 @@ addEventListener('load',async()=>{
   const sd=document.getElementById('supplierTaskDialog');
   if(!sd?.open)throw Error('Supplier Quest popup did not open');
   if(!sd.querySelector('.supplier-quest-stepper')||!sd.textContent.includes('Data Review'))throw Error('Supplier Quest data stage missing');
-  if(!document.querySelector('.quest-open-product'))throw Error('Data review product action missing');
+  if(!document.querySelector('[data-edit]'))throw Error('Data review product action missing');
   if(!document.getElementById('supplierQuestPrimary')?.disabled)throw Error('Blocking data should disable the stage');
   browserFixture.rows[2].needs_review=false;browserFixture.rows[2].blocking_review=false;browserFixture.rows[2].review_reason=null;browserFixture.master[2].needs_review=false;browserFixture.master[2].blocking_review=false;browserFixture.master[2].review_reason=null;browserFixture.master_revision++;
   await refreshSupplierQuest(supplierTask.task_key);
@@ -75,14 +75,15 @@ addEventListener('load',async()=>{
   if(SupplierQuestUI.quest.current_stage!=='lt10')throw Error('Completed stage did not reopen for editing');
   const picked=document.querySelector('[data-quest-select="Browser A"]');if(!picked?.checked)throw Error('Saved batch selection was not restored');
   picked.checked=false;picked.dispatchEvent(new Event('change',{bubbles:true}));
-  const noAction=document.getElementById('supplierQuestNoAction');if(!noAction)throw Error('No Purchase Required control missing');
-  noAction.checked=true;noAction.dispatchEvent(new Event('change',{bubbles:true}));
-  if(document.getElementById('supplierQuestPrimary').disabled)throw Error('Explicit no-action did not enable stage save');
+  const noAction=document.getElementById('supplierQuestPrimary');
+  if(noAction.disabled||!noAction.textContent.includes('No Purchase Required'))throw Error('Direct no-purchase action missing');
+  await noAction.onclick();
+  if(!browserQuest.stage_data.lt10.no_action)throw Error('No purchase action was not persisted');
   if(msAudit.getState().taskAssistant.tasks.find(t=>t.task_key===supplierTask.task_key)?.status!=='open')throw Error('Supplier Quest completed the task');
   if(document.getElementById('tasksBadgeTotal').textContent!=='0')throw Error('Supplier Quest awarded an unverified badge');
   sd.close();
   if(browserErrors.length)throw Error(browserErrors.join('; '));
-  report.textContent='PASS: rendered Build 81 Supplier Quest, stage-specific reconfirmation, editable batch, explicit no-action, supplier move and no false badge';
+  report.textContent='PASS: rendered Build 82 Supplier Quest, stage-specific reconfirmation, editable batch, explicit no-action, supplier move and no false badge';
  }catch(e){report.textContent='FAIL: '+e.message;}
 });
 '''
