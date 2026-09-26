@@ -17,3 +17,6 @@ Presentation and navigation only. No Supabase migration, RPC, score/risk formula
 
 ## Responsive behavior
 Desktop uses a sticky right performance rail and a two-column task board. Tablet brings the performance cards above the queue. Mobile stacks all content in task priority order.
+
+## Build 90 override
+The earlier Top-5 default / View All toggle is superseded. Supplier Priorities now shows the full ranked Top 10 by default and the View All / Show Top 5 toggle is hidden. The `10 open` count remains visible. This is presentation-only; supplier ranking and task logic are unchanged.

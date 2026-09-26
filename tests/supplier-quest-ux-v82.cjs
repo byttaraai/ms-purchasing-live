@@ -20,7 +20,7 @@ test('business/risk assets are byte-for-byte unchanged',()=>{
 });
 test('index keeps protected Supplier Quest contracts while allowing the approved Build 89 task extension',()=>{
  const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
- assert(html.includes('Live Build 89'));
+ assert(html.includes('Live Build 90'));
  assert(html.includes("profitRecoveryRows(10,80).slice(0,10)"));
  assert(html.includes("profitRecoveryRows(80,150).slice(0,10)"));
  assert(html.includes("focus:'profit_recovery_80_150'"));
