@@ -260,7 +260,8 @@ function supplierQuestRender(task,response){
   }
   paintMessages();sqBindContent();sqPaintControls();
   $('supplierTaskCloseX').onclick=sqRequestClose;d.oncancel=e=>{e.preventDefault();sqRequestClose();};d.onclick=e=>{if(e.target===d)sqRequestClose();};
-  d.onclose=()=>{document.body.classList.remove('sq-modal-open');SupplierQuestUI.request++;SupplierQuestUI.returnFocus?.focus?.();sqUpdateTaskButtons();};
+  // A queued close from the previous opening must not cancel the reopened dialog's save.
+  d.onclose=()=>{if(d.open)return;document.body.classList.remove('sq-modal-open');SupplierQuestUI.request++;SupplierQuestUI.returnFocus?.focus?.();sqUpdateTaskButtons();};
   $('supplierQuestDetails').onclick=e=>{SupplierQuestUI.details=!SupplierQuestUI.details;e.currentTarget.setAttribute('aria-expanded',String(SupplierQuestUI.details));paintMessages();};
   for(const step of d.querySelectorAll('[data-quest-stage]'))step.onclick=()=>sqNavigate(step.dataset.questStage);
   const search=$('supplierQuestSearch');if(search)search.oninput=()=>{SupplierQuestUI.query=search.value;sqStoreDraft();sqUpdateContent();};

@@ -89,7 +89,14 @@ addEventListener('load',async()=>{
   sqRequestClose();check(document.getElementById('supplierQuestLeaveWarning'),'Dirty-close warning missing');document.getElementById('supplierQuestLeave').click();
   await new Promise(r=>setTimeout(r,15));await openSupplierTaskPopup(task);
   check(SupplierQuestUI.selected.size===2,'Closing and reopening lost session draft');
-  qaFailSave=true;await save();check(document.querySelector('#supplierTaskDialog [role="alert"]')?.textContent.includes('QA simulated'),'Save error not visible');check(SupplierQuestUI.selected.size===2,'Failed save lost selections');
+  // Deterministically deliver a delayed close event from the previous opening during this save.
+  // A native dialog close event can be queued until after the same element is reopened.
+  qaFailSave=true;const pendingSave=save();dialog.dispatchEvent(new Event('close'));await pendingSave;
+  check(document.body.classList.contains('sq-modal-open'),'Stale close unlocked the reopened modal background');
+  check(!qaFailSave,'Simulated failure was not exercised');
+  check(document.querySelector('#supplierTaskDialog [role="alert"]')?.textContent.includes('QA simulated'),'Save error not visible');
+  check(!SupplierQuestUI.busy&&!document.getElementById('supplierQuestPrimary').disabled,'Failed save did not restore controls');
+  check(SupplierQuestUI.selected.size===2,'Failed save lost selections');
   await save();check(supplierQuestStage()==='10_50','Did not advance after retry');
   choose('Purchase B');await save();
   choose('Purchase C');await save();
