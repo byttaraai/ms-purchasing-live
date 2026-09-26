@@ -120,21 +120,30 @@
   }
   function tooltips(dialog) {
     if (bound.has(dialog)) return; bound.add(dialog);
-    let current = null;
-    function hide() { if (current) current.removeAttribute('aria-describedby'); current = null; dialog.querySelector('.sq84-tooltip')?.remove(); }
-    function show(target) {
-      hide(); if (!target?.dataset.sq84Hint || target.disabled) return;
-      current = target; const tip = document.createElement('div'); tip.className = 'sq84-tooltip'; tip.id = 'sq84Tooltip'; tip.setAttribute('role', 'tooltip'); tip.textContent = target.dataset.sq84Hint;
-      dialog.append(tip); target.setAttribute('aria-describedby', tip.id);
+    let current = null, hovered = null;
+    function clear() { if (current) current.removeAttribute('aria-describedby'); current = null; dialog.querySelector('.sq84-tooltip')?.remove(); }
+    function update() {
+      // Keyboard focus may scroll a cell into view after focusin. Re-anchor its hint;
+      // do not dismiss it because of that queued scroll or an unrelated pointerout.
+      const focused = dialog.contains(document.activeElement) ? document.activeElement.closest('[data-sq84-hint]') : null;
+      const target = focused || hovered;
+      if (!dialog.open || !target?.isConnected || !dialog.contains(target) || target.disabled || target.closest('[inert]')) { clear(); return; }
+      let tip = dialog.querySelector('.sq84-tooltip');
+      if (current !== target || !tip) {
+        clear(); current = target; tip = document.createElement('div'); tip.className = 'sq84-tooltip'; tip.id = 'sq84Tooltip';
+        tip.setAttribute('role', 'tooltip'); dialog.append(tip); target.setAttribute('aria-describedby', tip.id);
+      }
+      tip.textContent = target.dataset.sq84Hint;
       const r = target.getBoundingClientRect(), t = tip.getBoundingClientRect();
       tip.style.left = Math.max(8, Math.min(innerWidth - t.width - 8, r.left + (r.width - t.width) / 2)) + 'px';
       tip.style.top = (r.top > t.height + 12 ? r.top - t.height - 8 : r.bottom + 8) + 'px';
     }
-    dialog.addEventListener('focusin', e => show(e.target.closest('[data-sq84-hint]')));
-    dialog.addEventListener('focusout', hide);
-    dialog.addEventListener('pointerover', e => { const el = e.target.closest('[data-sq84-hint]'); if (el !== current) show(el); });
-    dialog.addEventListener('pointerout', e => { if (current && !current.contains(e.relatedTarget)) hide(); });
-    dialog.addEventListener('scroll', hide, true); dialog.addEventListener('close', hide);
+    dialog.addEventListener('focusin', update);
+    dialog.addEventListener('focusout', () => requestAnimationFrame(update));
+    dialog.addEventListener('pointerover', e => { hovered = e.target.closest('[data-sq84-hint]'); update(); });
+    dialog.addEventListener('pointerout', e => { if (hovered && !hovered.contains(e.relatedTarget)) hovered = null; update(); });
+    dialog.addEventListener('scroll', () => requestAnimationFrame(update), true);
+    dialog.addEventListener('close', () => { if (!dialog.open) { hovered = null; clear(); } });
   }
   function polish(dialog) {
     if (!dialog?.classList.contains('sq84')) return;
