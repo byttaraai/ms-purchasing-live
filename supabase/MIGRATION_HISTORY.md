@@ -64,3 +64,5 @@ This manifest mirrors the migration history reported by the live project on 2026
 - 20260926231715 `build93_master_review_popup` — restricted authenticated Master Data Review save RPC for current task targets only; no direct task completion or badge side effects.
 
 - 20260927000607 `security_fix1_null_safe_admin_guards` — missing/inactive roles now fail closed on general Master save and Inventory upload; only two authorization predicates changed. Restricted Master Review permissions, business logic and data are unchanged. Frontend remains Build 93.
+
+- 20260927001941 `security_fix2_require_master_revision` — rejects NULL expected_revision in shared Master saves (including restricted Review) and Inventory uploads; existing stale-write rejection, locks, permissions, formulas, tasks and business data are unchanged. Frontend remains Build 93.
