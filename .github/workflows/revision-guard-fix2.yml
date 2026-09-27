@@ -1,0 +1,26 @@
+name: Verify revision guard fix 2
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'supabase/**'
+      - 'tests/revision-guard-fix2.cjs'
+      - 'tests/sql/revision-guard-fix2-sandbox.sql'
+      - '.github/workflows/revision-guard-fix2.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'supabase/**'
+      - 'tests/revision-guard-fix2.cjs'
+      - 'tests/sql/revision-guard-fix2-sandbox.sql'
+      - '.github/workflows/revision-guard-fix2.yml'
+permissions:
+  contents: read
+jobs:
+  revision-guard-contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Scope, safety and caller contracts
+        run: node --test tests/revision-guard-fix2.cjs
