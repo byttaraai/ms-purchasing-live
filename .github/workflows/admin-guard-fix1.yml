@@ -1,0 +1,28 @@
+name: Verify admin guard fix 1
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'supabase/**'
+      - 'tests/admin-guard-fix1.cjs'
+      - 'index.html'
+      - 'assets/**'
+      - '.github/workflows/admin-guard-fix1.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'supabase/**'
+      - 'tests/admin-guard-fix1.cjs'
+      - 'index.html'
+      - 'assets/**'
+      - '.github/workflows/admin-guard-fix1.yml'
+permissions:
+  contents: read
+jobs:
+  patch-contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Static authorization patch and protected-engine contracts
+        run: node --test tests/admin-guard-fix1.cjs
