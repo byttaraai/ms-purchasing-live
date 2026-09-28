@@ -1,0 +1,32 @@
+name: Prepare DATA-01 branch once
+on:
+  push:
+    branches: [fix/data01-numeric-validation]
+    paths: ['.github/workflows/data01-prepare-once.yml']
+permissions:
+  contents: write
+jobs:
+  prepare:
+    if: github.repository == 'byttaraai/ms-purchasing-live' && github.ref == 'refs/heads/fix/data01-numeric-validation'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: fix/data01-numeric-validation
+      - name: Generate migration file with pinned CLI and prepare exact patch
+        run: |
+          npx --yes supabase@2.81.3 --version
+          npx --yes supabase@2.81.3 migration new --help
+          npx --yes supabase@2.81.3 migration new data01_numeric_validation
+          node scripts/data01-prepare.cjs
+          git diff --check
+          node --check assets/js/task-assistant-v94.js
+          node --test tests/numeric-data01.cjs tests/task-assistant-v93.cjs
+      - name: Commit generated files only to this review branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html assets/js/task-assistant-v94.js tests/task-assistant-v93.cjs supabase/migrations/20260928113235_data01_numeric_validation.sql supabase/MIGRATION_HISTORY.md
+          git commit -m 'Build 94: numeric validation asset and canonical migration record'
+          git push origin HEAD:refs/heads/fix/data01-numeric-validation
