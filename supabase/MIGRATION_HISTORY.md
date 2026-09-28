@@ -68,3 +68,5 @@ This manifest mirrors the migration history reported by the live project on 2026
 - 20260927001941 `security_fix2_require_master_revision` — rejects NULL expected_revision in shared Master saves (including restricted Review) and Inventory uploads; existing stale-write rejection, locks, permissions, formulas, tasks and business data are unchanged. Frontend remains Build 93.
 
 - 20260928110947 `security_fix3_backup_legacy_tables` — BACKUP ONLY: owner-only logical recovery snapshot of three legacy tables in purchasing_private. No legacy table has been deleted; restore verification and retirement remain pending. V5 data/runtime untouched. See docs/SECURITY_FIX3_LEGACY_RETIREMENT_STATUS.md.
+
+- 20260928113235 `data01_numeric_validation` - numeric bounds and atomic derived-output validation; no purchasing formula or task changes. Frontend numeric guard: Build 94. SEC-03 deletion remains pending.

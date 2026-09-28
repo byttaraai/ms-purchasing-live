@@ -1,7 +1,7 @@
 const {test}=require('node:test');
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const root=path.resolve(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
-const js=read('assets/js/task-assistant-v93.js'),css=read('assets/css/task-assistant-v93.css'),html=read('index.html');
+const js=read('assets/js/task-assistant-v94.js'),css=read('assets/css/task-assistant-v93.css'),html=read('index.html');
 test('Build 93 moves Master Data above Profit Recovery',()=>{
   assert(css.includes('.ta16-master{grid-column:2;grid-row:1}'));
   assert(css.includes('.ta16-profit{grid-column:2;grid-row:2}'));
@@ -24,7 +24,7 @@ test('Popup supports agreed direct-edit fields and new products',()=>{
   assert(js.includes('Save &amp; Recalculate'));
 });
 test('Build 93 assets load after Build 92',()=>{
-  assert(html.includes('Live Build 93'));
-  assert(html.indexOf('task-assistant-v93.js?v=93')>html.indexOf('task-assistant-v92.js?v=92'));
+  assert(html.includes('Live Build 94'));
+  assert(html.indexOf('task-assistant-v94.js?v=94')>html.indexOf('task-assistant-v92.js?v=92'));
   assert(html.indexOf('task-assistant-v93.css?v=93')>html.indexOf('task-assistant-v92.css?v=92'));
 });
