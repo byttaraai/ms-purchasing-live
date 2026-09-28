@@ -1,0 +1,64 @@
+name: Prepare popup95 branch once
+on:
+  push:
+    branches: [fix/popup95-unsaved-inputs]
+    paths: ['.github/workflows/prepare-popup95-once.yml']
+permissions:
+  contents: write
+jobs:
+  prepare:
+    if: github.repository == 'byttaraai/ms-purchasing-live' && github.ref == 'refs/heads/fix/popup95-unsaved-inputs'
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: fix/popup95-unsaved-inputs
+      - name: Verify locally tested files and wire only approved release references
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib
+          def git_hash(data):
+              return hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()
+          def replace_once(text, old, new):
+              assert text.count(old)==1, ('Unexpected release reference',old,text.count(old))
+              return text.replace(old,new)
+          for name, expected in {
+              'index.html':'59af8730182baca15d36b0232ba8c5f232ef9137',
+              'assets/js/task-assistant-v95.js':'8520851af1704270245abe028a99445fb6a4f268',
+              'tests/run-popup-drafts-v95.py':'7dcdafc62cb149e00d69d5845dd6138db6ecf9c7',
+              'tests/popup-drafts-v95.cjs':'9d45f0f026c3a5d5f7e4b5d00c883d2e9461acbe',
+              'tests/admin-guard-fix1.cjs':'6d73dc5387fa0b5e22dc4c4c570949c561b94322'
+          }.items():
+              assert git_hash(Path(name).read_bytes())==expected, 'Source drift: '+name
+          p=Path('index.html');s=p.read_text()
+          s=replace_once(s,'Live Build 94</span>','Live Build 95</span>')
+          s=replace_once(s,'task-assistant-v94.js?v=94','task-assistant-v95.js?v=95')
+          p.write_text(s)
+          p=Path('tests/task-assistant-v93.cjs');s=p.read_text()
+          s=s.replace('task-assistant-v94.js','task-assistant-v95.js').replace('?v=94','?v=95').replace('Live Build 94','Live Build 95')
+          p.write_text(s)
+          p=Path('tests/numeric-data01.cjs');s=p.read_text()
+          s=replace_once(s,'Live Build 94</span>','Live Build 95</span>')
+          s=replace_once(s,'task-assistant-v94.js?v=94','task-assistant-v95.js?v=95')
+          p.write_text(s)
+          p=Path('tests/admin-guard-fix1.cjs');s=p.read_text()
+          s=s.replace('Build 94 release references','Build 95 release references')
+          s=replace_once(s,'Live Build 94</span>','Live Build 95</span>')
+          s=replace_once(s,'task-assistant-v94.js?v=94','task-assistant-v95.js?v=95')
+          p.write_text(s)
+          p=Path('.github/workflows/workspace-v47.yml');s=p.read_text()
+          s=replace_once(s,'grep -q "Live Build 94" index.html','grep -q "Live Build 95" index.html')
+          s=replace_once(s,'          node --check assets/js/task-assistant-v94.js','          node --check assets/js/task-assistant-v94.js\n          node --check assets/js/task-assistant-v95.js')
+          s=replace_once(s,'          node --test tests/numeric-data01.cjs','          node --test tests/numeric-data01.cjs\n          node --test tests/popup-drafts-v95.cjs')
+          s=replace_once(s,'          python3 tests/run-numeric-data01.py','          python3 tests/run-numeric-data01.py\n          python3 tests/run-popup-drafts-v95.py')
+          p.write_text(s)
+          PY
+          node --check assets/js/task-assistant-v95.js
+          node --test tests/popup-drafts-v95.cjs tests/numeric-data01.cjs tests/task-assistant-v93.cjs tests/admin-guard-fix1.cjs
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html .github/workflows/workspace-v47.yml tests/admin-guard-fix1.cjs tests/task-assistant-v93.cjs tests/numeric-data01.cjs
+          git commit -m 'Build 95: wire verified draft-safe popup and preserve prior test contracts'
+          git push origin HEAD:fix/popup95-unsaved-inputs
