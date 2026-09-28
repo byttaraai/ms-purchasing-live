@@ -14,7 +14,7 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           ref: fix/popup95-unsaved-inputs
-      - name: Verify locally tested files and wire only approved release references
+      - name: Verify locally tested files and wire only ordinary release files
         run: |
           python3 - <<'PY'
           from pathlib import Path
@@ -48,17 +48,11 @@ jobs:
           s=replace_once(s,'Live Build 94</span>','Live Build 95</span>')
           s=replace_once(s,'task-assistant-v94.js?v=94','task-assistant-v95.js?v=95')
           p.write_text(s)
-          p=Path('.github/workflows/workspace-v47.yml');s=p.read_text()
-          s=replace_once(s,'grep -q "Live Build 94" index.html','grep -q "Live Build 95" index.html')
-          s=replace_once(s,'          node --check assets/js/task-assistant-v94.js','          node --check assets/js/task-assistant-v94.js\n          node --check assets/js/task-assistant-v95.js')
-          s=replace_once(s,'          node --test tests/numeric-data01.cjs','          node --test tests/numeric-data01.cjs\n          node --test tests/popup-drafts-v95.cjs')
-          s=replace_once(s,'          python3 tests/run-numeric-data01.py','          python3 tests/run-numeric-data01.py\n          python3 tests/run-popup-drafts-v95.py')
-          p.write_text(s)
           PY
           node --check assets/js/task-assistant-v95.js
           node --test tests/popup-drafts-v95.cjs tests/numeric-data01.cjs tests/task-assistant-v93.cjs tests/admin-guard-fix1.cjs
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add index.html .github/workflows/workspace-v47.yml tests/admin-guard-fix1.cjs tests/task-assistant-v93.cjs tests/numeric-data01.cjs
+          git add index.html tests/admin-guard-fix1.cjs tests/task-assistant-v93.cjs tests/numeric-data01.cjs
           git commit -m 'Build 95: wire verified draft-safe popup and preserve prior test contracts'
           git push origin HEAD:fix/popup95-unsaved-inputs
