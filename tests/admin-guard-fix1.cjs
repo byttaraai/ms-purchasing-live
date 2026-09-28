@@ -18,7 +18,7 @@ test('migration fails closed on source drift and unexpected extra edits',()=>{
   assert(body.includes('pg_get_functiondef(fn) IS DISTINCT FROM updated'));
   assert(body.includes('Expected exactly one admin guard'));
 });
-test('protected engines match Build 93 except the two approved Build 94 release references',()=>{
+test('protected engines match Build 93 except the two approved Build 95 release references',()=>{
   const files={
     'index.html':'c49c2efb894f1b4958d4e3c1955c893dfe546830',
     'assets/js/workspace-v47.js':'479823da0a805b1e15a3e28ad29213d284796534',
@@ -32,8 +32,8 @@ test('protected engines match Build 93 except the two approved Build 94 release 
       // must still reproduce the exact original hash. Do not reset the baseline.
       let html=data.toString('utf8');
       for(const [current,previous] of [
-        ['Live Build 94</span>','Live Build 93</span>'],
-        ['task-assistant-v94.js?v=94','task-assistant-v93.js?v=93']
+        ['Live Build 95</span>','Live Build 93</span>'],
+        ['task-assistant-v95.js?v=95','task-assistant-v93.js?v=93']
       ]){
         assert.equal(html.split(current).length-1,1,'Expected one approved release reference');
         html=html.replace(current,previous);
