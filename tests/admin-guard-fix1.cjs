@@ -18,7 +18,7 @@ test('migration fails closed on source drift and unexpected extra edits',()=>{
   assert(body.includes('pg_get_functiondef(fn) IS DISTINCT FROM updated'));
   assert(body.includes('Expected exactly one admin guard'));
 });
-test('frontend and protected engines are unchanged from the verified Build 93 baseline',()=>{
+test('protected engines match Build 93 except the two approved Build 94 release references',()=>{
   const files={
     'index.html':'c49c2efb894f1b4958d4e3c1955c893dfe546830',
     'assets/js/workspace-v47.js':'479823da0a805b1e15a3e28ad29213d284796534',
@@ -26,7 +26,20 @@ test('frontend and protected engines are unchanged from the verified Build 93 ba
     'assets/js/task-assistant-v93.js':'9c90f3dfcd79451b7d65a3f35f902fa6837ffb67'
   };
   for(const [name,expected] of Object.entries(files)){
-    const data=fs.readFileSync(name);
+    let data=fs.readFileSync(name);
+    if(name==='index.html'){
+      // Invert ONLY the approved marker/asset reference changes; all embedded logic
+      // must still reproduce the exact original hash. Do not reset the baseline.
+      let html=data.toString('utf8');
+      for(const [current,previous] of [
+        ['Live Build 94</span>','Live Build 93</span>'],
+        ['task-assistant-v94.js?v=94','task-assistant-v93.js?v=93']
+      ]){
+        assert.equal(html.split(current).length-1,1,'Expected one approved release reference');
+        html=html.replace(current,previous);
+      }
+      data=Buffer.from(html,'utf8');
+    }
     const actual=crypto.createHash('sha1').update(Buffer.from('blob '+data.length+'\0')).update(data).digest('hex');
     assert.equal(actual,expected,name);
   }
