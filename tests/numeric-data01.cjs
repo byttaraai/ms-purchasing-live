@@ -1,7 +1,7 @@
 'use strict';
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
 const root=path.resolve(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
-const html=read('index.html'),js=read('assets/js/task-assistant-v94.js');
+const html=require('./release-colors-v98.cjs')(read('index.html')),js=read('assets/js/task-assistant-v94.js');
 const coreScript=[...html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)].map(x=>x[1]).find(x=>x.includes('root.PurchasingCore=api'));
 assert(coreScript,'Canonical core script must exist');
 const box={};vm.runInNewContext(coreScript,box);const C=box.PurchasingCore;

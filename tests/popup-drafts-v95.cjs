@@ -24,7 +24,7 @@ test('draft protection adds no persistent storage, formula or official task writ
   assert(!span(current,'  function open(','  function sameOwner(').includes('.sort('));
 });
 test('only two release references differ from the exact pre-fix entrypoint',()=>{
-  let html=read('index.html');
+  let html=require('./release-colors-v98.cjs')(read('index.html'));
   for(const [now,before] of [['Live Build 97</span>','Live Build 94</span>'],['task-assistant-v97.js?v=97','task-assistant-v94.js?v=94']]){
     assert.equal(html.split(now).length-1,1);
     html=html.replace(now,before);
