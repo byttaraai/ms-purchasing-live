@@ -14,7 +14,8 @@ p=Path('index.html');html=p.read_text()
 assert blob_hash(html)=='2347d66d951abd23f5ccf30671fbfd3fda47703c','Build 97 entrypoint drift'
 link='<link rel="stylesheet" href="assets/css/task-assistant-v98.css?v=98">'
 html=once(html,'Live Build 97</span>','Live Build 98</span>')
-html=once(html,'</head><body>',link+'</head><body>')
+anchor='<link rel="stylesheet" href="assets/css/task-assistant-v93.css?v=93">'
+html=once(html,anchor,anchor+link)
 p.write_text(html)
 for name in ['numeric-data01.cjs','popup-drafts-v95.cjs','units-v96.cjs','freshness-v97.cjs','task-assistant-v93.cjs']:
     p=Path('tests')/name;s=p.read_text()
