@@ -32,8 +32,8 @@ test('protected engines match Build 93 except the two approved Build 95 release 
       // must still reproduce the exact original hash. Do not reset the baseline.
       let html=data.toString('utf8');
       for(const [current,previous] of [
-        ['Live Build 95</span>','Live Build 93</span>'],
-        ['task-assistant-v95.js?v=95','task-assistant-v93.js?v=93']
+        ['Live Build 96</span>','Live Build 93</span>'],
+        ['task-assistant-v96.js?v=96','task-assistant-v93.js?v=93']
       ]){
         assert.equal(html.split(current).length-1,1,'Expected one approved release reference');
         html=html.replace(current,previous);

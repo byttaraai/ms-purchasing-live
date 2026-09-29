@@ -30,8 +30,8 @@ test('only numeric validation differs from the previous runtime',()=>{
  const strip=s=>s.replace(/^\/\*[^\n]*\*\//,'').replace(/  function numericValue\([\s\S]*?\n  }\n/,'').replaceAll(' max="1000000000000"','').replace('Check numeric values; maximum is 1,000,000,000,000.','Check numeric values.');
  assert.equal(strip(js),strip(base));
  assert.equal((js.match(/max="1000000000000"/g)||[]).length,2);
- assert(html.includes('Live Build 95</span>'));
- assert(html.includes('task-assistant-v95.js?v=95'));
+ assert(html.includes('Live Build 96</span>'));
+ assert(html.includes('task-assistant-v96.js?v=96'));
  assert(!html.includes('<script src="assets/js/task-assistant-v93.js?v=93"'));
 });
 test('database guard preserves authorization, bounded inputs and calculated values',()=>{
