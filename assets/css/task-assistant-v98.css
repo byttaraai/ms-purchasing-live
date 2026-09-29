@@ -1,0 +1,31 @@
+/* Build 98: presentation only. Read existing popup states; never change save rules. */
+#masterReviewDialog93 .mr93-product .mr93-row-state {
+  color: #6f7789;
+}
+#masterReviewDialog93 .mr93-product[data-new="1"]:not(.ready):not(.invalid):not([data-saved95="1"]) .mr93-row-state {
+  color: #8b6b43;
+}
+#masterReviewDialog93 .mr93-product.ready .mr93-row-state,
+#masterReviewDialog93 .mr93-product[data-saved95="1"] .mr93-row-state {
+  color: #43805e;
+}
+#masterReviewDialog93 .mr93-product.invalid .mr93-row-state {
+  color: #a75050;
+}
+/* A request in flight is not a confirmed save. */
+#masterReviewDialog93[aria-busy="true"] .mr93-product.ready:not([data-saved95="1"]) {
+  background-color: #ffffff;
+  border-color: #e3e6ee;
+}
+#masterReviewDialog93[aria-busy="true"] .mr93-product.ready:not([data-saved95="1"]) .mr93-row-state {
+  color: #6f7789;
+}
+/* Existing freshness warning takes precedence over an unsaved ready row. */
+#masterReviewDialog93:has(#mr97Freshness:not([hidden])) .mr93-product.ready:not([data-saved95="1"]) {
+  background-color: #fff7ee;
+  border-color: #ead9be;
+}
+#masterReviewDialog93:has(#mr97Freshness:not([hidden])) .mr93-product.ready:not([data-saved95="1"]) .mr93-row-state,
+#masterReviewDialog93 #mr97Freshness > span {
+  color: #8b6b43;
+}
