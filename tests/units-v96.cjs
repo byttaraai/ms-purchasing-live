@@ -45,7 +45,7 @@ test('all save/draft/retry/owner/task routing behavior remains byte identical',(
 });
 test('unit display is scoped to popup; source entrypoint contains only release-reference edits',()=>{
  if(!html)return;
- const reverted=html.replace('Live Build 96</span>','Live Build 95</span>').replace('task-assistant-v96.js?v=96','task-assistant-v95.js?v=95');
+ const reverted=html.replace('Live Build 97</span>','Live Build 95</span>').replace('task-assistant-v97.js?v=97','task-assistant-v95.js?v=95');
  const b=Buffer.from(reverted);assert.equal(crypto.createHash('sha1').update(Buffer.from('blob '+b.length+'\0')).update(b).digest('hex'),'078492deb993f6c57e09afe2d5dba2505eade6aa');
- assert(html.includes('Live Build 96</span>'));assert(!/\.sort\(|masterReviewSeverity|localStorage|sessionStorage/.test(js.slice(js.indexOf('  function updateUnitLabels'),js.indexOf('  function optionList'))));
+ assert(html.includes('Live Build 97</span>'));assert(!/\.sort\(|masterReviewSeverity|localStorage|sessionStorage/.test(js.slice(js.indexOf('  function updateUnitLabels'),js.indexOf('  function optionList'))));
 });
