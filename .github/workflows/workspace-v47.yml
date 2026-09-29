@@ -31,7 +31,7 @@ jobs:
           test -s assets/css/task-assistant-v91.css
           test -s assets/css/task-assistant-v92.css
           test -s assets/css/task-assistant-v93.css
-          grep -q "Live Build 97" index.html
+          grep -q "Live Build 98" index.html
           grep -q "build57_workspace_security_and_validation" supabase/MIGRATION_HISTORY.md
           grep -q "revoke execute on function public.purchasing_tasks_sync_v5" supabase/migrations/20260924154106_build57_workspace_security_and_validation.sql
           grep -q "purchasing_workspace_sync_v58" supabase/migrations/20260924161035_build58_server_authoritative_score_foundation.sql
@@ -90,6 +90,7 @@ jobs:
           node --test tests/popup-drafts-v95.cjs
           node --test tests/units-v96.cjs
           node --test tests/freshness-v97.cjs
+          node --test tests/status-colors-v98.cjs
       - name: Browser smoke and full Supplier Quest journey - synthetic data only
         run: |
           python3 -m pip install --disable-pip-version-check 'playwright==1.57.0' 'pyee==13.0.1' 'greenlet==3.5.1'
@@ -109,3 +110,4 @@ jobs:
           python3 tests/run-units-v96.py
           python3 tests/run-freshness-v97.py --prior-drafts
           python3 tests/run-freshness-v97.py
+          python3 tests/run-status-colors-v98.py

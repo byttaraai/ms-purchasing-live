@@ -2,7 +2,7 @@
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),path=require('node:path'),crypto=require('node:crypto');
 const root=path.resolve(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
 const js=read('assets/js/task-assistant-v96.js'),base=read('assets/js/task-assistant-v95.js');
-const html=fs.existsSync(path.join(root,'index.html'))?read('index.html'):'';
+const html=fs.existsSync(path.join(root,'index.html'))?require('./release-colors-v98.cjs')(read('index.html')):'';
 const core=process.env.UNIT96_CORE_FILE?fs.readFileSync(process.env.UNIT96_CORE_FILE,'utf8'):[...html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)].map(x=>x[1]).find(x=>x.includes('root.PurchasingCore=api'));
 assert(core,'Canonical core required');const box={};vm.runInNewContext(core,box);const C=box.PurchasingCore;
 const state={master:[{product_code:'A',purchase_unit:'Box 12',option_unit:'Piece',factor:12,supplier:'QA'}],rows:[{product_code:'B',raw_unit:'Piece'}],aliases:[]};

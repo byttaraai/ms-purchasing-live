@@ -1,7 +1,7 @@
 const {test}=require('node:test');
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const root=path.resolve(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
-const js=read('assets/js/task-assistant-v97.js'),css=read('assets/css/task-assistant-v93.css'),html=read('index.html');
+const js=read('assets/js/task-assistant-v97.js'),css=read('assets/css/task-assistant-v93.css'),html=require('./release-colors-v98.cjs')(read('index.html'));
 test('Build 93 moves Master Data above Profit Recovery',()=>{
   assert(css.includes('.ta16-master{grid-column:2;grid-row:1}'));
   assert(css.includes('.ta16-profit{grid-column:2;grid-row:2}'));
