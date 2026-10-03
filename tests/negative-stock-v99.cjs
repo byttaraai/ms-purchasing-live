@@ -62,5 +62,5 @@ test('rendering creates no editable quantity, state mutation, network or storage
  const output=render(Object.freeze(row),true);
  assert.equal(JSON.stringify(row),snapshot);
  assert(!/<input|<select|data-key=/.test(output));
- assert(!/rpc\(|fetch\(|localStorage|sessionStorage|\.sort\(|badge|task|\.raw_quantity\s*=/.test(addition));
+ assert(!/rpc\(|fetch\(|localStorage|sessionStorage|\.sort\(|badge|task|\.raw_quantity\s*=(?!=)/.test(addition));
 });
