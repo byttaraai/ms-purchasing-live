@@ -5,6 +5,7 @@ on:
     paths:
       - '.prepare-negative99.py'
       - '.github/workflows/prepare-negative99-once.yml'
+      - 'tests/negative-stock-v99.cjs'
 permissions:
   contents: write
 jobs:
