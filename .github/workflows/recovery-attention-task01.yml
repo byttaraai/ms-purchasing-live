@@ -1,0 +1,30 @@
+name: Verify TASK01 completion
+on:
+  push:
+    branches: [main]
+    paths: ['supabase/**', 'tests/**', '.github/workflows/recovery-attention-task01.yml']
+  pull_request:
+    branches: [main]
+    paths: ['supabase/**', 'tests/**', '.github/workflows/recovery-attention-task01.yml']
+permissions:
+  contents: read
+jobs:
+  recovery-attention:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    services:
+      postgres:
+        image: postgres:17.6@sha256:00bc86618629af00d2937fdc5a5d63db3ff8450acf52f0636ec813c7f4902929
+        env:
+          POSTGRES_PASSWORD: synthetic-task01
+          POSTGRES_DB: task01_test
+        ports: ['5432:5432']
+        options: --health-cmd "pg_isready -U postgres -d task01_test" --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Exact production recovery and caller on synthetic dependencies
+        env:
+          TASK01_ISOLATED: '1'
+        run: |
+          python3 -m py_compile tests/run-recovery-attention-task01.py
+          python3 tests/run-recovery-attention-task01.py

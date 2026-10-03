@@ -74,3 +74,5 @@ This manifest mirrors the migration history reported by the live project on 2026
 - 20260929113114 `master_review_units_v96` - explicit Option Unit and Factor for new products in the restricted Master Review popup; existing product units remain protected. Uses existing conversion/save engines without formula or task changes. Frontend: Build 96. SEC-03 deletion remains pending.
 
 - 20260929120055 `master_review_freshness_v97` - enforces the existing full-inventory/48-hour deadline in the restricted Master Review save, including atomic rollback if expiry occurs during save. Frontend: Build 97 retains unsaved drafts. No task-cycle/formula or general Admin-save changes. SEC-03 deletion remains pending.
+
+- 20261003130152 `task01_nonblocking_attention_completion` - user-approved exception for nonblocking missing price/rating ONLY in verified supplier/recovery completion. Same stock evidence, units, thresholds, timing and badge deduplication; no backfill or deployment-time business-data writes. Frontend remains Build 99. Generated via CLI as 20261003125713 and renamed to the API-recorded applied version; SQL bytes unchanged. SEC-03 deletion remains pending.
