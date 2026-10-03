@@ -2,6 +2,7 @@
 const assert=require('node:assert/strict');
 // Test-only inverse. Never normalize or modify production data or calculations.
 module.exports=function build98Entrypoint(html){
+  html=require('./release-task02-v100.cjs').previous(html);
   for(const [current,previous] of [
     ['Live Build 99</span>','Live Build 98</span>'],
     ['task-assistant-v99.js?v=99','task-assistant-v97.js?v=97']

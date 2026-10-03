@@ -39,7 +39,7 @@ try:
                     p.evaluate("ta16OpenTask(state.taskAssistant.tasks.find(t=>t.focus==='profit_recovery_80_150'))")
                     p.wait_for_function("state.dailyFocus?.task_key==='recovery|profit-80-150'")
                     assert set(p.evaluate('state.filtered.map(r=>r.product_code)'))==set(codes)
-                    assert p.evaluate("[...document.querySelectorAll('tbody tr')].some(r=>r.getBoundingClientRect().height>0&&r.textContent.includes('P125'))")
+                    assert p.evaluate("[...document.querySelectorAll('tbody tr, #cards article.mobile-product')].some(r=>r.getBoundingClientRect().height>0&&r.textContent.includes('P125'))")
                     r=p.evaluate("state.rows.find(r=>r.product_code==='P125')");assert r['min_order_qty']==0 and r['max_order_qty']==75 and r['stock_qty']==125
                     assert p.evaluate('JSON.stringify(qaFixture.rows)')==before
                     assert p.evaluate("state.taskAssistant.tasks.every(t=>t.status==='open'&&!t.badge_awarded)")

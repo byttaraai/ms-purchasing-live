@@ -9,7 +9,7 @@ const anchor="const root=process.argv[2]||'.',html=fs.readFileSync(root+'/index.
 assert.equal(source.split(anchor).length-1,1);
 function harness(text){
   return vm.runInNewContext(source.replace(anchor,"const root='.',html=__html;")+ '\n({run,derive,row,base,context});',{
-    __html:text,require:createRequire(__filename),process:{argv:['node','qa','.']},console:{log(){},error:console.error}
+    __html:text,URL,TextDecoder,TextEncoder,structuredClone,AbortController,Blob,queueMicrotask,require:createRequire(__filename),process:{argv:['node','qa','.']},console:{log(){},error:console.error}
   });
 }
 const live=harness(html),old=harness(prior),copy=x=>JSON.parse(JSON.stringify(x));
