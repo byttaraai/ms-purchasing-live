@@ -1,7 +1,7 @@
 'use strict';
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),crypto=require('node:crypto');
 const read=p=>fs.readFileSync(p,'utf8');
-const old=read('assets/js/task-assistant-v96.js'),js=read('assets/js/task-assistant-v97.js'),html=require('./release-colors-v98.cjs')(read('index.html'));
+const old=read('assets/js/task-assistant-v96.js'),js=read('assets/js/task-assistant-v97.js'),html=require('./release-colors-v98.cjs')(require('./release-negative-v99.cjs')(read('index.html')));
 const hash=s=>{const b=Buffer.from(s);return crypto.createHash('sha1').update(Buffer.from('blob '+b.length+'\0')).update(b).digest('hex');};
 const span=(s,a,b)=>s.slice(s.indexOf(a),s.indexOf(b));
 test('immutable baseline and all product/unit/payload definitions preserved',()=>{

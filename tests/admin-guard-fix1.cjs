@@ -30,7 +30,7 @@ test('protected engines match Build 93 except the two approved Build 95 release 
     if(name==='index.html'){
       // Invert ONLY the approved marker/asset reference changes; all embedded logic
       // must still reproduce the exact original hash. Do not reset the baseline.
-      let html=require('./release-colors-v98.cjs')(data.toString('utf8'));
+      let html=require('./release-colors-v98.cjs')(require('./release-negative-v99.cjs')(data.toString('utf8')));
       for(const [current,previous] of [
         ['Live Build 97</span>','Live Build 93</span>'],
         ['task-assistant-v97.js?v=97','task-assistant-v93.js?v=93']
