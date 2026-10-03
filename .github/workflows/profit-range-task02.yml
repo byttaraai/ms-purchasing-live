@@ -1,0 +1,37 @@
+name: Verify TASK02 profit range
+on:
+  push:
+    branches: [main]
+    paths: ['index.html', 'assets/**', 'supabase/**', 'tests/**', '.github/workflows/profit-range-task02.yml']
+  pull_request:
+    branches: [main]
+    paths: ['index.html', 'assets/**', 'supabase/**', 'tests/**', '.github/workflows/profit-range-task02.yml']
+permissions:
+  contents: read
+jobs:
+  profit-range:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    services:
+      postgres:
+        image: postgres:17.6
+        env:
+          POSTGRES_PASSWORD: synthetic-task01
+          POSTGRES_DB: task01_test
+        ports: ['5432:5432']
+        options: --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Actual frontend payload and isolated validator completion regression
+        env:
+          TASK02_EXPORT: '1'
+          TASK02_ISOLATED: '1'
+          TASK01_ISOLATED: '1'
+        run: |
+          node --test tests/profit-range-task02.cjs
+          python3 tests/run-profit-range-task02.py
+          python3 tests/run-recovery-attention-task01.py
+      - name: Actual task Open at desktop and mobile sizes - synthetic IO
+        run: |
+          python3 -m pip install --disable-pip-version-check 'playwright==1.57.0' 'pyee==13.0.1' 'greenlet==3.5.1'
+          python3 tests/run-profit-range-browser-task02.py

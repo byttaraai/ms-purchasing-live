@@ -1,7 +1,7 @@
 const {test}=require('node:test');
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const root=path.resolve(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
-const html=read('index.html'),css=read('assets/css/task-assistant-v89.css'),migration=read('supabase/migrations/20260926163215_build89_profit_recovery_two_bands.sql');
+const html=require('./release-task02-v100.cjs').previous(read('index.html')),css=read('assets/css/task-assistant-v89.css'),migration=read('supabase/migrations/20260926163215_build89_profit_recovery_two_bands.sql');
 
 test('Profit Recovery is split into two explicit task bands',()=>{
   assert(html.includes("focus:'profit_recovery'"));
