@@ -44,7 +44,7 @@ END; $$;
 """
 execute('exact migration followed by owner-only full recovery',header+release_helpers+migration+qa['helpers']+check_deleted+cleanup_temp+restore+verify_recovery)
 execute('source data drift refuses deletion',header+"UPDATE public.products_master SET supplier='changed' WHERE product_code='QA0001';\n"+release_helpers+migration,'snapshot/source drift')
-execute('external FK stops RESTRICT deletion',header+"CREATE TABLE public.sec03_external(code text REFERENCES public.products_master(product_code));\n"+release_helpers+migration,'other objects depend on it')
+execute('external FK stops RESTRICT deletion',header+"CREATE TABLE public.sec03_external(code text REFERENCES public.products_master(product_code));\n"+release_helpers+migration,'other objects depend on')
 execute('routine dependency refuses deletion',header+"CREATE FUNCTION public.sec03_external() RETURNS bigint LANGUAGE sql AS $$SELECT count(*) FROM public.products_master$$;\n"+release_helpers+migration,'application routine references')
 execute('damaged snapshot refuses deletion',header+"UPDATE purchasing_private.retired_legacy_snapshot_v1 SET payload_md5='bad';\n"+release_helpers+migration,'snapshot/source drift')
 execute('public restore refuses existing source',header+restore,'restore refuses existing source tables')
