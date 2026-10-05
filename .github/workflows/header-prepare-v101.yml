@@ -1,0 +1,24 @@
+name: Prepare header101 on isolated branch
+on:
+  push:
+    branches: [fix/header-v101]
+permissions:
+  contents: write
+jobs:
+  header-preparation:
+    if: github.repository == 'byttaraai/ms-purchasing-live' && github.ref == 'refs/heads/fix/header-v101'
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Exact source-only preparation
+        env:
+          HEADER_PUBLISH_BLOBS: '1'
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python3 maintenance/prepare-header-v101.py
+      - name: Scope, source preservation and CI contracts
+        run: node --test tests/header-v101.cjs tests/legacy-retirement-contracts-sec03.cjs tests/ci-required-checks-sec04.cjs
+      - name: Actual page header, navigation and dialog tests - synthetic only
+        run: |
+          python3 -m pip install --disable-pip-version-check 'playwright==1.57.0' 'pyee==13.0.1' 'greenlet==3.5.1'
+          python3 tests/run-header-v101.py
