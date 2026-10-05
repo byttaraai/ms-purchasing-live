@@ -1,11 +1,9 @@
 name: Verify SEC03 restore rehearsal
 on:
   push:
-    branches: [main, review/sec03-restore-rehearsal]
-    paths: ['maintenance/sec03*', 'tests/*sec03*', 'supabase/migrations/*_security_fix3_retire_legacy_tables.sql', '.github/workflows/legacy-restore-sec03.yml']
+    branches: [main]
   pull_request:
     branches: [main]
-    paths: ['maintenance/sec03*', 'tests/*sec03*', 'supabase/migrations/*_security_fix3_retire_legacy_tables.sql', '.github/workflows/legacy-restore-sec03.yml']
 permissions:
   contents: read
 jobs:
