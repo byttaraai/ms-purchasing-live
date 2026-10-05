@@ -1,0 +1,30 @@
+name: Verify SEC03 restore rehearsal
+on:
+  push:
+    branches: [main, review/sec03-restore-rehearsal]
+    paths: ['maintenance/sec03*', 'tests/run-legacy-restore-sec03.py', '.github/workflows/legacy-restore-sec03.yml']
+  pull_request:
+    branches: [main]
+    paths: ['maintenance/sec03*', 'tests/run-legacy-restore-sec03.py', '.github/workflows/legacy-restore-sec03.yml']
+permissions:
+  contents: read
+jobs:
+  restore-rehearsal:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    services:
+      postgres:
+        image: postgres:17.6
+        env:
+          POSTGRES_PASSWORD: synthetic-sec03
+          POSTGRES_DB: sec03_test
+        ports: ['5432:5432']
+        options: --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Compile and run synthetic full restore scenarios
+        env:
+          SEC03_ISOLATED: '1'
+        run: |
+          python3 -m py_compile tests/run-legacy-restore-sec03.py
+          python3 tests/run-legacy-restore-sec03.py
