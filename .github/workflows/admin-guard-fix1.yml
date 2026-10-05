@@ -2,20 +2,8 @@ name: Verify admin guard fix 1
 on:
   push:
     branches: [main]
-    paths:
-      - 'supabase/**'
-      - 'tests/admin-guard-fix1.cjs'
-      - 'index.html'
-      - 'assets/**'
-      - '.github/workflows/admin-guard-fix1.yml'
   pull_request:
     branches: [main]
-    paths:
-      - 'supabase/**'
-      - 'tests/admin-guard-fix1.cjs'
-      - 'index.html'
-      - 'assets/**'
-      - '.github/workflows/admin-guard-fix1.yml'
 permissions:
   contents: read
 jobs:

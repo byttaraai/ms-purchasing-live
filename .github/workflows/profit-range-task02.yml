@@ -2,10 +2,8 @@ name: Verify TASK02 profit range
 on:
   push:
     branches: [main]
-    paths: ['index.html', 'assets/**', 'supabase/**', 'tests/**', '.github/workflows/profit-range-task02.yml']
   pull_request:
     branches: [main]
-    paths: ['index.html', 'assets/**', 'supabase/**', 'tests/**', '.github/workflows/profit-range-task02.yml']
 permissions:
   contents: read
 jobs:

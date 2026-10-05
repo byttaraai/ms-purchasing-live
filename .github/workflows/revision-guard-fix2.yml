@@ -2,18 +2,8 @@ name: Verify revision guard fix 2
 on:
   push:
     branches: [main]
-    paths:
-      - 'supabase/**'
-      - 'tests/revision-guard-fix2.cjs'
-      - 'tests/sql/revision-guard-fix2-sandbox.sql'
-      - '.github/workflows/revision-guard-fix2.yml'
   pull_request:
     branches: [main]
-    paths:
-      - 'supabase/**'
-      - 'tests/revision-guard-fix2.cjs'
-      - 'tests/sql/revision-guard-fix2-sandbox.sql'
-      - '.github/workflows/revision-guard-fix2.yml'
 permissions:
   contents: read
 jobs:

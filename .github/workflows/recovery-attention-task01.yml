@@ -2,10 +2,8 @@ name: Verify TASK01 completion
 on:
   push:
     branches: [main]
-    paths: ['supabase/**', 'tests/**', '.github/workflows/recovery-attention-task01.yml']
   pull_request:
     branches: [main]
-    paths: ['supabase/**', 'tests/**', '.github/workflows/recovery-attention-task01.yml']
 permissions:
   contents: read
 jobs:

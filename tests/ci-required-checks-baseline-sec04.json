@@ -1,0 +1,26 @@
+{
+  "admin-guard-fix1.yml": {
+    "sha": "e00b5e5cf0aab3a8f5ef5e0dcbd060d8bd862c64",
+    "old_on": "on:\n  push:\n    branches: [main]\n    paths:\n      - 'supabase/**'\n      - 'tests/admin-guard-fix1.cjs'\n      - 'index.html'\n      - 'assets/**'\n      - '.github/workflows/admin-guard-fix1.yml'\n  pull_request:\n    branches: [main]\n    paths:\n      - 'supabase/**'\n      - 'tests/admin-guard-fix1.cjs'\n      - 'index.html'\n      - 'assets/**'\n      - '.github/workflows/admin-guard-fix1.yml'\n"
+  },
+  "revision-guard-fix2.yml": {
+    "sha": "421e50b5227d9de10d0c9285f71abf738fd60f0b",
+    "old_on": "on:\n  push:\n    branches: [main]\n    paths:\n      - 'supabase/**'\n      - 'tests/revision-guard-fix2.cjs'\n      - 'tests/sql/revision-guard-fix2-sandbox.sql'\n      - '.github/workflows/revision-guard-fix2.yml'\n  pull_request:\n    branches: [main]\n    paths:\n      - 'supabase/**'\n      - 'tests/revision-guard-fix2.cjs'\n      - 'tests/sql/revision-guard-fix2-sandbox.sql'\n      - '.github/workflows/revision-guard-fix2.yml'\n"
+  },
+  "recovery-attention-task01.yml": {
+    "sha": "1ef15889d41128af592970a3120051b335e40c2e",
+    "old_on": "on:\n  push:\n    branches: [main]\n    paths: ['supabase/**', 'tests/**', '.github/workflows/recovery-attention-task01.yml']\n  pull_request:\n    branches: [main]\n    paths: ['supabase/**', 'tests/**', '.github/workflows/recovery-attention-task01.yml']\n"
+  },
+  "profit-range-task02.yml": {
+    "sha": "cbfeddf8a64fa49663a1e52086907c02a24eafbb",
+    "old_on": "on:\n  push:\n    branches: [main]\n    paths: ['index.html', 'assets/**', 'supabase/**', 'tests/**', '.github/workflows/profit-range-task02.yml']\n  pull_request:\n    branches: [main]\n    paths: ['index.html', 'assets/**', 'supabase/**', 'tests/**', '.github/workflows/profit-range-task02.yml']\n"
+  },
+  "legacy-restore-sec03.yml": {
+    "sha": "a6b145e1d450f75cd8eead84e1825f0338dcd2e2",
+    "old_on": "on:\n  push:\n    branches: [main, review/sec03-restore-rehearsal]\n    paths: ['maintenance/sec03*', 'tests/*sec03*', 'supabase/migrations/*_security_fix3_retire_legacy_tables.sql', '.github/workflows/legacy-restore-sec03.yml']\n  pull_request:\n    branches: [main]\n    paths: ['maintenance/sec03*', 'tests/*sec03*', 'supabase/migrations/*_security_fix3_retire_legacy_tables.sql', '.github/workflows/legacy-restore-sec03.yml']\n"
+  },
+  "workspace-v47.yml": {
+    "sha": "577e6af037880eee0d62d9c5161b39ed958b7e53",
+    "old_on": "on:\n  push:\n    branches: [main]\n    paths:\n      - 'index.html'\n      - 'assets/**'\n      - 'tests/**'\n      - 'supabase/**'\n      - '.github/workflows/workspace-v47.yml'\n  pull_request:\n    branches: [main]\n    paths:\n      - 'index.html'\n      - 'assets/**'\n      - 'tests/**'\n      - 'supabase/**'\n      - '.github/workflows/workspace-v47.yml'\n"
+  }
+}
