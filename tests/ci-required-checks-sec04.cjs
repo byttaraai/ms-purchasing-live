@@ -55,8 +55,3 @@ test('trigger contract rejects path filtering, skipped jobs, permissive errors a
   const s=read('.github/workflows/workspace-v47.yml');
   for(const bad of [s.replace('  pull_request:\n','    paths: [index.html]\n  pull_request:\n'),s.replace('  regression:\n','  regression:\n    if: false\n'),s.replace('  regression:\n','  regression:\n    continue-on-error: true\n'),s.replace('pull_request:','pull_request_target:')])assert.throws(()=>validateTrigger(bad));
 });
-
-// TEMPORARY SEC04 negative probe on an isolated PR. Must be removed before merge.
-test('SEC04_NEGATIVE_PROBE_REQUIRED_CHECK_MUST_BLOCK',()=>{
-  assert.fail('Intentional isolated protection probe; no application or database changes');
-});
