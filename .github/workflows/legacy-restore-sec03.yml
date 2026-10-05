@@ -2,10 +2,10 @@ name: Verify SEC03 restore rehearsal
 on:
   push:
     branches: [main, review/sec03-restore-rehearsal]
-    paths: ['maintenance/sec03*', 'tests/run-legacy-restore-sec03.py', '.github/workflows/legacy-restore-sec03.yml']
+    paths: ['maintenance/sec03*', 'tests/*sec03*', 'supabase/migrations/*_security_fix3_retire_legacy_tables.sql', '.github/workflows/legacy-restore-sec03.yml']
   pull_request:
     branches: [main]
-    paths: ['maintenance/sec03*', 'tests/run-legacy-restore-sec03.py', '.github/workflows/legacy-restore-sec03.yml']
+    paths: ['maintenance/sec03*', 'tests/*sec03*', 'supabase/migrations/*_security_fix3_retire_legacy_tables.sql', '.github/workflows/legacy-restore-sec03.yml']
 permissions:
   contents: read
 jobs:
@@ -22,9 +22,11 @@ jobs:
         options: --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 10
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-      - name: Compile and run synthetic full restore scenarios
+      - name: Verify unchanged Build 100 and scoped retirement contracts
+        run: node --test tests/legacy-retirement-contracts-sec03.cjs
+      - name: Full synthetic restore, retirement and owner-only recovery
         env:
           SEC03_ISOLATED: '1'
         run: |
-          python3 -m py_compile tests/run-legacy-restore-sec03.py
-          python3 tests/run-legacy-restore-sec03.py
+          python3 -m py_compile tests/run-legacy-restore-sec03.py tests/run-legacy-retirement-sec03.py
+          python3 tests/run-legacy-retirement-sec03.py
