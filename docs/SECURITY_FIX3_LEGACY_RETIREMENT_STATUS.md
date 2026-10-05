@@ -1,44 +1,41 @@
-# SEC-03 - legacy retirement: BACKUP ONLY, NOT COMPLETE
+# SEC-03 - legacy retirement completed on 2026-10-05
 
-## User-approved scope
+## Latest verified database state
 
-The user approved deleting only the original `public.products_master`, `public.inventory_uploads`, and `public.inventory_lines` tables plus their own dependent objects, after a recoverable snapshot and verification that live V5 workflows are unaffected. No Supabase project, GitHub repository, V5 table, current history, formula, or other audit item is approved for deletion/change.
+The three approved legacy tables public.products_master, public.inventory_uploads and public.inventory_lines have been deleted with explicit RESTRICT after successful restoration of their protected snapshot into session-local temporary tables. Their own identity sequence is also absent. No Supabase project, repository, Auth account, V5 table, current history, shared routine or business formula was deleted or changed.
 
-## Actual state on 2026-09-28
+Applied once: 20261005115852_security_fix3_retire_legacy_tables. CLI-generated as 20261005115201; the same SQL bytes were renamed to the API-recorded version. Stored SQL Git blob hash equals repository blob 90adbd2ee16fb3df96dd554fb25f695cdddb5fa0. Do not replay this or any old migration.
 
-**No legacy table has been deleted. SEC-03 remains open.**
+The actual restore proof is stored in purchasing_private.retired_legacy_snapshot_v1, key sec03_legacy_retirement, verification.retirement. Retirement timestamp: 2026-10-05T11:58:56.581252+00:00.
 
-Applied once: `20260928110947_security_fix3_backup_legacy_tables`.
-Do not replay this migration or any historical migration.
+| Restored snapshot table | Rows | Data MD5 |
+| --- | --- | --- |
+| products_master | 1576 | 9fd6e4e08f86f01ad254b9c6fe8ea60c |
+| inventory_uploads | 1 | cb6f258fa7b4990994aedc9ae8671c29 |
+| inventory_lines | 1309 | 462209004645b1544f8605902e760aaf |
 
-A single logical snapshot is stored in `purchasing_private.retired_legacy_snapshot_v1`, key `sec03_legacy_retirement`. It contains all legacy rows and captured table DDL, defaults, constraints, indexes, trigger definitions, policies, owner/grants, comments, and identity state/settings. It is a private recovery record in the SAME database, not an independent disaster-recovery backup, synchronized data source, or new operating path. Raw snapshot data is deliberately NOT committed to this public repository.
+All restored constraints were validated, complete contents matched, and the identity sequence state matched. No old broad policies were replayed. Temporary copies were session-local and removed at transaction end. The deletion ran only after the snapshot matched the current old tables in full and the restoration succeeded; any dependency or nonlegacy drift would abort the transaction.
 
-The snapshot table has RLS enabled and all access revoked from PUBLIC, anon, authenticated, and service_role. Administrative database-owner access remains. No public RPC was added.
+Twenty-one nonlegacy public/private table fingerprints (data, structure, policies and privileges) and every application routine/ACL were compared before and after deletion within the transaction. Shared public.set_updated_at remained. The independently rechecked routine hash remained 06f914c65e37187d509cf36424259153.
 
-Read-only checks confirmed:
-- The stored payload checksum matches: 1,204,951 bytes of logical snapshot JSON.
-- Snapshot/source counts: 1,576 master rows; one inventory upload; 1,309 inventory lines.
-- All three original tables are still present with those row counts.
-- Anonymous and authenticated roles have no SELECT privilege on the snapshot.
-- V5 Master, Tasks, and Inventory Upload fingerprints still match the pre-backup baseline.
-- Master revision remains 57.
+A read-only authenticated-context purchasing_dashboard_v5 query succeeded after deletion and exactly matched its pre-deletion JSON hash b2a192111019fc0d8169397b6503da90. Master hash 38023b099d853713e330fc328a474ab1 and rows hash e2d2b5646d3957a6d52557a7ca772387 matched; revision72, 1576 master records and 1598 dashboard rows at both checks. No production save/upload, task synchronization, manual completion or badge grant was performed for deployment testing. Frontend remains byte-identical Build100.
 
-The backup migration also compared all non-legacy public/purchasing_private table data, structure and permissions, and all application routine definitions/ACLs before and after snapshot capture, aborting on any difference. It changed no frontend/runtime assets. Frontend remains Build 93.
+## Retained recovery record
 
-## Why deletion stopped
+The Sep28 owner-only logical snapshot remains in the SAME database. Its payload checksum is unchanged: 86cd0cb7a6c0785ca2c3e3e7ed2e1d23, 1,204,951 bytes. Anonymous, authenticated and service_role SELECT access remains denied. This is not another operating source, a synchronized master or an independent disaster-recovery backup. No customer records were exported to the public repository.
 
-An initial combined transactional deletion rehearsal was blocked by the tool safety check, with no database change. The supported migration action was then used for NON-DESTRUCTIVE snapshot capture only.
+maintenance/sec03_restore_retired.sql is the reviewed recovery path. Run only as an explicitly authorized transaction. It refuses existing source tables and recreates only the retired legacy definitions/data/constraints/indexes/triggers/identity state. It never restores broad client grants or policies and does not overwrite V5. Full retirement followed by this owner-only recovery passed in isolated PostgreSQL17.6.
 
-Temporary restore tests did not complete successfully. Test-fixture corrections were needed for trigger-name substitution, PostgreSQL's prohibition on temporary foreign keys referencing permanent tables, one SQL join typo, and JSONB operator precedence. Failed test transactions rolled back. The corrected restore-test invocation was blocked by the tool safety check. No further restore/deletion execution was attempted after that block.
+## Tests and release verification
 
-Therefore checksum/row-count verification must NOT be described as a successful restore drill, and CI success for this backup/documentation change must NOT be described as successful legacy retirement. No live save/upload or post-deletion workflow test has been claimed for this step.
+Eight synthetic restore scenarios and six migration/recovery scenarios passed, covering constraints, parent references, indexes, identity, trigger behavior, source/snapshot drift, external RESTRICT dependencies and recovery overwrite refusal. Four additional Node contracts verify exact Build100, no legacy identifiers in active runtime scripts, explicit deletion scope and recovery restrictions. These use synthetic canary V5 tables, not a full production clone; existing workspace/browser and TASK01/TASK02 suites also passed before application. Final main/CI/Pages evidence is recorded in PR #38 after merge; do not infer it solely from this database result.
 
-## Remaining completion gate
+## Historical Sep28 stop (superseded, not rewritten as a success)
 
-Complete an authorized, reviewed restore drill and V5 save/upload/calculation regression check before any table deletion. Recheck current dependencies and confirm the old tables still match the snapshot; otherwise refresh the recovery plan. Any deletion must explicitly name only the three approved tables and use RESTRICT, never broad CASCADE. Keep shared routines and all V5 objects intact. Restore must not automatically re-enable the old overly broad client policies/grants.
+20260928110947_security_fix3_backup_legacy_tables created only the private snapshot. The earlier deletion rehearsal was blocked, temporary restore tests had trigger/FK/join/JSON-precedence errors, and a corrected invocation was blocked. No old table was deleted then. That status remained open through Build100.
 
-Repository changes in this step only record the applied non-destructive backup and the incomplete status. No deletion migration is included.
+On Oct5 the redesigned restore and exact deletion/owner-only recovery passed in an isolated database. Production read-only prechecks confirmed lossless snapshot decoding and unchanged old sources. The newly reviewed, explicit migration then succeeded, including the actual protected-snapshot restore before deletion. Neither historical migrations nor previously failed rehearsal SQL were replayed.
 
-## Next audit item, still unapproved
+## Out of scope
 
-DATA-01: align numeric input/server validation with the existing calculation engine's supported range, to prevent saving values that later make workspace calculations fail. Do not implement until separately approved.
+The two old app_assets_v5-based Edge publishing/download functions, authentication configuration and branch protection were inspected only as relevant and were not changed. SEC03 is the three-table retirement, not a purge of every historical project artifact.
