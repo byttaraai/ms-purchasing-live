@@ -1,0 +1,20 @@
+/* Build 101: keep the existing app header visible without removing its layout space. */
+#app > .topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+/* Clip rounded BO card edges without creating a competing sticky scroll container. */
+@media (min-width: 761px) {
+  #app > .page > [data-panel="recommendations"] > .table-card {
+    overflow: clip;
+  }
+}
+/* Reuse the existing ResizeObserver-driven header height; do not affect dialog tables. */
+#app > .page > [data-panel="recommendations"] .table-scroll thead th {
+  top: var(--topbar-height, 83px);
+}
+@media print {
+  #app > .topbar { position: static; }
+  #app > .page > [data-panel="recommendations"] .table-scroll thead th { top: 0; }
+}
