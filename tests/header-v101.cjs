@@ -8,13 +8,14 @@ const cleanBreak='<link rel="stylesheet" href="assets/css/task-assistant-v92.css
 const clipRule='@media (min-width: 761px) {\n  #app > .page > [data-panel="recommendations"] > .table-card {\n    overflow: clip;\n  }\n}\n';
 function once(s,a,b){assert.equal(s.split(a).length-1,1,'Unique header anchor: '+a);return s.replace(a,b);}
 function restoreIndex(html){
+  html=require('./navigation-v102.cjs').as101(html);
   html=once(html,link,'');
   html=once(html,'Live Build 101</span>','Live Build 100</span>');
   return once(html,cleanBreak,cleanBreak.replace('\n','\\n'));
 }
 module.exports={restoreIndex};
 if(require.main===module){
- const html=fs.readFileSync('index.html','utf8');
+ const html=require('./navigation-v102.cjs').as101(fs.readFileSync('index.html','utf8'));
  const css=fs.readFileSync('assets/css/header-v101.css','utf8');
  test('Build 101 changes only the malformed head separator, stylesheet link and visible build label',()=>{
   const b=Buffer.from(restoreIndex(html));

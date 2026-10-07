@@ -1,7 +1,7 @@
 'use strict';
 const {test}=require('node:test');
 const assert=require('node:assert/strict'),fs=require('node:fs'),crypto=require('node:crypto');
-const html=fs.readFileSync('index.html','utf8');
+const html=require('./navigation-v102.cjs').as101(fs.readFileSync('index.html','utf8')); // exact prior UI baseline
 const hash=s=>{const b=Buffer.from(s);return crypto.createHash('sha1').update(Buffer.from('blob '+b.length+'\0')).update(b).digest('hex');};
 const files=fs.readdirSync('supabase/migrations').filter(n=>n.endsWith('_security_fix3_retire_legacy_tables.sql'));
 assert.equal(files.length,1);
