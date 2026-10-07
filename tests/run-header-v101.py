@@ -2,7 +2,7 @@
 from pathlib import Path
 from functools import partial
 from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
-import json, runpy, shutil, threading
+import json, runpy, shutil, threading, time
 from playwright.sync_api import sync_playwright
 ROOT=Path(__file__).resolve().parents[1]
 qa=runpy.run_path(str(ROOT/'tests/browser-v82.py'))
@@ -13,6 +13,13 @@ threading.Thread(target=server.serve_forever,daemon=True).start()
 origin='http://127.0.0.1:'+str(server.server_port)
 pagefile=ROOT/'header-qa-v101.html'
 checks=[]
+def wait_for_state(page,expression):
+    # Poll through DevTools, not Playwright's in-page string eval. Keep the real CSP intact.
+    deadline=time.monotonic()+30
+    while time.monotonic()<deadline:
+        if page.evaluate('() => ('+expression+')'):return
+        page.wait_for_timeout(50)
+    raise AssertionError('Timed out waiting for '+expression)
 def check(ok,label):
     if not ok:
         print('HEADER_DIAGNOSTIC='+json.dumps(p.evaluate("""()=>({scrollY,viewport:[innerWidth,innerHeight],offset:getComputedStyle(document.documentElement).getPropertyValue('--topbar-height'),nodes:[...document.querySelectorAll('#app,.topbar,.page,[data-panel="recommendations"],.table-card,.table-scroll,.table-scroll table,.table-scroll thead,.table-scroll thead th:first-child')].map(e=>{const s=getComputedStyle(e),r=e.getBoundingClientRect();return {tag:e.tagName,id:e.id,cls:e.className,top:r.top,bottom:r.bottom,height:r.height,display:s.display,position:s.position,cssTop:s.top,overflowX:s.overflowX,overflowY:s.overflowY,parent:e.parentElement?.tagName,parentId:e.parentElement?.id};})})""")),flush=True)
@@ -40,7 +47,7 @@ try:
             label=str(width)+'x'+str(height)
             try:
                 p.goto(origin+'/header-qa-v101.html',wait_until='load')
-                p.wait_for_function("state.taskAssistant?.tasks?.some(t=>t.focus==='data')")
+                wait_for_state(p,"state.taskAssistant?.tasks?.some(t=>t.focus==='data')")
                 p.evaluate("go('recommendations');window.scrollTo(0,0)")
                 p.wait_for_timeout(150)
                 check(p.evaluate("[...document.body.childNodes].filter(n=>n.nodeType===3&&n.textContent.trim()).length===0"),label+' no stray body text')
@@ -69,12 +76,12 @@ try:
                 check(p.evaluate("(()=>{const d=document.querySelector('dialog.mr93-dialog[open]'),r=d.getBoundingClientRect();return d.contains(document.elementFromPoint(r.left+r.width/2,r.top+30));})()"),label+' Master popup above sticky header')
                 check(p.locator('dialog.mr93-dialog [data-key="purchase_price"]').count()>0,label+' Master fields available')
                 p.keyboard.press('Escape')
-                p.wait_for_function("!document.querySelector('dialog.mr93-dialog').open")
+                wait_for_state(p,"!document.querySelector('dialog.mr93-dialog').open")
                 p.evaluate("openSupplierTaskPopup(state.taskAssistant.tasks.find(t=>t.focus==='suppliers'))")
                 p.wait_for_selector('#supplierTaskDialog[open]')
                 check(p.evaluate("(()=>{const d=document.querySelector('#supplierTaskDialog'),r=d.getBoundingClientRect();return d.contains(document.elementFromPoint(r.left+r.width/2,r.top+30));})()"),label+' Supplier popup above sticky header')
                 p.locator('#supplierTaskCloseX').click()
-                p.wait_for_function("!document.querySelector('#supplierTaskDialog').open")
+                wait_for_state(p,"!document.querySelector('#supplierTaskDialog').open")
                 p.evaluate('window.scrollTo(0,400)');p.wait_for_timeout(100)
                 check(p.evaluate("Math.abs(document.querySelector('.topbar').getBoundingClientRect().top)<1"),label+' sticky after popup close')
                 p.emulate_media(media='print')
