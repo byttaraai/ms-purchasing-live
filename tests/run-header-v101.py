@@ -80,6 +80,9 @@ try:
                 p.evaluate("openSupplierTaskPopup(state.taskAssistant.tasks.find(t=>t.focus==='suppliers'))")
                 p.wait_for_selector('#supplierTaskDialog[open]')
                 check(p.evaluate("(()=>{const d=document.querySelector('#supplierTaskDialog'),r=d.getBoundingClientRect();return d.contains(document.elementFromPoint(r.left+r.width/2,r.top+30));})()"),label+' Supplier popup above sticky header')
+                # Compact Supplier Quest intentionally puts its close button in the controls drawer.
+                if not p.locator('#supplierTaskCloseX').is_visible():
+                    p.locator('#supplierTaskDialog .sq83-controls-toggle').click()
                 p.locator('#supplierTaskCloseX').click()
                 wait_for_state(p,"!document.querySelector('#supplierTaskDialog').open")
                 p.evaluate('window.scrollTo(0,400)');p.wait_for_timeout(100)
