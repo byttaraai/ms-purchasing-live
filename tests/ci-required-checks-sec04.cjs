@@ -24,6 +24,10 @@ for(const [name,b] of Object.entries(baseline)){
     if(name==='workspace-v47.yml'){
       assert.equal(s.split(command).length-1,1);
       s=s.replace(command,'');
+      // Build102 only adds UI checks and its visible marker; prior workflow contract remains exact.
+      for(const extra of ['          node --test tests/navigation-v102.cjs\n','          python3 tests/run-navigation-v102.py\n']){assert.equal(s.split(extra).length-1,1);s=s.replace(extra,'');}
+      assert(s.includes('grep -q "Live Build 102"'));
+      s=s.replace('grep -q "Live Build 102"','grep -q "Live Build 101"');
       // Build101 adds UI tests and advances only the visible build assertion.
       for(const extra of ['          node --test tests/header-v101.cjs\n','          python3 tests/run-header-v101.py\n']){assert.equal(s.split(extra).length-1,1);s=s.replace(extra,'');}
       assert(s.includes('grep -q "Live Build 101"'));

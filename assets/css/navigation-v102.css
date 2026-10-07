@@ -1,0 +1,73 @@
+/* Build 102: stable left-anchored navigation and compact BO footer actions. UI only. */
+#app > .topbar > nav {
+  justify-content: flex-start;
+  flex: 1 1 auto;
+  min-width: 0;
+  border-left: 1px solid var(--line);
+  padding-left: 16px;
+}
+#app > .topbar > nav > button { flex: 0 0 auto; }
+#app > .topbar > .actions { flex: 0 0 auto; margin-left: auto; }
+/* Reserve the badge slot even when its existing logic hides the zero count. */
+#app > .topbar > nav > [data-tab="tasks-assistant"] { padding-right: 46px!important; }
+#app > .topbar > nav .ta87-task-count {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  min-width: 32px;
+  margin-left: 0;
+  padding: 0 3px;
+}
+#app [data-panel="recommendations"] .continuous-footer { flex-wrap: wrap; row-gap: 8px; }
+#app [data-panel="recommendations"] .table-footer-meta { flex: 1 1 260px; flex-wrap: wrap; gap: 4px 10px; }
+#app [data-panel="recommendations"] .table-footer-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex: 0 0 auto;
+  margin-left: auto;
+}
+#app [data-panel="recommendations"] .table-footer-actions #boHeaderActions { display: flex; align-items: center; }
+#app [data-panel="recommendations"] .table-footer-actions .btn {
+  height: 32px;
+  min-height: 32px;
+  width: auto;
+  margin: 0;
+  padding: 0 10px;
+  border-radius: 8px;
+  font-size: 11px;
+  line-height: 1;
+  gap: 6px;
+  white-space: nowrap;
+}
+#app [data-panel="recommendations"] .table-footer-actions .btn svg { width: 15px; height: 15px; }
+#app [data-panel="recommendations"] .table-footer-actions .label { display: inline; }
+#app [data-panel="recommendations"] .table-footer-actions .count { min-width: 4ch; text-align: center; }
+/* One consistent second navigation row on compact screens, never page-dependent. */
+@media (max-width: 1100px) {
+  #app > .topbar {
+    display: grid;
+    grid-template-columns: minmax(0,1fr) auto;
+    grid-template-rows: auto auto;
+    height: auto!important;
+    min-height: 60px;
+    row-gap: 8px!important;
+  }
+  #app > .topbar > .brand { grid-column: 1; grid-row: 1; min-width: 0; }
+  #app > .topbar > .actions { grid-column: 2; grid-row: 1; }
+  #app > .topbar > nav {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    border-left: 0;
+    border-top: 1px solid var(--line);
+    padding-left: 0;
+    padding-top: 5px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin;
+    max-width: 100%;
+  }
+}
