@@ -1,0 +1,34 @@
+name: Verify public Build102 static bytes
+on:
+  push:
+    branches: [verify/public-build102]
+permissions: {}
+jobs:
+  public-static-verification:
+    if: github.repository == 'byttaraai/ms-purchasing-live' && github.ref == 'refs/heads/verify/public-build102'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: GET public HTML and CSS; compare with verified main source hashes
+        run: |
+          python3 - <<'PY'
+          import hashlib,json,urllib.request
+          base='https://byttaraai.github.io/ms-purchasing-live/'
+          checks=[('','d32029f93ea63f9f8537d342de59cabaef89649e'),('assets/css/navigation-v102.css','efd3fd6023e92b828a41548235048661a7d58bf7')]
+          evidence=[]
+          for path,expected in checks:
+              req=urllib.request.Request(base+path+'?verify=06516846b0b615c7cd31e0d05c0920030ee8bcac',headers={'Cache-Control':'no-cache'})
+              with urllib.request.urlopen(req,timeout=30) as r:
+                  data=r.read();status=r.status;final=r.url
+              actual=hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()
+              assert status==200,(path,status)
+              assert actual==expected,(path,actual,expected)
+              if not path:
+                  html=data.decode();assert 'Live Build 102</span>' in html
+                  head=html.split('<header class="topbar">',1)[1].split('</header>',1)[0]
+                  assert 'printSelectedBtn' not in head
+                  assert '<div class="table-footer-actions"><div class="bo-header-actions hidden" id="boHeaderActions">' in html
+                  assert '\\n' not in html.split('</head>',1)[0]
+              evidence.append({'path':path or 'index.html','http':status,'git_blob_sha':actual,'bytes':len(data)})
+          print('PUBLIC_BUILD102_VERIFIED='+json.dumps({'main':'06516846b0b615c7cd31e0d05c0920030ee8bcac','checks':evidence,'requests':'GET static public assets only','production_data_access':False}))
+          PY
