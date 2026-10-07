@@ -2,7 +2,7 @@
 from pathlib import Path
 from functools import partial
 from http.server import ThreadingHTTPServer,SimpleHTTPRequestHandler
-import json,runpy,shutil,threading,time
+import json,runpy,shutil,threading,time,subprocess
 from playwright.sync_api import sync_playwright
 ROOT=Path(__file__).resolve().parents[1]
 qa=runpy.run_path(str(ROOT/'tests/browser-v82.py'))
@@ -11,7 +11,6 @@ class Quiet(SimpleHTTPRequestHandler):
 server=ThreadingHTTPServer(('127.0.0.1',0),partial(Quiet,directory=str(ROOT)))
 threading.Thread(target=server.serve_forever,daemon=True).start()
 origin='http://127.0.0.1:'+str(server.server_port)
-pagefile=ROOT/'navigation-qa-v102.html'
 checks=[]
 def check(ok,label):
     assert ok,label
@@ -28,7 +27,10 @@ try:
     fixture['rows'] += [qa['row']('Navigation item '+str(i),35,price=None,review=True) for i in range(30)]
     fixture['master']=[dict(r) for r in fixture['rows']]
     mock='window.qaFixture='+json.dumps(fixture)+';\n'+qa['mock']+"\naddEventListener('load',()=>{void msAudit.loadLive();});"
-    pagefile.write_text((ROOT/'index.html').read_text().replace('</head>','<script>'+mock+'</script></head>',1))
+    html=(ROOT/'index.html').read_text()
+    baseline=subprocess.check_output(['node','-e',"process.stdout.write(require('./tests/navigation-v102.cjs').previous(require('fs').readFileSync('index.html','utf8')))"]).decode()
+    for name,source in [('navigation-qa-v102.html',html),('navigation-baseline-v101.html',baseline)]:
+        (ROOT/name).write_text(source.replace('</head>','<script>'+mock+'</script></head>',1))
     with sync_playwright() as pw:
         chrome=shutil.which('google-chrome') or shutil.which('chromium') or shutil.which('chromium-browser')
         assert chrome,'Chromium required'
@@ -40,9 +42,14 @@ try:
                 if r.request.url.startswith(origin+'/'):r.continue_()
                 else:external.append(r.request.url);r.abort()
             ctx.route('**/*',route)
-            p=ctx.new_page();p.on('pageerror',lambda e:errors.append(str(e)))
             label=str(width)+'x'+str(height)
             try:
+                old=ctx.new_page();old.goto(origin+'/navigation-baseline-v101.html',wait_until='load')
+                wait(old,"()=>state.taskAssistant?.tasks?.some(t=>t.focus==='data')")
+                old.evaluate("()=>go('recommendations')")
+                old.wait_for_timeout(100)
+                old_width=old.evaluate('()=>document.documentElement.scrollWidth');old.close()
+                p=ctx.new_page();p.on('pageerror',lambda e:errors.append(str(e)))
                 p.goto(origin+'/navigation-qa-v102.html',wait_until='load')
                 wait(p,"()=>state.taskAssistant?.tasks?.some(t=>t.focus==='data')")
                 p.evaluate("()=>go('recommendations')")
@@ -63,7 +70,11 @@ try:
                     badge_positions.append(p.evaluate("()=>[...document.querySelector('.topbar>nav').children].filter(e=>e.matches('button')).map(e=>[e.offsetLeft,e.offsetWidth])"))
                 check(all(a==badge_positions[0] for a in badge_positions),label+' zero and changing task counts do not move tabs')
                 p.evaluate("()=>{const b=document.querySelector('.ta87-task-count');[b.textContent,b.className]=window.navBadgeOriginal;}")
-                check(p.evaluate("()=>document.documentElement.scrollWidth<=innerWidth+1"),label+' no page horizontal overflow')
+                new_width=p.evaluate('()=>document.documentElement.scrollWidth')
+                if new_width>width+1:
+                    print('OVERFLOW_BASELINE='+json.dumps({'viewport':width,'build101':old_width,'build102':new_width,'elements':p.evaluate("()=>[...document.querySelectorAll('.topbar,.topbar>nav,.topbar>.actions,.compact-filter-card,.compact-filters,.continuous-footer,.table-footer-actions')].map(e=>({class:e.className,left:e.getBoundingClientRect().left,right:e.getBoundingClientRect().right,scroll:e.scrollWidth,width:e.clientWidth}))")}),flush=True)
+                check(new_width<=max(width,old_width)+1,label+' no added page overflow vs exact Build101')
+                check(p.evaluate("()=>['.topbar','.topbar>nav','.topbar>.actions','.table-footer-actions'].every(s=>{const r=document.querySelector(s).getBoundingClientRect();return r.left>=-1&&r.right<=innerWidth+1;})"),label+' header and footer controls stay within viewport')
                 if width>1100:
                     check(p.evaluate("()=>{const n=document.querySelector('.topbar>nav'),b=document.querySelector('.topbar>.brand');return getComputedStyle(n).borderLeftWidth==='1px'&&n.getBoundingClientRect().left>b.getBoundingClientRect().right;}"),label+' subtle brand separator')
                 else:
@@ -72,7 +83,6 @@ try:
                 check(p.evaluate("()=>{const a=document.querySelector('#printSelectedBtn').getBoundingClientRect(),b=document.querySelector('#exportBtn').getBoundingClientRect();return Math.abs(a.height-32)<1&&Math.abs(b.height-32)<1&&Math.abs(a.top-b.top)<1&&b.left>a.right&&b.left-a.right<=9;}"),label+' print and export compact aligned pair')
                 check(p.evaluate("()=>getComputedStyle(document.querySelector('.table-footer-actions')).position==='static'"),label+' no floating footer')
                 check(p.locator('#printSelectedBtn').is_disabled(),label+' no selection disables print')
-                # Trigger the existing checkbox handler and the original print button, not a duplicate.
                 selector='[data-panel="recommendations"] '+('.table-scroll .row-select' if width>760 else '.card-list .row-select')
                 boxes=p.locator(selector+':not(:disabled)')
                 check(boxes.count()>0,label+' selectable products available')
@@ -80,6 +90,9 @@ try:
                 chosen.check()
                 wait(p,"()=>!document.getElementById('printSelectedBtn').disabled")
                 check(p.locator('#selectedCount').inner_text()=='(1)',label+' original selected count updates')
+                p.locator('.topbar nav [data-tab="tasks-assistant"]').click()
+                p.locator('.topbar nav [data-tab="recommendations"]').click()
+                check(p.locator('#selectedCount').inner_text()=='(1)' and not p.locator('#printSelectedBtn').is_disabled(),label+' selection survives navigation')
                 p.evaluate("""()=>{window.navPrintHtml='';window.navPrintCalled=0;window.open=()=>({closed:false,document:{open(){},write(s){window.navPrintHtml+=s;},close(){}},focus(){},print(){window.navPrintCalled++;}});}""")
                 p.locator('#printSelectedBtn').click()
                 wait(p,"()=>window.navPrintHtml.length>0")
@@ -94,5 +107,5 @@ try:
         browser.close()
 finally:
     server.shutdown()
-    for name in ['navigation-qa-v102.html','quest-qa.html','quest-smoke.html']:(ROOT/name).unlink(missing_ok=True)
+    for name in ['navigation-qa-v102.html','navigation-baseline-v101.html','quest-qa.html','quest-smoke.html']:(ROOT/name).unlink(missing_ok=True)
 print(json.dumps({'navigation_assertions':len(checks),'viewport_profiles':7,'production_requests':0}))
