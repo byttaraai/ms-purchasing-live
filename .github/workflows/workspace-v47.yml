@@ -86,6 +86,7 @@ jobs:
       - name: Browser smoke and full Supplier Quest journey - synthetic data only
         run: |
           python3 -m pip install --disable-pip-version-check 'playwright==1.57.0' 'pyee==13.0.1' 'greenlet==3.5.1'
+          python3 tests/run-header-v101.py
           python3 tests/browser-v69.py
           python3 tests/browser-v82.py
           python3 -m http.server 8765 --bind 127.0.0.1 > /tmp/workspace-http.log 2>&1 &
@@ -103,4 +104,3 @@ jobs:
           python3 tests/run-freshness-v97.py --prior-drafts
           python3 tests/run-freshness-v97.py
           python3 tests/run-negative-stock-v99.py
-          python3 tests/run-header-v101.py

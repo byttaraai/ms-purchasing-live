@@ -5,6 +5,7 @@ const crypto=require('node:crypto');
 const {test}=require('node:test');
 const link='\n<link rel="stylesheet" href="assets/css/header-v101.css?v=101">';
 const cleanBreak='<link rel="stylesheet" href="assets/css/task-assistant-v92.css?v=92">\n<link rel="stylesheet" href="assets/css/task-assistant-v93.css?v=93">';
+const clipRule='@media (min-width: 761px) {\n  #app > .page > [data-panel="recommendations"] > .table-card {\n    overflow: clip;\n  }\n}\n';
 function once(s,a,b){assert.equal(s.split(a).length-1,1,'Unique header anchor: '+a);return s.replace(a,b);}
 function restoreIndex(html){
   html=once(html,link,'');
@@ -27,10 +28,16 @@ if(require.main===module){
  });
  test('sticky header retains normal flow, dimensions and existing modal hierarchy',()=>{
   assert(/#app > \.topbar\s*\{\s*position: sticky;\s*top: 0;\s*z-index: 50;\s*\}/.test(css));
-  assert(!/!important|display:|height:|padding:|margin:|overflow:|position:\s*fixed/.test(css));
+  const remainder=once(css,clipRule,'');
+  assert(!/!important|display:|height:|padding:|margin:|overflow:|position:\s*fixed/.test(remainder));
   assert(css.includes('top: var(--topbar-height, 83px)'));
   assert(css.includes('[data-panel="recommendations"] .table-scroll thead th'));
   assert(css.includes('@media print'));
+ });
+ test('only the desktop BO card stops trapping the sticky table header; clipping is preserved',()=>{
+  assert.equal(css.split(clipRule).length-1,1);
+  assert.equal([...css.matchAll(/overflow\s*:/g)].length,1);
+  assert(!/overflow:\s*(?:hidden|auto|scroll|visible)/.test(css));
  });
  test('baseline guard catches unrelated business-script edits',()=>{
   const changed=html.replace("'use strict';","'use strict';/* unrelated change */");
