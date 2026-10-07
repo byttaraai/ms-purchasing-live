@@ -14,6 +14,8 @@ origin='http://127.0.0.1:'+str(server.server_port)
 pagefile=ROOT/'header-qa-v101.html'
 checks=[]
 def check(ok,label):
+    if not ok:
+        print('HEADER_DIAGNOSTIC='+json.dumps(p.evaluate("""()=>({scrollY,viewport:[innerWidth,innerHeight],offset:getComputedStyle(document.documentElement).getPropertyValue('--topbar-height'),nodes:[...document.querySelectorAll('#app,.topbar,.page,[data-panel="recommendations"],.table-card,.table-scroll,.table-scroll table,.table-scroll thead,.table-scroll thead th:first-child')].map(e=>{const s=getComputedStyle(e),r=e.getBoundingClientRect();return {tag:e.tagName,id:e.id,cls:e.className,top:r.top,bottom:r.bottom,height:r.height,display:s.display,position:s.position,cssTop:s.top,overflowX:s.overflowX,overflowY:s.overflowY,parent:e.parentElement?.tagName,parentId:e.parentElement?.id};})})""")),flush=True)
     assert ok,label
     checks.append(label)
     print('PASS '+label,flush=True)

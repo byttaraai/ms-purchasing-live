@@ -7,9 +7,9 @@ const files=fs.readdirSync('supabase/migrations').filter(n=>n.endsWith('_securit
 assert.equal(files.length,1);
 const sql=fs.readFileSync('supabase/migrations/'+files[0],'utf8');
 const drill=fs.readFileSync('maintenance/sec03_restore_rehearsal.sql','utf8');
-test('frontend remains exact verified Build 100',()=>{
- assert.equal(hash(html),'9b5d3240bd2b0bae637efe89be89afa5e90d627a');
- assert(html.includes('Live Build 100</span>'));
+test('frontend preserves verified Build100 except the explicitly approved Build101 header patch',()=>{
+ assert.equal(hash(require('./header-v101.cjs').restoreIndex(html)),'9b5d3240bd2b0bae637efe89be89afa5e90d627a');
+ assert(html.includes('Live Build 101</span>')); 
 });
 test('active entrypoint and local scripts have no legacy table identifiers',()=>{
  const sources=[['index.html',html]];

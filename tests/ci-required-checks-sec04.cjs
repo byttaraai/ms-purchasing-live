@@ -24,6 +24,10 @@ for(const [name,b] of Object.entries(baseline)){
     if(name==='workspace-v47.yml'){
       assert.equal(s.split(command).length-1,1);
       s=s.replace(command,'');
+      // Build101 adds UI tests and advances only the visible build assertion.
+      for(const extra of ['          node --test tests/header-v101.cjs\n','          python3 tests/run-header-v101.py\n']){assert.equal(s.split(extra).length-1,1);s=s.replace(extra,'');}
+      assert(s.includes('grep -q "Live Build 101"'));
+      s=s.replace('grep -q "Live Build 101"','grep -q "Live Build 100"');
     }
     assert.equal(blob(s.replace(alwaysOn,b.old_on)),b.sha);
   });
