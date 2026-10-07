@@ -43,7 +43,7 @@ if(require.main===module){
  test('new stylesheet is scoped and has no positioning for a floating footer or count logic',()=>{
   assert(css.includes('justify-content: flex-start'));assert(css.includes('border-left: 1px solid var(--line)'));
   assert(css.includes('padding-right: 46px!important'));assert(css.includes('height: 32px'));
-  assert(!/position:\s*(fixed|sticky)|content:|\.hidden\s*\{/.test(css));
+  assert(!/position:\s*(fixed|sticky)|(?:^|[;{])\s*content\s*:|\.hidden\s*\{/.test(css));
   assert.equal(html.split(link).length-1,1);
   assert(!html.slice(0,html.indexOf('</head>')).includes('\\n'));
  });
