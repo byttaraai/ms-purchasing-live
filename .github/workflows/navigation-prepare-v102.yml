@@ -1,0 +1,22 @@
+name: Prepare approved navigation102 patch
+on:
+  push:
+    branches: [fix/navigation-v102]
+permissions:
+  contents: write
+jobs:
+  navigation-preparation:
+    if: github.repository == 'byttaraai/ms-purchasing-live' && github.ref == 'refs/heads/fix/navigation-v102'
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Prepare exact reversible source patch and source contracts
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python3 maintenance/prepare-navigation-v102.py
+      - name: Actual-page navigation and print checks - synthetic only
+        run: |
+          python3 -m pip install --disable-pip-version-check 'playwright==1.57.0' 'pyee==13.0.1' 'greenlet==3.5.1'
+          python3 tests/run-navigation-v102.py
+          python3 tests/run-header-v101.py
