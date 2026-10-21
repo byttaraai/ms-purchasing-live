@@ -1,0 +1,28 @@
+name: Verify public compact reorder assets
+on:
+  push:
+    branches: [verify/reorder-single-row-public]
+permissions: {}
+jobs:
+  public-static-verification:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Verify actual served HTML and compact CSS - unauthenticated GET only
+        run: |
+          python3 - <<'PY'
+          import hashlib,json,urllib.request
+          base='https://byttaraai.github.io/ms-purchasing-live/'
+          main='39a6864e1a073e04f54eee7fa0075e928585b519'
+          expected=[('','2987165ac50b7f3a58204b9e9ed258af4265e111'),('assets/css/reorder-generator-v103.css','85e9b404db5c0d340398c36b24e27b0472c456e8')]
+          evidence=[]
+          for path,wanted in expected:
+              req=urllib.request.Request(base+path+'?verify='+main,headers={'Cache-Control':'no-cache'})
+              with urllib.request.urlopen(req,timeout=30) as response:
+                  data=response.read();status=response.status
+              actual=hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()
+              assert status==200,(path,status)
+              assert actual==wanted,(path,actual,wanted)
+              evidence.append({'path':path or 'index.html','http':status,'git_blob_sha':actual,'bytes':len(data)})
+          print('COMPACT_PUBLIC_VERIFIED='+json.dumps({'main':main,'assets':evidence,'authenticated_requests':0,'business_data_access':False}))
+          PY
