@@ -15,7 +15,7 @@ function restoreIndex(html){
 }
 module.exports={restoreIndex};
 if(require.main===module){
- const html=require('./navigation-v102.cjs').as101(fs.readFileSync('index.html','utf8'));
+ const html=require('./navigation-v102.cjs').as101(require('./reorder-preview-v103.cjs').as102(fs.readFileSync('index.html','utf8')));
  const css=fs.readFileSync('assets/css/header-v101.css','utf8');
  test('Build 101 changes only the malformed head separator, stylesheet link and visible build label',()=>{
   const b=Buffer.from(restoreIndex(html));
