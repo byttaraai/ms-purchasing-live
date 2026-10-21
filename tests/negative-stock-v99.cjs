@@ -1,6 +1,6 @@
 'use strict';
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),crypto=require('node:crypto');
-const read=p=>fs.readFileSync(p,'utf8'),html=read('index.html');
+const read=p=>fs.readFileSync(p,'utf8'),html=require('./reorder-preview-v103.cjs').as102(read('index.html'));
 const old=read('assets/js/task-assistant-v97.js'),js=read('assets/js/task-assistant-v99.js');
 const hash=s=>{const b=Buffer.from(s);return crypto.createHash('sha1').update(Buffer.from('blob '+b.length+'\0')).update(b).digest('hex');};
 const addition=`    // NEG99: display only; unmatched stock has no purchase-unit conversion yet.

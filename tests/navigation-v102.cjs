@@ -26,7 +26,7 @@ function as101(s){return s.includes('Live Build 102</span>')?previous(s):s;}
 function blob(s){const b=Buffer.from(s);return crypto.createHash('sha1').update('blob '+b.length+'\0').update(b).digest('hex');}
 module.exports={next,previous,as101};
 if(require.main===module){
- const html=fs.readFileSync('index.html','utf8'),css=fs.readFileSync('assets/css/navigation-v102.css','utf8');
+ const html=require('./reorder-preview-v103.cjs').as102(fs.readFileSync('index.html','utf8')),css=fs.readFileSync('assets/css/navigation-v102.css','utf8');
  test('exact Build101 is recoverable: runtime logic and every existing control are unchanged',()=>{
   assert.equal(blob(previous(html)),'7d68537f289ed8e47be191265c4d5658cd2a48e4');
   assert.equal(next(previous(html)),html);
