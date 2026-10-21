@@ -1,0 +1,20 @@
+name: Verify compact reorder generator
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  reorder-compact-ui:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Exact source and scoped CSS contracts
+        run: node --test tests/reorder-compact.cjs
+      - name: Real page disclosure and single-row layout - synthetic data only
+        run: |
+          python3 -m pip install --disable-pip-version-check 'playwright==1.57.0' 'pyee==13.0.1' 'greenlet==3.5.1'
+          python3 tests/run-reorder-compact.py
