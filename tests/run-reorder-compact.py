@@ -147,6 +147,7 @@ try:
             wait_state(p,"state.taskAssistant?.tasks?.some(t=>t.focus==='data')")
             p.evaluate("go('daily-tasks')")
             metrics=p.evaluate("""()=>{let r=document.querySelector('#ropGenerator'),t=r.querySelector('#ropgTitle'),m=r.querySelector('[data-m=super]'),a=r.querySelector('#ropgProducts summary');return {display:getComputedStyle(r).display,overflow:getComputedStyle(r).overflowX,yTitle:t.getBoundingClientRect().y,yMultiplier:m.getBoundingClientRect().y,arrowWidth:a.getBoundingClientRect().width,scroll:r.scrollWidth,client:r.clientWidth}}""")
+            print('STALE_CSS_METRICS='+json.dumps(metrics),flush=True)
             check(metrics['display']=='block','stale-CSS defense keeps root block layout')
             check(abs(metrics['yTitle']-metrics['yMultiplier'])<14,'stale-CSS defense keeps title and profit multipliers on same row')
             check(metrics['arrowWidth']==32,'stale-CSS defense prevents full-card arrow hitbox')
