@@ -15,6 +15,8 @@ test('table collapsed, approval disabled, importer isolated to preview',()=>{
  assert(html.includes('<details class="ropg-details" id="ropgProducts">'));
  assert(html.includes('id="ropgApprove" disabled'));
  assert(html.includes('id="ropgUpload"'));
+ assert(html.includes('class="ropg-controls"'));
+ assert(html.includes("root.querySelector('.ropg-inputs').after(multipliers)"));
  assert(html.includes('readRows(text)'));
  for(const name of ['Super','High','Medium','Low','Loss']) assert(html.includes('aria-label="'+name+' coverage days"'));
 });
@@ -24,4 +26,10 @@ test('all CSS selectors scoped to generator',()=>{
  assert(selectors.length>15);
  for(const selector of selectors)assert(selector.trim().startsWith('#ropGenerator'),selector);
  assert(!/!important|position\s*:\s*(?:fixed|sticky)|@import|url\(/i.test(clean));
+ assert(clean.includes('width: calc(100% - 44px)'));
+ assert(clean.includes('top: 11px'));
+ assert(!clean.includes('inset: 0'));
+ assert(clean.includes('.ropg-details:has(.ropg-empty)'));
+ assert(html.includes('reorder-generator-v103.css?v=105'));
+
 });

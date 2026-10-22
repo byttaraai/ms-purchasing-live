@@ -50,7 +50,7 @@ try:
                 check(not p.locator('#ropgProducts .ropg-table-scroll').is_visible(),label+' no hidden table leakage')
                 for selector in ['.ropg-summary','.ropg-input-head','.ropg-kicker','.ropg-head p','.ropg-note','.ropg-pill']:
                     check(not p.locator('#ropGenerator '+selector).is_visible(),label+' removed visual clutter '+selector)
-                geom=p.evaluate("""()=>{const q=document.querySelector('#ropGenerator'),r=q.getBoundingClientRect();const nodes=[...q.querySelectorAll('.ropg-head h3,.ropg-inputs input,.ropg-toolbar button,.ropg-details summary')].map(e=>{const b=e.getBoundingClientRect();return {x:b.x-r.x,y:b.y-r.y,w:b.width,h:b.height}});return {height:r.height,left:r.left,right:r.right,width:r.width,scroll:q.scrollWidth,client:q.clientWidth,nodes};}""")
+                geom=p.evaluate("""()=>{const q=document.querySelector('#ropGenerator'),r=q.getBoundingClientRect();const controls=q.querySelector('.ropg-controls'),disclosure=q.querySelector('.ropg-details summary');const nodes=[...q.querySelectorAll('.ropg-head h3,.ropg-inputs input,.ropg-multipliers input,.ropg-toolbar button,.ropg-details summary')].map(e=>{const b=e.getBoundingClientRect();return {x:b.x-r.x,y:b.y-r.y,w:b.width,h:b.height}});const a=disclosure.getBoundingClientRect();return {height:r.height,left:r.left,right:r.right,width:r.width,scroll:q.scrollWidth,client:q.clientWidth,controlsScroll:controls.scrollWidth,controlsClient:controls.clientWidth,arrow:{x:a.x-r.x,y:a.y-r.y,w:a.width,h:a.height},nodes};}""")
                 print('COMPACT_GEOMETRY='+json.dumps({'viewport':width,**geom}),flush=True)
                 check(geom['height']<=72,label+' single compact row at most 72px including scrollbar')
                 centers=[n['y']+n['h']/2 for n in geom['nodes']]
@@ -58,7 +58,12 @@ try:
                 check(all(n['w']>0 and n['h']>0 for n in geom['nodes']),label+' controls not clipped to zero')
                 check(geom['left']>=-1 and geom['right']<=width+1,label+' card stays inside viewport')
                 check(all(geom['nodes'][i]['x']+geom['nodes'][i]['w']<=geom['nodes'][i+1]['x']+1 for i in range(len(geom['nodes'])-1)),label+' no overlapping controls')
-                if width>=1280:check(geom['scroll']<=geom['client']+1,label+' full desktop row fits without horizontal scroll')
+                check(geom['scroll']<=geom['client']+1,label+' generator root never scrolls horizontally')
+                check(geom['arrow']['w']<=34 and geom['arrow']['h']<=34,label+' arrow is a small independent control')
+                check(geom['arrow']['x']>=geom['width']-56,label+' arrow anchored at right edge')
+                if width>=1920:check(geom['controlsScroll']<=geom['controlsClient']+1,label+' wide desktop shows all controls with no strip scroll')
+                if width<1100:check(geom['controlsScroll']>geom['controlsClient'],label+' narrow screens scroll only the controls strip')
+                check(p.locator('#ropGenerator .ropg-multipliers input').count()==3,label+' three profit multiplier controls in main row')
                 check(not p.locator('#ropgUpload').is_disabled(),label+' CSV upload enabled')
                 for selector in ['#ropgGenerate','#ropgApprove']:
                     check(p.locator(selector).is_disabled(),label+' unapproved action still disabled '+selector)
@@ -66,6 +71,10 @@ try:
                 check(values==['30','25','20','15','5'],label+' draft example days unchanged')
                 p.get_by_label('Super coverage days',exact=True).fill('42')
                 summary=p.locator('#ropgProducts summary')
+                p.locator('#ropgTitle').click()
+                check(not p.locator('#ropgProducts').evaluate('(e)=>e.open'),label+' title click never opens product table')
+                p.get_by_label('Super coverage days',exact=True).click()
+                check(not p.locator('#ropgProducts').evaluate('(e)=>e.open'),label+' day input click never opens table')
                 summary.click()
                 check(p.locator('#ropgProducts .ropg-table-scroll').is_visible(),label+' arrow opens native product table')
                 opened=p.locator('#ropGenerator').bounding_box()['height']
@@ -96,6 +105,10 @@ try:
                 p.locator('#ropgGenerate').click()
                 check('Medium 2' in p.locator('#ropGenerator .ropg-status').inner_text(),label+' profitability generated from profit values')
                 check(p.locator('#ropgProducts tbody tr').count()==3,label+' three source products in preview')
+                check(p.locator('#ropgProducts thead th').count()==6,label+' all six product headers generated')
+                table_geo=p.evaluate("()=>{const q=document.querySelector('#ropGenerator'),t=q.querySelector('.ropg-table-scroll');return {rootWidth:q.clientWidth,rootScroll:q.scrollWidth,tableWidth:t.clientWidth,tableScroll:t.scrollWidth}}")
+                check(table_geo['rootScroll']<=table_geo['rootWidth']+1,label+' generated table never pushes the whole generator horizontally')
+                check(table_geo['tableWidth']<=table_geo['rootWidth'],label+' table scroll remains inside the card')
                 check(p.locator('#ropgApprove').is_disabled(),label+' production approval remains safely locked')
                 check(p.evaluate('JSON.stringify(state.master)')==master_before,label+' CSV preview does not modify master')
 
