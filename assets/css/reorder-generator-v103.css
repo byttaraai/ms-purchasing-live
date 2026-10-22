@@ -85,3 +85,7 @@
 #ropGenerator .ropg-table-scroll th,
 #ropGenerator .ropg-table-scroll td { padding: 10px; text-align: left; border-bottom: 1px solid var(--line, #e5e7eb); }
 #ropGenerator .ropg-table-scroll .ropg-empty { text-align: center; color: var(--muted, #697386); padding: 22px; }
+
+#ropGenerator .ropg-multipliers{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 0;font-size:11px}
+#ropGenerator .ropg-multipliers label{display:inline-flex;align-items:center;gap:5px;font-weight:650}
+#ropGenerator .ropg-multipliers input{width:52px;height:30px;border:1px solid var(--line,#d6dce6);border-radius:6px;padding:4px;color:inherit;background:var(--card,#fff)}

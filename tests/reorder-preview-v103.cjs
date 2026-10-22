@@ -11,11 +11,11 @@ function as102(html){
   const end=html.indexOf(sectionEnd,start);
   assert(end>start,'generator section end');
   const section=html.slice(start,end);
-  assert(!section.includes('<script'),'presentation only; no executable script');
+  assert(section.includes('readRows(text)'),'validated CSV parser is scoped to generator');
   assert(section.includes('id="ropgProducts"'),'collapsible table present');
   assert(section.includes('id="ropgGenerate" disabled'),'generator must stay gated');
   assert(section.includes('id="ropgApprove" disabled'),'approval must stay gated');
-  assert(section.includes('id="ropgUpload" disabled'),'import must stay gated');
+  assert(section.includes('id="ropgUpload"'),'upload control available');
   html=html.slice(0,start)+html.slice(end);
   assert.equal(html.split(link).length-1,1,'one added stylesheet link');
   return html.replace(link,'');
@@ -31,8 +31,8 @@ test('generator is collapsed by default and cannot write production data',()=>{
  const section=html.slice(html.indexOf(sectionStart),html.indexOf(sectionEnd,html.indexOf(sectionStart)));
  assert(/<details class="ropg-details" id="ropgProducts">/.test(section));
  assert(!/<details[^>]+open/.test(section));
- for(const id of ['ropgUpload','ropgGenerate','ropgApprove'])assert(section.includes('id="'+id+'" disabled'));
- assert(!/<script|on(click|change|submit)=/i.test(section));
+ for(const id of ['ropgGenerate','ropgApprove'])assert(section.includes('id="'+id+'" disabled'));
+ assert(section.includes('approval remains locked') || section.includes('Approval remains locked'));
 });
 test('new stylesheet only styles ropg namespaced selectors',()=>{
 const css=fs.readFileSync('assets/css/reorder-generator-v103.css','utf8');

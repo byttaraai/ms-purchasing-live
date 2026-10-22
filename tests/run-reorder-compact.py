@@ -59,9 +59,10 @@ try:
                 check(geom['left']>=-1 and geom['right']<=width+1,label+' card stays inside viewport')
                 check(all(geom['nodes'][i]['x']+geom['nodes'][i]['w']<=geom['nodes'][i+1]['x']+1 for i in range(len(geom['nodes'])-1)),label+' no overlapping controls')
                 if width>=1280:check(geom['scroll']<=geom['client']+1,label+' full desktop row fits without horizontal scroll')
-                for selector in ['#ropgUpload','#ropgGenerate','#ropgApprove']:
-                    check(p.locator(selector).is_disabled(),label+' action still disabled '+selector)
-                values=p.locator('#ropGenerator input').evaluate_all('(es)=>es.map(e=>e.value)')
+                check(not p.locator('#ropgUpload').is_disabled(),label+' CSV upload enabled')
+                for selector in ['#ropgGenerate','#ropgApprove']:
+                    check(p.locator(selector).is_disabled(),label+' unapproved action still disabled '+selector)
+                values=p.locator('#ropGenerator [data-rop-class]').evaluate_all('(es)=>es.map(e=>e.value)')
                 check(values==['30','25','20','15','5'],label+' draft example days unchanged')
                 p.get_by_label('Super coverage days',exact=True).fill('42')
                 summary=p.locator('#ropgProducts summary')
@@ -77,6 +78,27 @@ try:
                 check(not p.locator('#ropgProducts .ropg-table-scroll').is_visible(),label+' arrow closes table again')
                 check(p.get_by_label('Super coverage days',exact=True).input_value()=='42',label+' disclosure preserves edited draft')
                 check(p.evaluate('JSON.stringify(state.master)')==master_before,label+' master data unchanged')
+                # Validate a real CSV upload/generation path against synthetic master records.
+                sample=p.evaluate("""()=>state.master.slice(0,3).map(x=>({name:x.product_name,unit:x.purchase_unit}))""")
+                assert len(sample)==3 and all(x['name'] and x['unit'] for x in sample)
+                def csv_field(x):
+                    x=str(x)
+                    return '"'+x.replace('"','""')+'"'
+                lines=['Product Name,Supplier,Sales,,Refunds,,Net Sales,,Total Cost,Profit,,Profit percentage,',
+                       ',,Quantity,Value,Quantity,Value,Quantity,Value,,Value,Percentage,To Sales,To Cost']
+                for j,m in enumerate(sample):
+                    q='120 ('+m['unit']+')'
+                    amount=[3000,1500,-200][j]
+                    lines.append(','.join([csv_field(m['name']),'',csv_field(q),'0 SR',csv_field('0 ('+m['unit']+')'),'0 SR',csv_field(q),'0 SR','0 SR',str(amount)+' SR','','','']))
+                raw=('\n'.join(lines)+'\n').encode('utf-8')
+                p.locator('#ropGenerator input[type=file]').set_input_files({'name':'Sample-From 01_10_2025 To 01_10_2026.csv','mimeType':'text/csv','buffer':raw})
+                check(not p.locator('#ropgGenerate').is_disabled(),label+' CSV parsed and generator enabled')
+                p.locator('#ropgGenerate').click()
+                check('Medium 2' in p.locator('#ropGenerator .ropg-status').inner_text(),label+' profitability generated from profit values')
+                check(p.locator('#ropgProducts tbody tr').count()==3,label+' three source products in preview')
+                check(p.locator('#ropgApprove').is_disabled(),label+' production approval remains safely locked')
+                check(p.evaluate('JSON.stringify(state.master)')==master_before,label+' CSV preview does not modify master')
+
                 check(p.evaluate("getComputedStyle(document.querySelector('.topbar')).position==='sticky'"),label+' sticky header unchanged')
                 check(p.locator('.continuous-footer #printSelectedBtn').count()==1,label+' footer print placement unchanged')
                 check(not external and not errors,label+' no external network or page errors '+str((external,errors)))
