@@ -151,7 +151,8 @@ try:
             check(metrics['display']=='block','stale-CSS defense keeps root block layout')
             check(abs(metrics['yTitle']-metrics['yMultiplier'])<14,'stale-CSS defense keeps title and profit multipliers on same row')
             check(metrics['arrowWidth']==32,'stale-CSS defense prevents full-card arrow hitbox')
-            check(metrics['scroll']<=metrics['client']+1,'stale-CSS defense eliminates root horizontal scrollbar')
+            check(metrics['overflow']=='clip','stale-CSS defense clips horizontal spill without affecting table scrolling')
+            check(metrics['documentScroll']<=metrics['documentClient']+1,'stale-CSS defense prevents document-wide horizontal overflow')
             rows=['Product Name,Supplier,Sales,,Refunds,,Net Sales,,Total Cost,Profit,,Profit percentage,',
                   ',,Quantity,Value,Quantity,Value,Quantity,Value,,Value,Percentage,To Sales,To Cost']
             first=p.evaluate("()=>state.master.slice(0,3).map(x=>({name:x.product_name,unit:x.purchase_unit}))")

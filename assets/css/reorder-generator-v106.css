@@ -222,3 +222,6 @@
 #ropGenerator .ropg-details:not([open]) .ropg-table-scroll{display:none}
 #ropGenerator .ropg-controls { gap:10px; }
 #ropGenerator .ropg-result-info { padding:9px 4px; white-space:normal; }
+
+/* Root can never create a horizontal scrollbar, including when legacy styles are cached. */
+#ropGenerator { overflow: clip; }
