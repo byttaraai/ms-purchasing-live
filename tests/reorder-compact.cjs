@@ -3,7 +3,7 @@ const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const html=fs.readFileSync('index.html','utf8');
-const css=fs.readFileSync('assets/css/reorder-generator-v103.css','utf8');
+const css=fs.readFileSync('assets/css/reorder-generator-v106.css','utf8');
 const {as102}=require('./reorder-preview-v103.cjs');
 const crypto=require('node:crypto');
 test('generator modification restores the frozen pre-generator app byte for byte',()=>{
@@ -18,6 +18,8 @@ test('table collapsed, approval disabled, importer isolated to preview',()=>{
  assert(html.includes('class="ropg-controls"'));
  assert(html.includes("root.querySelector('.ropg-inputs').after(multipliers)"));
  assert(html.includes('readRows(text)'));
+ assert(html.includes('Generate a fresh preview') || html.includes('generatePreview()'));
+
  for(const name of ['Super','High','Medium','Low','Loss']) assert(html.includes('aria-label="'+name+' coverage days"'));
 });
 test('all CSS selectors scoped to generator',()=>{
@@ -30,6 +32,10 @@ test('all CSS selectors scoped to generator',()=>{
  assert(clean.includes('top: 11px'));
  assert(!clean.includes('inset: 0'));
  assert(clean.includes('.ropg-details:has(.ropg-empty)'));
- assert(html.includes('reorder-generator-v103.css?v=105'));
+ assert(html.includes('reorder-generator-v106.css?v=106'));
+ assert(html.includes('id="ropg-critical-v106"'));
+ assert(html.includes('data-ui-build="106"'));
+ assert(html.includes('class="ropg-status" role="status" hidden'));
+
 
 });
