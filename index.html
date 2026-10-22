@@ -127,7 +127,7 @@ scroller.prepend(resultInfo);root.querySelector('.ropg-inputs').after(multiplier
 upload.disabled=false;upload.textContent='Upload 12-month CSV';upload.title='Upload one complete 12-month product sales and profit CSV';
 generate.disabled=true;generate.title='Validate the report before generating';
 approve.disabled=true;approve.title='Approval requires a server-verified preview and an Admin account';
-let records=null,filename='',period=null,serverPreview=null,lastBody=null,busy=false;
+let records=null,filename='',period=null,serverPreview=null,lastBody=null,busy=false,previewSerial=0,debounceTimer=null;
 const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\u0027':'&#39;'}[c]));
 const normalized=s=>String(s||'').normalize('NFKC').replace(/\s+/g,' ').trim().toLocaleLowerCase('en');
 const unitKey=s=>String(s||'').replace(/[()\[\]]/g,' ').replace(/\s+/g,' ').trim().toLocaleLowerCase('en');
@@ -167,8 +167,8 @@ function settings(){
  if(Object.values(cover).some(v=>!Number.isInteger(v)||v<0||v>365))throw Error('Coverage days must be integers 0–365');
  return {mult,cover};
 }
-function setStatus(s){status.textContent=s;status.setAttribute('aria-live','polite');resultInfo.textContent=s;}
-function invalidate(){serverPreview=null;lastBody=null;approve.disabled=true;}
+function setStatus(s){status.hidden=false;status.textContent=s;status.setAttribute('aria-live','polite');resultInfo.textContent=s;}
+function invalidate(){previewSerial++;serverPreview=null;lastBody=null;approve.disabled=true;}
 function rowsForServer(){
  if(typeof state==='undefined'||!Array.isArray(state.master)||!state.master.length)throw Error('Master is not loaded. Sign in and refresh');
  const lookup=new Map();
@@ -178,7 +178,7 @@ function rowsForServer(){
 function draw(rows){
  thead.innerHTML='<th>Product</th><th>Net Profit (SAR)</th><th>Profitability</th><th>Avg. Monthly Sales</th><th>Reorder Point (Purchase Unit)</th><th>Status</th>';
  tbody.innerHTML=rows.map(r=>'<tr><td>'+esc(r.name)+'</td><td>'+esc(Number(r.profit).toLocaleString('en-US',{maximumFractionDigits:2}))+'</td><td>'+esc(r.classification)+'</td><td>'+esc(Number(r.monthly_sales).toLocaleString('en-US',{maximumFractionDigits:3})+' '+r.report_unit)+'</td><td>'+esc(r.new_rop===null?'—':Number(r.new_rop).toLocaleString('en-US',{maximumFractionDigits:2})+(r.purchase_unit?' '+r.purchase_unit:''))+'</td><td>'+esc(r.review|| (r.changed?'Changed':'Unchanged'))+'</td></tr>').join('');
- document.getElementById('ropgProducts').open=true;
+ thead.hidden=false;
 }
 function localPreview(rows,mult,cover){
  const avg=records.filter(r=>r.p>0).reduce((a,r)=>a+r.p,0)/records.filter(r=>r.p>0).length;
@@ -209,38 +209,77 @@ function statusText(d,server){
  return (server?'Server verified':'Local preview only')+' · '+records.length+' products · '+d.eligible_rows+' eligible · '+d.skipped_rows+' need review · '+d.changed_rows+' changes · Avg profit '+Number(d.mean_positive_profit).toLocaleString('en-US',{maximumFractionDigits:2})+' SAR · Super '+c.Super+' · High '+c.High+' · Medium '+c.Medium+' · Low '+c.Low+' · Loss '+c.Loss;
 }
 const liveHost=()=>location.hostname==='byttaraai.github.io';
-upload.addEventListener('click',()=>picker.click());
-picker.addEventListener('change',async()=>{
- invalidate();generate.disabled=true;records=null;const f=picker.files[0];if(!f)return;
- try{
-  if(!/\.csv$/i.test(f.name)||f.size>8e6)throw Error('Upload a CSV smaller than 8MB');
-  const p=parsePeriod(f.name);const r=readRows(await f.text());
-  filename=f.name;period=p;records=r;generate.disabled=false;setStatus(r.length+' products loaded · '+p.start+' to '+p.end+' · Generate to preview. Nothing saved.');
- }catch(e){setStatus('Upload blocked: '+e.message);}
-});
-root.querySelectorAll('[data-rop-class],[data-m]').forEach(input=>input.addEventListener('input',()=>{
- invalidate();if(records)setStatus('Settings changed. Generate a fresh preview before approval.');
-}));
-generate.addEventListener('click',async()=>{
- if(busy)return;busy=true;generate.disabled=true;invalidate();
+function clearTable(){
+ thead.hidden=true;
+ tbody.innerHTML='<tr><td class="ropg-empty" colspan="6">Upload a 12-month report to calculate product profitability and reorder points.</td></tr>';
+}
+async function generatePreview(){
+ if(busy)return;
+ // A token ensures an old server response can never approve stale settings or a replaced report.
+ const token=++previewSerial;
+ serverPreview=null;lastBody=null;approve.disabled=true;generate.disabled=true;
  try{
   if(!records||!period)throw Error('Upload a valid 12-month CSV first');
-  if(typeof state==='undefined'||!Array.isArray(state.master)||!state.master.length)throw Error('Master data is not loaded');
+  if(typeof state==='undefined'||!Array.isArray(state.master)||!state.master.length)throw Error('Master data is not loaded. Please sign in or refresh.');
   const {mult,cover}=settings(),matched=rowsForServer();
+  // Always show the calculations immediately. Server verification is a separate, read-only step.
+  const local=localPreview(matched,mult,cover);
+  if(token!==previewSerial)return;
+  draw(local.rows);
+  setStatus(statusText(local,false)+(liveHost()&&state.mode==='live'?' · Checking the Master database...':' · Approval unavailable outside the live app.'));
   if(liveHost()&&state.mode==='live'){
-    setStatus('Validating against live Master database; no changes yet.');
-    const body={p_rows:matched.map(({name,code,profit,qty,unit})=>({name,code,profit,qty,unit})),
-      p_start:period.start,p_end:period.end,p_cover:cover,p_mult:mult,p_file:filename,
-      p_revision:state.revision,p_request:null,p_approve:false};
+   const body={p_rows:matched.map(({name,code,profit,qty,unit})=>({name,code,profit,qty,unit})),
+     p_start:period.start,p_end:period.end,p_cover:cover,p_mult:mult,p_file:filename,
+     p_revision:state.revision,p_request:null,p_approve:false};
+   try{
     const d=await rpc('purchasing_sales_generator_v104',body);
-    if(!d||!d.ok||d.approved)throw Error('Server did not confirm a safe preview');
-    lastBody=body;serverPreview=d;draw(d.rows);setStatus(statusText(d,true));
-    if(state.role==='admin'&&d.eligible_rows>0){approve.disabled=false;approve.title='Approve the server-verified eligible products in one atomic transaction';}
-  }else{
-    const d=localPreview(matched,mult,cover);draw(d.rows);setStatus(statusText(d,false)+' · Approval disabled outside live authenticated server');
+    if(token!==previewSerial)return;
+    if(!d||!d.ok||d.approved||!Array.isArray(d.rows))throw Error('Server did not return a valid read-only preview');
+    lastBody=body;serverPreview=d;draw(d.rows);
+    setStatus(statusText(d,true)+(d.skipped_rows?' · Check excluded products before approval.':' · All matched products checked.'));
+    if(state.role==='admin'&&d.eligible_rows>0&&d.changed_rows>0){
+      approve.disabled=false;
+      approve.title='Update the eligible Master products after explicit confirmation';
+    }
+   }catch(error){
+    if(token!==previewSerial)return;
+    serverPreview=null;lastBody=null;approve.disabled=true;
+    setStatus(statusText(local,false)+' · Server verification unavailable: '+(error?.message||String(error))+' · Nothing saved. Approval remains disabled.');
+   }
   }
- }catch(e){setStatus('Generate blocked: '+(e?.message||String(e)));}finally{busy=false;generate.disabled=!records;}
+ }catch(error){
+  if(token!==previewSerial)return;
+  clearTable();
+  setStatus('Preview blocked: '+(error?.message||String(error))+' · No database changes.');
+ }finally{
+  if(token===previewSerial)generate.disabled=!records;
+ }
+}
+generate.addEventListener('click',()=>{void generatePreview();});
+upload.addEventListener('click',()=>picker.click());
+picker.addEventListener('change',async()=>{
+ clearTimeout(debounceTimer);
+ invalidate();generate.disabled=true;records=null;period=null;filename='';clearTable();
+ const file=picker.files[0];if(!file)return;
+ setStatus('Reading sales report: '+file.name+'...');
+ try{
+  if(!/\.csv$/i.test(file.name)||file.size>8e6)throw Error('Upload a CSV smaller than 8MB');
+  const p=parsePeriod(file.name),r=readRows(await file.text());
+  filename=file.name;period=p;records=r;
+  setStatus(r.length+' products loaded · '+p.start+' to '+p.end+' · Calculating profit classes and reorder points...');
+  void generatePreview();
+ }catch(error){
+  setStatus('Upload blocked: '+(error?.message||String(error))+' · Nothing saved.');
+ }
 });
+root.querySelectorAll('[data-rop-class],[data-m]').forEach(input=>input.addEventListener('input',()=>{
+ clearTimeout(debounceTimer);
+ invalidate();
+ if(records){
+  setStatus('Coverage or profitability threshold changed · Updating product preview...');
+  debounceTimer=setTimeout(()=>{if(records&&!busy)void generatePreview();},500);
+ }
+}));
 approve.addEventListener('click',async()=>{
  if(busy||!serverPreview||!lastBody||state?.role!=='admin')return;
  if(!liveHost())return;
