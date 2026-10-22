@@ -73,7 +73,7 @@
     <div class="freshness-meta"><span class="fresh-chip neutral" id="inventoryFreshnessStatus">Checking</span><span class="fresh-chip neutral" id="inventoryFreshnessAge">-</span></div>
   </div>
 </div><section class="ropg-section" id="ropGenerator" aria-labelledby="ropgTitle">
-  <div class="ropg-head"><div><span class="ropg-kicker">MASTER DATA · REORDER POINT</span><h3 id="ropgTitle">Reorder Point Generator</h3><p>Monthly cumulative sales · Rolling 12 months · Preview before approval</p></div><span class="ropg-pill">Preview Only</span></div>
+  <div class="ropg-head"><div><span class="ropg-kicker">MASTER DATA · REORDER POINT</span><h3 id="ropgTitle">Reorder Point Generator</h3><p>12-month sales · Profitability &amp; Reorder Point · Preview before approval</p></div><span class="ropg-pill">Preview Only</span></div>
   <div class="ropg-summary"><div><span>Sales report</span><strong>Not connected yet</strong><small>Upload format pending validation</small></div><div><span>Calculation window</span><strong>Last 12 months</strong><small>All branches combined</small></div><div><span>Approval</span><strong>Manual only</strong><small>Original Master remains unchanged</small></div></div>
   <div class="ropg-input-head"><strong>Coverage days by profitability</strong><small>Editable draft settings · No changes saved to database</small></div>
   <div class="ropg-inputs">
@@ -84,9 +84,72 @@
     <label>Loss<input type="number" min="0" max="365" step="1" value="5" data-rop-class="loss" aria-label="Loss coverage days"><small>617 products</small></label>
   </div>
   <p class="ropg-note">These are draft example days, not approved settings. The 172 unclassified products are excluded until their classification is updated. Confirmed zero sales can generate zero ROP; missing sales data is never treated as zero.</p>
-  <div class="ropg-toolbar"><button type="button" class="btn" id="ropgUpload" disabled title="Sales cumulative import requires the actual report schema">Upload cumulative sales <span class="ropg-soon">Coming next</span></button><button type="button" class="btn primary" id="ropgGenerate" disabled title="Generate becomes available after a validated sales import">Generate preview</button><button type="button" class="btn" id="ropgApprove" disabled>Approve &amp; update Master</button></div>
+  <div class="ropg-toolbar"><button type="button" class="btn" id="ropgUpload" title="Upload the confirmed 12-month sales CSV">Upload 12-month CSV</button><button type="button" class="btn primary" id="ropgGenerate" disabled title="Generate becomes available after a validated sales import">Generate preview</button><button type="button" class="btn" id="ropgApprove" disabled>Approve &amp; update Master</button></div>
   <div class="ropg-status" role="status">Waiting for a real sales report. No calculation or database update has been performed.</div>
-  <details class="ropg-details" id="ropgProducts"><summary><span><strong>Products &amp; Generated Reorder Points</strong><small>Collapsed by default · Opens for review</small></span><span class="ropg-chevron" aria-hidden="true">⌄</span></summary><div class="ropg-table-scroll"><table><thead><tr><th>Product</th><th>Profitability</th><th>Avg. monthly sales</th><th>Current ROP</th><th>Generated ROP</th><th>Change</th></tr></thead><tbody><tr><td colspan="6" class="ropg-empty">No generated results yet. Upload a validated sales report to enable this table.</td></tr></tbody></table></div></details>
+  <details class="ropg-details" id="ropgProducts"><summary><span><strong>Products &amp; Generated Reorder Points</strong><small>Collapsed by default · Opens for review</small></span><span class="ropg-chevron" aria-hidden="true">⌄</span></summary><div class="ropg-table-scroll"><table><thead><tr><th>Product</th><th>Profitability</th><th>Avg. monthly sales</th><th>Current ROP</th><th>Generated ROP</th><th>Change</th></tr></thead><tbody><tr><td colspan="6" class="ropg-empty">No generated results yet. Upload a 12-month sales report to generate a read-only preview.</td></tr></tbody></table></div></details><script>
+(function(){
+'use strict';
+const root=document.getElementById('ropGenerator');
+if(!root)return;
+const upload=document.getElementById('ropgUpload'),generate=document.getElementById('ropgGenerate'),approve=document.getElementById('ropgApprove');
+const status=root.querySelector('.ropg-status'),tbody=root.querySelector('tbody'),thead=root.querySelector('thead tr');
+const picker=document.createElement('input');picker.type='file';picker.accept='.csv,text/csv';picker.hidden=true;root.appendChild(picker);
+const multipliers=document.createElement('span');multipliers.className='ropg-multipliers';
+multipliers.innerHTML='<label>Super ×<input type="number" min="1.51" step=".1" value="3" data-m="super"></label><label>High ×<input type="number" min=".51" step=".1" value="1.5" data-m="high"></label><label>Medium ×<input type="number" min=".01" step=".1" value=".5" data-m="medium"></label>';
+root.querySelector('.ropg-inputs').appendChild(multipliers);
+upload.disabled=false;upload.textContent='Upload 12-month CSV';upload.title='Import a complete 12-month product profitability report for preview only';
+generate.disabled=true;generate.title='Preview after uploading a valid report';approve.disabled=true;approve.title='Approval locked until audited atomic database update is implemented';
+let records=null,filename='';
+const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const normalized=s=>String(s||'').normalize('NFKC').replace(/\s+/g,' ').trim().toLocaleLowerCase('en');
+function csv(text){
+ const out=[];let row=[],cell='',quoted=false;
+ for(let i=0;i<text.length;i++){const c=text[i];if(quoted){if(c==='"'&&text[i+1]==='"'){cell+='"';i++;}else if(c==='"')quoted=false;else cell+=c;}
+ else if(c==='"')quoted=true;else if(c===','){row.push(cell);cell='';}else if(c==='\n'){row.push(cell);out.push(row);row=[];cell='';}else if(c!=='\r')cell+=c;}
+ if(quoted)throw Error('Unterminated CSV quotation');if(cell||row.length){row.push(cell);out.push(row);}return out;
+}
+function money(s){const n=Number(String(s||'').replace(/\u00a0/g,'').replace(/SR/gi,'').replace(/,/g,'').trim());return Number.isFinite(n)?n:null;}
+function quantity(s){let v=String(s||'').trim().replace(/,/g,'');const m=v.match(/^(-?\d+(?:\.\d+)?)\s+(.+)$/);return m?{qty:Number(m[1]),unit:m[2].trim()}:null;}
+function readRows(text){
+ const a=csv(text.replace(/^\uFEFF/,''));if(a.length<4||a[0][0]!=='Product Name'||a[0][9]!=='Profit'||a[1][6]!=='Quantity')throw Error('Unexpected report header. Expected Product Name, Net Sales Quantity, Profit Value.');
+ const rows=a.slice(2).filter(x=>x[0]&&normalized(x[0])!=='total').map((r,i)=>{const q=quantity(r[6]),p=money(r[9]);return {line:i+3,name:r[0].trim(),q,p};});
+ if(!rows.length||rows.length>30000)throw Error('Invalid product row count');
+ if(rows.some(r=>!r.q||!Number.isFinite(r.q.qty)||r.p===null))throw Error('Missing or invalid quantity/profit in report');
+ const unique=new Set(rows.map(x=>normalized(x.name)));if(unique.size!==rows.length)throw Error('Duplicate product names in report; resolve before generating.');
+ return rows;
+}
+function setStatus(v){status.textContent=v;status.setAttribute('aria-live','polite');}
+upload.addEventListener('click',()=>picker.click());
+picker.addEventListener('change',async()=>{records=null;generate.disabled=true;approve.disabled=true;const f=picker.files[0];if(!f)return;try{
+ if(!/\.csv$/i.test(f.name)||f.size>8e6)throw Error('Upload a CSV file smaller than 8MB.');
+ records=readRows(await f.text());filename=f.name;
+ if(!/From 01_10_2025 To 01_10_2026|From \d\d_\d\d_\d{4} To \d\d_\d\d_\d{4}/i.test(filename))throw Error('Report period cannot be verified from the filename. Use a 12-month date-range export.');
+ generate.disabled=false;setStatus(records.length+' product rows loaded. Verify that the report covers exactly 12 months, all branches. Click Generate preview. No database writes.');
+ }catch(e){setStatus('Import blocked: '+e.message);} });
+generate.addEventListener('click',()=>{try{
+ if(!records)throw Error('Upload the CSV first');
+ if(typeof state==='undefined'||!Array.isArray(state.master)||!state.master.length)throw Error('Master is not loaded. Sign in and refresh.');
+ const factor=Object.fromEntries([...root.querySelectorAll('[data-m]')].map(e=>[e.dataset.m,Number(e.value)]));
+ if(![factor.super,factor.high,factor.medium].every(Number.isFinite)||!(factor.super>factor.high&&factor.high>factor.medium&&factor.medium>0))throw Error('Profit multipliers must be Super > High > Medium > 0.');
+ const positive=records.filter(r=>r.p>0),mean=positive.reduce((s,r)=>s+r.p,0)/positive.length;if(!Number.isFinite(mean)||mean<=0)throw Error('No profitable products.');
+ const masterMap=new Map();for(const m of state.master){const key=normalized(m.product_name);if(!masterMap.has(key))masterMap.set(key,[]);masterMap.get(key).push(m);}
+ const days=Object.fromEntries([...root.querySelectorAll('[data-rop-class]')].map(e=>[e.dataset.ropClass,Number(e.value)]));
+ if(Object.values(days).some(v=>!Number.isInteger(v)||v<0||v>365))throw Error('Coverage days must be integers from 0 through 365.');
+ const counts={Super:0,High:0,Medium:0,Low:0,Loss:0};let matched=0,convertible=0;
+ const rows=records.map(r=>{const kind=r.p<=0?'Loss':r.p>=mean*factor.super?'Super':r.p>=mean*factor.high?'High':r.p>=mean*factor.medium?'Medium':'Low';counts[kind]++;
+ const mm=masterMap.get(normalized(r.name))||[],m=mm.length===1?mm[0]:null;if(m)matched++;
+ const purchase=m&&normalized(m.purchase_unit),sale=normalized(r.q.unit);
+ // A factor is not applied automatically: its direction is not proven by a product-level unit contract.
+ const safeUnit=Boolean(m&&purchase&&purchase===sale);
+ const rop=safeUnit?Math.max(0,Math.ceil(r.q.qty/12/30*days[kind.toLowerCase()])):null;if(safeUnit)convertible++;
+ return {r,kind,m,rop,safeUnit,problem:!m?(mm.length?'Duplicate master name':'Unmatched product name'):!safeUnit?'Unit conversion requires review':null};
+ });
+ thead.innerHTML='<th>Product</th><th>Net profit (SAR)</th><th>Profitability</th><th>Avg monthly sales (report unit)</th><th>New ROP (purchase unit)</th><th>Review</th>';
+ tbody.innerHTML=rows.map(x=>'<tr><td>'+esc(x.r.name)+'</td><td>'+esc(x.r.p.toLocaleString('en-US',{maximumFractionDigits:2}))+'</td><td>'+x.kind+'</td><td>'+esc((x.r.q.qty/12).toLocaleString('en-US',{maximumFractionDigits:3})+' '+x.r.q.unit)+'</td><td>'+esc(x.rop==null?'—':x.rop)+'</td><td>'+esc(x.problem||'Preview only')+'</td></tr>').join('');
+ document.getElementById('ropgProducts').open=true;setStatus('Preview only | '+rows.length+' report products | '+matched+' unique name matches | '+convertible+' exact purchase-unit matches | mean profit '+mean.toFixed(2)+' SAR | Super '+counts.Super+' · High '+counts.High+' · Medium '+counts.Medium+' · Low '+counts.Low+' · Loss '+counts.Loss+'. Approval remains locked; no database writes.');
+ }catch(e){setStatus('Generation blocked: '+e.message);} });
+})();
+</script>
 </section></section>
 <section class="hidden" data-panel="tasks-assistant">
   <div class="tasks-assistant-page">
