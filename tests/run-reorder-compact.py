@@ -146,7 +146,7 @@ try:
             p.goto(origin+'/reorder-compact-qa.html',wait_until='load')
             wait_state(p,"state.taskAssistant?.tasks?.some(t=>t.focus==='data')")
             p.evaluate("go('daily-tasks')")
-            metrics=p.evaluate("""()=>{let r=document.querySelector('#ropGenerator'),t=r.querySelector('#ropgTitle'),m=r.querySelector('[data-m=super]'),a=r.querySelector('#ropgProducts summary');return {display:getComputedStyle(r).display,overflow:getComputedStyle(r).overflowX,yTitle:t.getBoundingClientRect().y,yMultiplier:m.getBoundingClientRect().y,arrowWidth:a.getBoundingClientRect().width,scroll:r.scrollWidth,client:r.clientWidth}}""")
+            metrics=p.evaluate("""()=>{let r=document.querySelector('#ropGenerator'),t=r.querySelector('#ropgTitle'),m=r.querySelector('[data-m=super]'),a=r.querySelector('#ropgProducts summary');return {display:getComputedStyle(r).display,overflow:getComputedStyle(r).overflowX,yTitle:t.getBoundingClientRect().y,yMultiplier:m.getBoundingClientRect().y,arrowWidth:a.getBoundingClientRect().width,scroll:r.scrollWidth,client:r.clientWidth,documentScroll:document.documentElement.scrollWidth,documentClient:document.documentElement.clientWidth}}""")
             print('STALE_CSS_METRICS='+json.dumps(metrics),flush=True)
             check(metrics['display']=='block','stale-CSS defense keeps root block layout')
             check(abs(metrics['yTitle']-metrics['yMultiplier'])<14,'stale-CSS defense keeps title and profit multipliers on same row')
