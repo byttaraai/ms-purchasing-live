@@ -47,6 +47,8 @@ try:
                 p.wait_for_timeout(100)
                 master_before=p.evaluate('JSON.stringify(state.master)')
                 check(not p.locator('#ropgProducts').evaluate('(e)=>e.open'),label+' table initially collapsed')
+                check(p.locator('#ropgProducts thead').is_hidden(),label+' empty table has no misleading header')
+                check(p.locator('#ropGenerator .ropg-status').is_hidden(),label+' clean one-line card before import')
                 check(not p.locator('#ropgProducts .ropg-table-scroll').is_visible(),label+' no hidden table leakage')
                 for selector in ['.ropg-summary','.ropg-input-head','.ropg-kicker','.ropg-head p','.ropg-note','.ropg-pill']:
                     check(not p.locator('#ropGenerator '+selector).is_visible(),label+' removed visual clutter '+selector)
@@ -101,9 +103,21 @@ try:
                     lines.append(','.join([csv_field(m['name']),'',csv_field(q),'0 SR',csv_field('0 ('+m['unit']+')'),'0 SR',csv_field(q),'0 SR','0 SR',str(amount)+' SR','','','']))
                 raw=('\n'.join(lines)+'\n').encode('utf-8')
                 p.locator('#ropGenerator input[type=file]').set_input_files({'name':'Sample-From 01_10_2025 To 01_10_2026.csv','mimeType':'text/csv','buffer':raw})
-                check(not p.locator('#ropgGenerate').is_disabled(),label+' CSV parsed and generator enabled')
+                wait_state(p,"document.querySelectorAll('#ropgProducts tbody tr').length===3 && !document.querySelector('#ropgGenerate').disabled")
+                check(p.locator('#ropGenerator .ropg-status').is_visible(),label+' import and preview state is visible')
+                check('Medium 2' in p.locator('#ropGenerator .ropg-status').inner_text(),label+' profitability generated automatically on upload')
+                check(not p.locator('#ropgProducts').evaluate('(e)=>e.open'),label+' generated table stays collapsed until the arrow is used')
+                summary.click()
+                check(p.locator('#ropgProducts tbody tr').count()==3,label+' arrow reveals three calculated products')
+                summary.click()
+                check(not p.locator('#ropgProducts').evaluate('(e)=>e.open'),label+' arrow hides data without deleting the rows')
+                check(p.locator('#ropgProducts tbody tr').count()==3,label+' all generated rows persist after collapse')
+                p.locator('#ropGenerator [data-m=super]').fill('3.2')
+                wait_state(p,"document.querySelector('#ropGenerator .ropg-status').textContent.includes('Local preview only') && !document.querySelector('#ropgGenerate').disabled")
+                check('Medium 2' in p.locator('#ropGenerator .ropg-status').inner_text(),label+' multiplier edit automatically recalculates preview')
                 p.locator('#ropgGenerate').click()
-                check('Medium 2' in p.locator('#ropGenerator .ropg-status').inner_text(),label+' profitability generated from profit values')
+                wait_state(p,"!document.querySelector('#ropgGenerate').disabled")
+                check(p.locator('#ropgProducts tbody tr').count()==3,label+' Generate can also be rerun manually')
                 check(p.locator('#ropgProducts tbody tr').count()==3,label+' three source products in preview')
                 check(p.locator('#ropgProducts thead th').count()==6,label+' all six product headers generated')
                 table_geo=p.evaluate("()=>{const q=document.querySelector('#ropGenerator'),t=q.querySelector('.ropg-table-scroll');return {rootWidth:q.clientWidth,rootScroll:q.scrollWidth,tableWidth:t.clientWidth,tableScroll:t.scrollWidth}}")
@@ -116,6 +130,52 @@ try:
                 check(p.locator('.continuous-footer #printSelectedBtn').count()==1,label+' footer print placement unchanged')
                 check(not external and not errors,label+' no external network or page errors '+str((external,errors)))
             finally:ctx.close()
+        # Cache-regression: a browser can receive an obsolete stylesheet while running
+        # the latest HTML. Critical inline layout styles must keep the generator usable.
+        ctx=browser.new_context(viewport={'width':1440,'height':900})
+        errors=[]
+        def guard_external(route):
+            if route.request.url.startswith(origin+'/'):route.continue_()
+            else:route.abort()
+        ctx.route('**/*',guard_external)
+        old_css='#ropGenerator{display:grid;grid-template-columns:max-content 1fr max-content 32px;overflow-x:auto}#ropGenerator .ropg-details summary{position:absolute;inset:0;width:auto;height:auto}#ropGenerator .ropg-status{position:absolute;width:1px;height:1px;clip-path:inset(50%)}'
+        ctx.route('**/assets/css/reorder-generator-v106.css*',lambda r:r.fulfill(status=200,content_type='text/css',body=old_css))
+        p=ctx.new_page()
+        p.on('pageerror',lambda e:errors.append(str(e)))
+        try:
+            p.goto(origin+'/reorder-compact-qa.html',wait_until='load')
+            wait_state(p,"state.taskAssistant?.tasks?.some(t=>t.focus==='data')")
+            p.evaluate("go('daily-tasks')")
+            metrics=p.evaluate("""()=>{let r=document.querySelector('#ropGenerator'),t=r.querySelector('#ropgTitle'),m=r.querySelector('[data-m=super]'),a=r.querySelector('#ropgProducts summary');return {display:getComputedStyle(r).display,overflow:getComputedStyle(r).overflowX,yTitle:t.getBoundingClientRect().y,yMultiplier:m.getBoundingClientRect().y,arrowWidth:a.getBoundingClientRect().width,scroll:r.scrollWidth,client:r.clientWidth,documentScroll:document.documentElement.scrollWidth,documentClient:document.documentElement.clientWidth}}""")
+            print('STALE_CSS_METRICS='+json.dumps(metrics),flush=True)
+            check(metrics['display']=='block','stale-CSS defense keeps root block layout')
+            check(abs(metrics['yTitle']-metrics['yMultiplier'])<14,'stale-CSS defense keeps title and profit multipliers on same row')
+            check(metrics['arrowWidth']==32,'stale-CSS defense prevents full-card arrow hitbox')
+            check(metrics['overflow']=='clip','stale-CSS defense clips horizontal spill without affecting table scrolling')
+            check(metrics['documentScroll']<=metrics['documentClient']+1,'stale-CSS defense prevents document-wide horizontal overflow')
+            rows=['Product Name,Supplier,Sales,,Refunds,,Net Sales,,Total Cost,Profit,,Profit percentage,',
+                  ',,Quantity,Value,Quantity,Value,Quantity,Value,,Value,Percentage,To Sales,To Cost']
+            first=p.evaluate("()=>state.master.slice(0,3).map(x=>({name:x.product_name,unit:x.purchase_unit}))")
+            names=[x['name'] for x in first]+['Synthetic Test Product '+str(i).zfill(4) for i in range(4,1562)]
+            unit=first[0]['unit']
+            for i,name in enumerate(names):
+                sales_unit=first[i]['unit'] if i<3 else unit
+                q='120 ('+sales_unit+')'
+                name='"'+name.replace('"','""')+'"'
+                rows.append(','.join([name,'','"'+q+'"','0 SR','"0 ('+sales_unit+')"','0 SR','"'+q+'"','0 SR','0 SR',str(100+i%31)+' SR','','','']))
+            raw=('\n'.join(rows)+'\n').encode('utf-8')
+            p.locator('#ropGenerator input[type=file]').set_input_files({'name':'Sample-From 01_10_2025 To 01_10_2026.csv','mimeType':'text/csv','buffer':raw})
+            wait_state(p,"document.querySelectorAll('#ropgProducts tbody tr').length===1561 && !document.querySelector('#ropgGenerate').disabled")
+            check('1561 products' in p.locator('#ropGenerator .ropg-status').inner_text(),'full-size synthetic CSV generates a visible 1561-product result summary')
+            check(not p.locator('#ropgProducts').evaluate('(e)=>e.open'),'full-size results stay collapsed until arrow')
+            p.locator('#ropgProducts summary').click()
+            check(p.locator('#ropgProducts tbody tr').count()==1561,'full-size expanded results contain all 1561 synthetic products')
+            check(p.locator('#ropgProducts thead th').count()==6,'full-size expanded results keep all six table columns')
+            p.locator('#ropgProducts summary').click()
+            check(p.locator('#ropgProducts tbody tr').count()==1561,'full-size results are preserved after closing the arrow')
+            check(p.locator('#ropgApprove').is_disabled(),'full-size local preview cannot accidentally approve master changes')
+            check(not errors,'full-size stale-CSS browser test has no JavaScript errors '+str(errors))
+        finally:ctx.close()
         browser.close()
 finally:
     server.shutdown()

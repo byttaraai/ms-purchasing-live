@@ -15,7 +15,7 @@
 <link rel="stylesheet" href="assets/css/task-assistant-v92.css?v=92">
 <link rel="stylesheet" href="assets/css/task-assistant-v93.css?v=93"><link rel="stylesheet" href="assets/css/task-assistant-v98.css?v=98">
 <link rel="stylesheet" href="assets/css/header-v101.css?v=101">
-<link rel="stylesheet" href="assets/css/navigation-v102.css?v=102"><link rel="stylesheet" href="assets/css/reorder-generator-v103.css?v=105"></head><body>
+<link rel="stylesheet" href="assets/css/navigation-v102.css?v=102"><link rel="stylesheet" href="assets/css/reorder-generator-v106.css?v=106"></head><body>
 <div class="auth" id="auth"><form class="auth-card" id="authForm"><div class="brand"><div class="logo"><svg aria-hidden="true" viewbox="0 0 24 24"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l3 14h12l3-10H6M8 15l-1 3h14"></path></svg></div><div><h1>MS Purchasing</h1><p>One purchase unit. Traceable calculations.</p></div></div><p class="muted">Sign in with your approved purchasing account.</p><div class="field"><label for="authEmail">Email</label><input autocomplete="username" id="authEmail" placeholder="name@company.com" required="" type="email"/></div><div class="field"><label for="authPassword">Password</label><input autocomplete="current-password" id="authPassword" required="" type="password"/></div><button class="btn primary" id="signInBtn" type="submit">Sign In</button><button class="btn" id="signUpBtn" type="button">Create Account</button><button class="btn hidden" id="openLocalBtn" type="button">Open local test data</button><p class="auth-error" id="authError" role="alert"></p><p class="sub">Create Account is enabled for the approved purchasing email. Choose your own password, then sign in.</p><span class="build-tag">Dashboard + BOs + Tasks Assistant - Live Build 102</span><!-- prior verified baseline: Live Build 92 --></form></div>
 <div class="hidden" id="app"><header class="topbar"><div class="brand"><div class="logo"><svg aria-hidden="true" viewbox="0 0 24 24"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l3 14h12l3-10H6M8 15l-1 3h14"></path></svg></div><div><h1>MS Purchasing</h1><p>Smarter Purchasing. Healthier Stock.</p></div></div><nav><button class="active" data-tab="daily-tasks"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M4 20V10m6 10V4m6 16v-7m4 7V7"></path></svg> Dashboard</button><button class="" data-tab="recommendations"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="m3 10 9-7 9 7v11h-6v-7H9v7H3z"></path></svg> BOs Assistant</button><button class="" data-tab="tasks-assistant"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M9 11l2 2 4-4M5 4h14v16H5zM8 17h8"></path></svg> Tasks Assistant</button></nav><div class="actions"><span class="avatar">MS</span><div class="account-identity"><strong id="accountName"></strong><span class="account" id="accountEmail"></span></div><button class="btn" id="logoutBtn" title="Sign out"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M10 4H3v16h7m4-12 4 4-4 4M8 12h10"></path></svg></button></div></header>
 <main class="page"><div class="banner hidden" id="demoBanner"><div><strong>LOCAL TEST - NOT LIVE</strong>  Your original reorder-point numbers are retained. Unit conversions only. Changes here never update Supabase. Do not publish this test file: it contains your data.</div></div><div class="error-panel hidden" id="globalError" role="alert"></div>
@@ -72,10 +72,32 @@
     <div class="freshness-copy"><strong>Inventory Snapshot</strong><span id="inventoryFreshnessText">Checking latest inventory snapshot...</span></div>
     <div class="freshness-meta"><span class="fresh-chip neutral" id="inventoryFreshnessStatus">Checking</span><span class="fresh-chip neutral" id="inventoryFreshnessAge">-</span></div>
   </div>
-</div><section class="ropg-section" id="ropGenerator" aria-labelledby="ropgTitle">
+</div><section class="ropg-section" id="ropGenerator" aria-labelledby="ropgTitle" data-ui-build="106">
+<style id="ropg-critical-v106">
+/* Safeguard against cached v104 CSS combined with newer HTML. */
+#ropGenerator{position:relative;box-sizing:border-box;display:block;width:100%;max-width:100%;min-width:0;overflow:clip}
+#ropGenerator .ropg-controls{box-sizing:border-box;display:flex;align-items:center;flex-wrap:nowrap;gap:10px;width:calc(100% - 44px);max-width:calc(100% - 44px);height:34px;overflow-x:auto;overflow-y:hidden}
+#ropGenerator .ropg-head,#ropGenerator .ropg-inputs,#ropGenerator .ropg-multipliers,#ropGenerator .ropg-toolbar{flex:0 0 auto;white-space:nowrap}
+#ropGenerator .ropg-head>div{display:flex;align-items:center;gap:6px}
+#ropGenerator .ropg-inputs,#ropGenerator .ropg-multipliers,#ropGenerator .ropg-toolbar{display:flex;align-items:center;gap:7px;flex-wrap:nowrap;margin:0}
+#ropGenerator .ropg-multipliers{padding:0 0 0 10px;border-left:1px solid var(--line,#e5e7eb)}
+#ropGenerator .ropg-inputs input,#ropGenerator .ropg-multipliers input{height:32px;box-sizing:border-box}
+#ropGenerator .ropg-version{font-size:9px;font-weight:600;color:var(--muted,#8693a8)}
+#ropGenerator .ropg-details{position:static;display:block;width:100%;min-width:0;overflow:visible}
+#ropGenerator .ropg-details summary{position:absolute;inset:auto;top:11px;right:12px;bottom:auto;left:auto;display:flex;align-items:center;justify-content:center;width:32px;height:32px;box-sizing:border-box}
+#ropGenerator .ropg-details:not([open]) .ropg-table-scroll{display:none}
+#ropGenerator .ropg-table-scroll{display:block;box-sizing:border-box;width:100%;min-width:0;max-width:100%;max-height:min(62vh,610px);overflow:auto}
+#ropGenerator .ropg-status{position:static;width:auto;height:auto;clip-path:none;overflow:visible;margin:7px 0 0;padding:0;font-size:11px;line-height:1.4;color:var(--muted,#697386);white-space:normal}
+#ropGenerator .ropg-status[hidden],#ropGenerator .ropg-table-scroll thead[hidden]{display:none}
+#ropGenerator .ropg-result-info{padding:9px 4px;white-space:normal}
+#ropGenerator .ropg-table-scroll table{min-width:820px;width:100%}
+#ropGenerator .ropg-details:has(.ropg-empty) .ropg-table-scroll table{min-width:0;width:100%}
+#ropGenerator .ropg-details:has(.ropg-empty) .ropg-table-scroll thead{display:none}
+#ropGenerator .ropg-details:has(.ropg-empty) .ropg-empty{padding:10px 4px;white-space:normal}
+</style>
   
   <div class="ropg-controls" role="group" aria-label="Reorder generator controls; horizontally scroll on smaller screens">
-  <div class="ropg-head"><div><span class="ropg-kicker">MASTER DATA · REORDER POINT</span><h3 id="ropgTitle">Reorder Point Generator</h3><p>12-month sales · Profitability &amp; Reorder Point · Preview before approval</p></div><span class="ropg-pill">Preview Only</span></div>
+  <div class="ropg-head"><div><span class="ropg-kicker">MASTER DATA · REORDER POINT</span><h3 id="ropgTitle">Reorder Point Generator</h3><span class="ropg-version" title="Generator UI build 106">v106</span><p>12-month sales · Profitability &amp; Reorder Point · Preview before approval</p></div><span class="ropg-pill">Preview Only</span></div>
   <div class="ropg-inputs">
     <label>Super<input type="number" min="0" max="365" step="1" value="30" data-rop-class="super" aria-label="Super coverage days"><small>56 products</small></label>
     <label>High<input type="number" min="0" max="365" step="1" value="25" data-rop-class="high" aria-label="High coverage days"><small>76 products</small></label>
@@ -88,8 +110,8 @@
   <div class="ropg-summary"><div><span>Sales report</span><strong>Not connected yet</strong><small>Upload format pending validation</small></div><div><span>Calculation window</span><strong>Last 12 months</strong><small>All branches combined</small></div><div><span>Approval</span><strong>Manual only</strong><small>Original Master remains unchanged</small></div></div>
   <div class="ropg-input-head"><strong>Coverage days by profitability</strong><small>Editable draft settings · No changes saved to database</small></div>
   <p class="ropg-note">These are draft example days, not approved settings. The 172 unclassified products are excluded until their classification is updated. Confirmed zero sales can generate zero ROP; missing sales data is never treated as zero.</p>
-  <div class="ropg-status" role="status">Waiting for a real sales report. No calculation or database update has been performed.</div>
-  <details class="ropg-details" id="ropgProducts"><summary><span><strong>Products &amp; Generated Reorder Points</strong><small>Collapsed by default · Opens for review</small></span><span class="ropg-chevron" aria-hidden="true">⌄</span></summary><div class="ropg-table-scroll"><table><thead><tr><th>Product</th><th>Profitability</th><th>Avg. monthly sales</th><th>Current ROP</th><th>Generated ROP</th><th>Change</th></tr></thead><tbody><tr><td colspan="6" class="ropg-empty">No generated results yet. Upload a 12-month sales report to generate a read-only preview.</td></tr></tbody></table></div></details>
+  <div class="ropg-status" role="status" hidden>Waiting for a real sales report. No calculation or database update has been performed.</div>
+  <details class="ropg-details" id="ropgProducts"><summary><span><strong>Products &amp; Generated Reorder Points</strong><small>Collapsed by default · Opens for review</small></span><span class="ropg-chevron" aria-hidden="true">⌄</span></summary><div class="ropg-table-scroll"><table><thead hidden><tr><th>Product</th><th>Profitability</th><th>Avg. monthly sales</th><th>Current ROP</th><th>Generated ROP</th><th>Change</th></tr></thead><tbody><tr><td colspan="6" class="ropg-empty">No generated results yet. Upload a 12-month sales report to generate a read-only preview.</td></tr></tbody></table></div></details>
 <script>
 (function(){
 'use strict';
@@ -105,7 +127,7 @@ scroller.prepend(resultInfo);root.querySelector('.ropg-inputs').after(multiplier
 upload.disabled=false;upload.textContent='Upload 12-month CSV';upload.title='Upload one complete 12-month product sales and profit CSV';
 generate.disabled=true;generate.title='Validate the report before generating';
 approve.disabled=true;approve.title='Approval requires a server-verified preview and an Admin account';
-let records=null,filename='',period=null,serverPreview=null,lastBody=null,busy=false;
+let records=null,filename='',period=null,serverPreview=null,lastBody=null,busy=false,previewSerial=0,debounceTimer=null;
 const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\u0027':'&#39;'}[c]));
 const normalized=s=>String(s||'').normalize('NFKC').replace(/\s+/g,' ').trim().toLocaleLowerCase('en');
 const unitKey=s=>String(s||'').replace(/[()\[\]]/g,' ').replace(/\s+/g,' ').trim().toLocaleLowerCase('en');
@@ -145,8 +167,8 @@ function settings(){
  if(Object.values(cover).some(v=>!Number.isInteger(v)||v<0||v>365))throw Error('Coverage days must be integers 0–365');
  return {mult,cover};
 }
-function setStatus(s){status.textContent=s;status.setAttribute('aria-live','polite');resultInfo.textContent=s;}
-function invalidate(){serverPreview=null;lastBody=null;approve.disabled=true;}
+function setStatus(s){status.hidden=false;status.textContent=s;status.setAttribute('aria-live','polite');resultInfo.textContent=s;}
+function invalidate(){previewSerial++;serverPreview=null;lastBody=null;approve.disabled=true;}
 function rowsForServer(){
  if(typeof state==='undefined'||!Array.isArray(state.master)||!state.master.length)throw Error('Master is not loaded. Sign in and refresh');
  const lookup=new Map();
@@ -156,7 +178,7 @@ function rowsForServer(){
 function draw(rows){
  thead.innerHTML='<th>Product</th><th>Net Profit (SAR)</th><th>Profitability</th><th>Avg. Monthly Sales</th><th>Reorder Point (Purchase Unit)</th><th>Status</th>';
  tbody.innerHTML=rows.map(r=>'<tr><td>'+esc(r.name)+'</td><td>'+esc(Number(r.profit).toLocaleString('en-US',{maximumFractionDigits:2}))+'</td><td>'+esc(r.classification)+'</td><td>'+esc(Number(r.monthly_sales).toLocaleString('en-US',{maximumFractionDigits:3})+' '+r.report_unit)+'</td><td>'+esc(r.new_rop===null?'—':Number(r.new_rop).toLocaleString('en-US',{maximumFractionDigits:2})+(r.purchase_unit?' '+r.purchase_unit:''))+'</td><td>'+esc(r.review|| (r.changed?'Changed':'Unchanged'))+'</td></tr>').join('');
- document.getElementById('ropgProducts').open=true;
+ thead.hidden=false;
 }
 function localPreview(rows,mult,cover){
  const avg=records.filter(r=>r.p>0).reduce((a,r)=>a+r.p,0)/records.filter(r=>r.p>0).length;
@@ -187,38 +209,77 @@ function statusText(d,server){
  return (server?'Server verified':'Local preview only')+' · '+records.length+' products · '+d.eligible_rows+' eligible · '+d.skipped_rows+' need review · '+d.changed_rows+' changes · Avg profit '+Number(d.mean_positive_profit).toLocaleString('en-US',{maximumFractionDigits:2})+' SAR · Super '+c.Super+' · High '+c.High+' · Medium '+c.Medium+' · Low '+c.Low+' · Loss '+c.Loss;
 }
 const liveHost=()=>location.hostname==='byttaraai.github.io';
-upload.addEventListener('click',()=>picker.click());
-picker.addEventListener('change',async()=>{
- invalidate();generate.disabled=true;records=null;const f=picker.files[0];if(!f)return;
- try{
-  if(!/\.csv$/i.test(f.name)||f.size>8e6)throw Error('Upload a CSV smaller than 8MB');
-  const p=parsePeriod(f.name);const r=readRows(await f.text());
-  filename=f.name;period=p;records=r;generate.disabled=false;setStatus(r.length+' products loaded · '+p.start+' to '+p.end+' · Generate to preview. Nothing saved.');
- }catch(e){setStatus('Upload blocked: '+e.message);}
-});
-root.querySelectorAll('[data-rop-class],[data-m]').forEach(input=>input.addEventListener('input',()=>{
- invalidate();if(records)setStatus('Settings changed. Generate a fresh preview before approval.');
-}));
-generate.addEventListener('click',async()=>{
- if(busy)return;busy=true;generate.disabled=true;invalidate();
+function clearTable(){
+ thead.hidden=true;
+ tbody.innerHTML='<tr><td class="ropg-empty" colspan="6">Upload a 12-month report to calculate product profitability and reorder points.</td></tr>';
+}
+async function generatePreview(){
+ if(busy)return;
+ // A token ensures an old server response can never approve stale settings or a replaced report.
+ const token=++previewSerial;
+ serverPreview=null;lastBody=null;approve.disabled=true;generate.disabled=true;
  try{
   if(!records||!period)throw Error('Upload a valid 12-month CSV first');
-  if(typeof state==='undefined'||!Array.isArray(state.master)||!state.master.length)throw Error('Master data is not loaded');
+  if(typeof state==='undefined'||!Array.isArray(state.master)||!state.master.length)throw Error('Master data is not loaded. Please sign in or refresh.');
   const {mult,cover}=settings(),matched=rowsForServer();
+  // Always show the calculations immediately. Server verification is a separate, read-only step.
+  const local=localPreview(matched,mult,cover);
+  if(token!==previewSerial)return;
+  draw(local.rows);
+  setStatus(statusText(local,false)+(liveHost()&&state.mode==='live'?' · Checking the Master database...':' · Approval unavailable outside the live app.'));
   if(liveHost()&&state.mode==='live'){
-    setStatus('Validating against live Master database; no changes yet.');
-    const body={p_rows:matched.map(({name,code,profit,qty,unit})=>({name,code,profit,qty,unit})),
-      p_start:period.start,p_end:period.end,p_cover:cover,p_mult:mult,p_file:filename,
-      p_revision:state.revision,p_request:null,p_approve:false};
+   const body={p_rows:matched.map(({name,code,profit,qty,unit})=>({name,code,profit,qty,unit})),
+     p_start:period.start,p_end:period.end,p_cover:cover,p_mult:mult,p_file:filename,
+     p_revision:state.revision,p_request:null,p_approve:false};
+   try{
     const d=await rpc('purchasing_sales_generator_v104',body);
-    if(!d||!d.ok||d.approved)throw Error('Server did not confirm a safe preview');
-    lastBody=body;serverPreview=d;draw(d.rows);setStatus(statusText(d,true));
-    if(state.role==='admin'&&d.eligible_rows>0){approve.disabled=false;approve.title='Approve the server-verified eligible products in one atomic transaction';}
-  }else{
-    const d=localPreview(matched,mult,cover);draw(d.rows);setStatus(statusText(d,false)+' · Approval disabled outside live authenticated server');
+    if(token!==previewSerial)return;
+    if(!d||!d.ok||d.approved||!Array.isArray(d.rows))throw Error('Server did not return a valid read-only preview');
+    lastBody=body;serverPreview=d;draw(d.rows);
+    setStatus(statusText(d,true)+(d.skipped_rows?' · Check excluded products before approval.':' · All matched products checked.'));
+    if(state.role==='admin'&&d.eligible_rows>0&&d.changed_rows>0){
+      approve.disabled=false;
+      approve.title='Update the eligible Master products after explicit confirmation';
+    }
+   }catch(error){
+    if(token!==previewSerial)return;
+    serverPreview=null;lastBody=null;approve.disabled=true;
+    setStatus(statusText(local,false)+' · Server verification unavailable: '+(error?.message||String(error))+' · Nothing saved. Approval remains disabled.');
+   }
   }
- }catch(e){setStatus('Generate blocked: '+(e?.message||String(e)));}finally{busy=false;generate.disabled=!records;}
+ }catch(error){
+  if(token!==previewSerial)return;
+  clearTable();
+  setStatus('Preview blocked: '+(error?.message||String(error))+' · No database changes.');
+ }finally{
+  if(token===previewSerial)generate.disabled=!records;
+ }
+}
+generate.addEventListener('click',()=>{void generatePreview();});
+upload.addEventListener('click',()=>picker.click());
+picker.addEventListener('change',async()=>{
+ clearTimeout(debounceTimer);
+ invalidate();generate.disabled=true;records=null;period=null;filename='';clearTable();
+ const file=picker.files[0];if(!file)return;
+ setStatus('Reading sales report: '+file.name+'...');
+ try{
+  if(!/\.csv$/i.test(file.name)||file.size>8e6)throw Error('Upload a CSV smaller than 8MB');
+  const p=parsePeriod(file.name),r=readRows(await file.text());
+  filename=file.name;period=p;records=r;
+  setStatus(r.length+' products loaded · '+p.start+' to '+p.end+' · Calculating profit classes and reorder points...');
+  void generatePreview();
+ }catch(error){
+  setStatus('Upload blocked: '+(error?.message||String(error))+' · Nothing saved.');
+ }
 });
+root.querySelectorAll('[data-rop-class],[data-m]').forEach(input=>input.addEventListener('input',()=>{
+ clearTimeout(debounceTimer);
+ invalidate();
+ if(records){
+  setStatus('Coverage or profitability threshold changed · Updating product preview...');
+  debounceTimer=setTimeout(()=>{if(records&&!busy)void generatePreview();},500);
+ }
+}));
 approve.addEventListener('click',async()=>{
  if(busy||!serverPreview||!lastBody||state?.role!=='admin')return;
  if(!liveHost())return;
