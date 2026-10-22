@@ -130,6 +130,50 @@ try:
                 check(p.locator('.continuous-footer #printSelectedBtn').count()==1,label+' footer print placement unchanged')
                 check(not external and not errors,label+' no external network or page errors '+str((external,errors)))
             finally:ctx.close()
+        # Cache-regression: a browser can receive an obsolete stylesheet while running
+        # the latest HTML. Critical inline layout styles must keep the generator usable.
+        ctx=browser.new_context(viewport={'width':1440,'height':900})
+        errors=[]
+        def guard_external(route):
+            if route.request.url.startswith(origin+'/'):route.continue_()
+            else:route.abort()
+        ctx.route('**/*',guard_external)
+        old_css='#ropGenerator{display:grid;grid-template-columns:max-content 1fr max-content 32px;overflow-x:auto}#ropGenerator .ropg-details summary{position:absolute;inset:0;width:auto;height:auto}#ropGenerator .ropg-status{position:absolute;width:1px;height:1px;clip-path:inset(50%)}'
+        ctx.route('**/assets/css/reorder-generator-v106.css*',lambda r:r.fulfill(status=200,content_type='text/css',body=old_css))
+        p=ctx.new_page()
+        p.on('pageerror',lambda e:errors.append(str(e)))
+        try:
+            p.goto(origin+'/reorder-compact-qa.html',wait_until='load')
+            wait_state(p,"state.taskAssistant?.tasks?.some(t=>t.focus==='data')")
+            p.evaluate("go('daily-tasks')")
+            metrics=p.evaluate("""()=>{let r=document.querySelector('#ropGenerator'),t=r.querySelector('#ropgTitle'),m=r.querySelector('[data-m=super]'),a=r.querySelector('#ropgProducts summary');return {display:getComputedStyle(r).display,overflow:getComputedStyle(r).overflowX,yTitle:t.getBoundingClientRect().y,yMultiplier:m.getBoundingClientRect().y,arrowWidth:a.getBoundingClientRect().width,scroll:r.scrollWidth,client:r.clientWidth}}""")
+            check(metrics['display']=='block','stale-CSS defense keeps root block layout')
+            check(abs(metrics['yTitle']-metrics['yMultiplier'])<14,'stale-CSS defense keeps title and profit multipliers on same row')
+            check(metrics['arrowWidth']==32,'stale-CSS defense prevents full-card arrow hitbox')
+            check(metrics['scroll']<=metrics['client']+1,'stale-CSS defense eliminates root horizontal scrollbar')
+            rows=['Product Name,Supplier,Sales,,Refunds,,Net Sales,,Total Cost,Profit,,Profit percentage,',
+                  ',,Quantity,Value,Quantity,Value,Quantity,Value,,Value,Percentage,To Sales,To Cost']
+            first=p.evaluate("()=>state.master.slice(0,3).map(x=>({name:x.product_name,unit:x.purchase_unit}))")
+            names=[x['name'] for x in first]+['Synthetic Test Product '+str(i).zfill(4) for i in range(4,1562)]
+            unit=first[0]['unit']
+            for i,name in enumerate(names):
+                sales_unit=first[i]['unit'] if i<3 else unit
+                q='120 ('+sales_unit+')'
+                name='"'+name.replace('"','""')+'"'
+                rows.append(','.join([name,'','"'+q+'"','0 SR','"0 ('+sales_unit+')"','0 SR','"'+q+'"','0 SR','0 SR',str(100+i%31)+' SR','','','']))
+            raw=('\n'.join(rows)+'\n').encode('utf-8')
+            p.locator('#ropGenerator input[type=file]').set_input_files({'name':'Sample-From 01_10_2025 To 01_10_2026.csv','mimeType':'text/csv','buffer':raw})
+            wait_state(p,"document.querySelectorAll('#ropgProducts tbody tr').length===1561 && !document.querySelector('#ropgGenerate').disabled")
+            check('1561 products' in p.locator('#ropGenerator .ropg-status').inner_text(),'full-size synthetic CSV generates a visible 1561-product result summary')
+            check(not p.locator('#ropgProducts').evaluate('(e)=>e.open'),'full-size results stay collapsed until arrow')
+            p.locator('#ropgProducts summary').click()
+            check(p.locator('#ropgProducts tbody tr').count()==1561,'full-size expanded results contain all 1561 synthetic products')
+            check(p.locator('#ropgProducts thead th').count()==6,'full-size expanded results keep all six table columns')
+            p.locator('#ropgProducts summary').click()
+            check(p.locator('#ropgProducts tbody tr').count()==1561,'full-size results are preserved after closing the arrow')
+            check(p.locator('#ropgApprove').is_disabled(),'full-size local preview cannot accidentally approve master changes')
+            check(not errors,'full-size stale-CSS browser test has no JavaScript errors '+str(errors))
+        finally:ctx.close()
         browser.close()
 finally:
     server.shutdown()
