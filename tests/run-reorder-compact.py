@@ -90,11 +90,11 @@ try:
                     q='120 ('+m['unit']+')'
                     amount=[3000,1500,-200][j]
                     lines.append(','.join([csv_field(m['name']),'',csv_field(q),'0 SR',csv_field('0 ('+m['unit']+')'),'0 SR',csv_field(q),'0 SR','0 SR',str(amount)+' SR','','','']))
-                raw=('\\n'.join(lines)+'\\n').encode('utf-8')
+                raw=('\n'.join(lines)+'\n').encode('utf-8')
                 p.locator('#ropGenerator input[type=file]').set_input_files({'name':'Sample-From 01_10_2025 To 01_10_2026.csv','mimeType':'text/csv','buffer':raw})
                 check(not p.locator('#ropgGenerate').is_disabled(),label+' CSV parsed and generator enabled')
                 p.locator('#ropgGenerate').click()
-                check('Super 1' in p.locator('#ropGenerator .ropg-status').inner_text(),label+' profitability generated from profit values')
+                check('Medium 2' in p.locator('#ropGenerator .ropg-status').inner_text(),label+' profitability generated from profit values')
                 check(p.locator('#ropgProducts tbody tr').count()==3,label+' three source products in preview')
                 check(p.locator('#ropgApprove').is_disabled(),label+' production approval remains safely locked')
                 check(p.evaluate('JSON.stringify(state.master)')==master_before,label+' CSV preview does not modify master')
