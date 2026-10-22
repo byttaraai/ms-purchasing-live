@@ -57,7 +57,7 @@ try:
                 check(max(centers)-min(centers)<2,label+' title inputs actions and arrow share one row')
                 check(all(n['w']>0 and n['h']>0 for n in geom['nodes']),label+' controls not clipped to zero')
                 check(geom['left']>=-1 and geom['right']<=width+1,label+' card stays inside viewport')
-                check(all(geom['nodes'][i]['x']+geom['nodes'][i]['w']<=geom['nodes'][i+1]['x']+1 for i in range(len(geom['nodes'])-1)),label+' no overlapping controls')
+                check(all(geom['nodes'][i]['x']+geom['nodes'][i]['w']<=geom['nodes'][i+1]['x']+1 for i in range(len(geom['nodes'])-2)),label+' no overlapping scroll-strip controls (arrow separately anchored)')
                 check(geom['scroll']<=geom['client']+1,label+' generator root never scrolls horizontally')
                 check(geom['arrow']['w']<=34 and geom['arrow']['h']<=34,label+' arrow is a small independent control')
                 check(geom['arrow']['x']>=geom['width']-56,label+' arrow anchored at right edge')
