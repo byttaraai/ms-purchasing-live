@@ -59,9 +59,10 @@ try:
                 check(geom['left']>=-1 and geom['right']<=width+1,label+' card stays inside viewport')
                 check(all(geom['nodes'][i]['x']+geom['nodes'][i]['w']<=geom['nodes'][i+1]['x']+1 for i in range(len(geom['nodes'])-1)),label+' no overlapping controls')
                 if width>=1280:check(geom['scroll']<=geom['client']+1,label+' full desktop row fits without horizontal scroll')
-                for selector in ['#ropgUpload','#ropgGenerate','#ropgApprove']:
-                    check(p.locator(selector).is_disabled(),label+' action still disabled '+selector)
-                values=p.locator('#ropGenerator input').evaluate_all('(es)=>es.map(e=>e.value)')
+                check(not p.locator('#ropgUpload').is_disabled(),label+' CSV upload enabled')
+                for selector in ['#ropgGenerate','#ropgApprove']:
+                    check(p.locator(selector).is_disabled(),label+' unapproved action still disabled '+selector)
+                values=p.locator('#ropGenerator [data-rop-class]').evaluate_all('(es)=>es.map(e=>e.value)')
                 check(values==['30','25','20','15','5'],label+' draft example days unchanged')
                 p.get_by_label('Super coverage days',exact=True).fill('42')
                 summary=p.locator('#ropgProducts summary')

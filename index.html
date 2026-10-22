@@ -90,13 +90,13 @@
 (function(){
 'use strict';
 const root=document.getElementById('ropGenerator');
-if(!root)return;
+if(!root||typeof root.appendChild!=='function')return;
 const upload=document.getElementById('ropgUpload'),generate=document.getElementById('ropgGenerate'),approve=document.getElementById('ropgApprove');
 const status=root.querySelector('.ropg-status'),tbody=root.querySelector('tbody'),thead=root.querySelector('thead tr');
 const picker=document.createElement('input');picker.type='file';picker.accept='.csv,text/csv';picker.hidden=true;root.appendChild(picker);
 const multipliers=document.createElement('span');multipliers.className='ropg-multipliers';
 multipliers.innerHTML='<label>Super ×<input type="number" min="1.51" step=".1" value="3" data-m="super"></label><label>High ×<input type="number" min=".51" step=".1" value="1.5" data-m="high"></label><label>Medium ×<input type="number" min=".01" step=".1" value=".5" data-m="medium"></label>';
-root.querySelector('.ropg-inputs').appendChild(multipliers);
+root.querySelector('.ropg-table-scroll').prepend(multipliers);
 upload.disabled=false;upload.textContent='Upload 12-month CSV';upload.title='Import a complete 12-month product profitability report for preview only';
 generate.disabled=true;generate.title='Preview after uploading a valid report';approve.disabled=true;approve.title='Approval locked until audited atomic database update is implemented';
 let records=null,filename='';
