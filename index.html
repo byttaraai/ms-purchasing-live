@@ -92,62 +92,146 @@
 const root=document.getElementById('ropGenerator');
 if(!root||typeof root.appendChild!=='function')return;
 const upload=document.getElementById('ropgUpload'),generate=document.getElementById('ropgGenerate'),approve=document.getElementById('ropgApprove');
-const status=root.querySelector('.ropg-status'),tbody=root.querySelector('tbody'),thead=root.querySelector('thead tr');
+const status=root.querySelector('.ropg-status'),tbody=root.querySelector('tbody'),thead=root.querySelector('thead tr'),scroller=root.querySelector('.ropg-table-scroll');
 const picker=document.createElement('input');picker.type='file';picker.accept='.csv,text/csv';picker.hidden=true;root.appendChild(picker);
 const multipliers=document.createElement('span');multipliers.className='ropg-multipliers';
-multipliers.innerHTML='<label>Super ×<input type="number" min="1.51" step=".1" value="3" data-m="super"></label><label>High ×<input type="number" min=".51" step=".1" value="1.5" data-m="high"></label><label>Medium ×<input type="number" min=".01" step=".1" value=".5" data-m="medium"></label>';
-root.querySelector('.ropg-table-scroll').prepend(multipliers);
-upload.disabled=false;upload.textContent='Upload 12-month CSV';upload.title='Import a complete 12-month product profitability report for preview only';
-generate.disabled=true;generate.title='Preview after uploading a valid report';approve.disabled=true;approve.title='Approval locked until audited atomic database update is implemented';
-let records=null,filename='';
-const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+multipliers.innerHTML='<label>Super ×<input type="number" min="1.51" max="1000" step=".1" value="3" data-m="super"></label><label>High ×<input type="number" min=".51" max="1000" step=".1" value="1.5" data-m="high"></label><label>Medium ×<input type="number" min=".01" max="1000" step=".1" value=".5" data-m="medium"></label>';
+const resultInfo=document.createElement('div');resultInfo.className='ropg-result-info';resultInfo.textContent='Upload a 12-month sales CSV to calculate profitability and purchase-unit reorder points.';
+scroller.prepend(resultInfo);scroller.prepend(multipliers);
+upload.disabled=false;upload.textContent='Upload 12-month CSV';upload.title='Upload one complete 12-month product sales and profit CSV';
+generate.disabled=true;generate.title='Validate the report before generating';
+approve.disabled=true;approve.title='Approval requires a server-verified preview and an Admin account';
+let records=null,filename='',period=null,serverPreview=null,lastBody=null,busy=false;
+const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\u0027':'&#39;'}[c]));
 const normalized=s=>String(s||'').normalize('NFKC').replace(/\s+/g,' ').trim().toLocaleLowerCase('en');
+const unitKey=s=>String(s||'').replace(/[()\[\]]/g,' ').replace(/\s+/g,' ').trim().toLocaleLowerCase('en');
 function csv(text){
  const out=[];let row=[],cell='',quoted=false;
  for(let i=0;i<text.length;i++){const c=text[i];if(quoted){if(c==='"'&&text[i+1]==='"'){cell+='"';i++;}else if(c==='"')quoted=false;else cell+=c;}
  else if(c==='"')quoted=true;else if(c===','){row.push(cell);cell='';}else if(c==='\n'){row.push(cell);out.push(row);row=[];cell='';}else if(c!=='\r')cell+=c;}
- if(quoted)throw Error('Unterminated CSV quotation');if(cell||row.length){row.push(cell);out.push(row);}return out;
+ if(quoted)throw Error('Unterminated quoted CSV value');if(cell||row.length){row.push(cell);out.push(row);}return out;
 }
-function money(s){const n=Number(String(s||'').replace(/\u00a0/g,'').replace(/SR/gi,'').replace(/,/g,'').trim());return Number.isFinite(n)?n:null;}
-function quantity(s){let v=String(s||'').trim().replace(/,/g,'');const m=v.match(/^(-?\d+(?:\.\d+)?)\s+(.+)$/);return m?{qty:Number(m[1]),unit:m[2].trim()}:null;}
+function money(s){const t=String(s||'').replace(/\u00a0/g,'').replace(/SR/gi,'').replace(/,/g,'').trim();if(!t)return null;const n=Number(t);return Number.isFinite(n)?n:null;}
+function quantity(s){const m=String(s||'').trim().replace(/,/g,'').match(/^(-?\d+(?:\.\d+)?)\s+(.+)$/);return m?{qty:Number(m[1]),unit:m[2].trim()}:null;}
 function readRows(text){
- const a=csv(text.replace(/^\uFEFF/,''));if(a.length<4||a[0][0]!=='Product Name'||a[0][9]!=='Profit'||a[1][6]!=='Quantity')throw Error('Unexpected report header. Expected Product Name, Net Sales Quantity, Profit Value.');
- const rows=a.slice(2).filter(x=>x[0]&&normalized(x[0])!=='total').map((r,i)=>{const q=quantity(r[6]),p=money(r[9]);return {line:i+3,name:r[0].trim(),q,p};});
- if(!rows.length||rows.length>30000)throw Error('Invalid product row count');
- if(rows.some(r=>!r.q||!Number.isFinite(r.q.qty)||r.p===null))throw Error('Missing or invalid quantity/profit in report');
- const unique=new Set(rows.map(x=>normalized(x.name)));if(unique.size!==rows.length)throw Error('Duplicate product names in report; resolve before generating.');
+ const all=csv(text.replace(/^\uFEFF/,''));
+ if(all.length<4||all[0][0]!=='Product Name'||all[0][9]!=='Profit'||all[1][6]!=='Quantity')throw Error('Unexpected CSV headers; expected Product Name, Net Sales Quantity and Profit Value.');
+ const rows=all.slice(2).filter(x=>x[0]&&normalized(x[0])!=='total').map((r,i)=>({line:i+3,name:r[0].trim(),q:quantity(r[6]),p:money(r[9])}));
+ if(!rows.length||rows.length>5000)throw Error('Report must have 1–5000 product rows');
+ if(rows.some(r=>!r.q||!Number.isFinite(r.q.qty)||r.p===null||Math.abs(r.p)>1e12||Math.abs(r.q.qty)>1e12))throw Error('Missing, invalid or out-of-range product quantity/profit');
+ if(new Set(rows.map(r=>normalized(r.name))).size!==rows.length)throw Error('Duplicate product names must be resolved');
  return rows;
 }
-function setStatus(v){status.textContent=v;status.setAttribute('aria-live','polite');}
-upload.addEventListener('click',()=>picker.click());
-picker.addEventListener('change',async()=>{records=null;generate.disabled=true;approve.disabled=true;const f=picker.files[0];if(!f)return;try{
- if(!/\.csv$/i.test(f.name)||f.size>8e6)throw Error('Upload a CSV file smaller than 8MB.');
- records=readRows(await f.text());filename=f.name;
- if(!/From 01_10_2025 To 01_10_2026|From \d\d_\d\d_\d{4} To \d\d_\d\d_\d{4}/i.test(filename))throw Error('Report period cannot be verified from the filename. Use a 12-month date-range export.');
- generate.disabled=false;setStatus(records.length+' product rows loaded. Verify that the report covers exactly 12 months, all branches. Click Generate preview. No database writes.');
- }catch(e){setStatus('Import blocked: '+e.message);} });
-generate.addEventListener('click',()=>{try{
- if(!records)throw Error('Upload the CSV first');
- if(typeof state==='undefined'||!Array.isArray(state.master)||!state.master.length)throw Error('Master is not loaded. Sign in and refresh.');
- const factor=Object.fromEntries([...root.querySelectorAll('[data-m]')].map(e=>[e.dataset.m,Number(e.value)]));
- if(![factor.super,factor.high,factor.medium].every(Number.isFinite)||!(factor.super>factor.high&&factor.high>factor.medium&&factor.medium>0))throw Error('Profit multipliers must be Super > High > Medium > 0.');
- const positive=records.filter(r=>r.p>0),mean=positive.reduce((s,r)=>s+r.p,0)/positive.length;if(!Number.isFinite(mean)||mean<=0)throw Error('No profitable products.');
- const masterMap=new Map();for(const m of state.master){const key=normalized(m.product_name);if(!masterMap.has(key))masterMap.set(key,[]);masterMap.get(key).push(m);}
- const days=Object.fromEntries([...root.querySelectorAll('[data-rop-class]')].map(e=>[e.dataset.ropClass,Number(e.value)]));
- if(Object.values(days).some(v=>!Number.isInteger(v)||v<0||v>365))throw Error('Coverage days must be integers from 0 through 365.');
- const counts={Super:0,High:0,Medium:0,Low:0,Loss:0};let matched=0,convertible=0;
- const rows=records.map(r=>{const kind=r.p<=0?'Loss':r.p>=mean*factor.super?'Super':r.p>=mean*factor.high?'High':r.p>=mean*factor.medium?'Medium':'Low';counts[kind]++;
- const mm=masterMap.get(normalized(r.name))||[],m=mm.length===1?mm[0]:null;if(m)matched++;
- const purchase=m&&normalized(m.purchase_unit),sale=normalized(r.q.unit);
- // A factor is not applied automatically: its direction is not proven by a product-level unit contract.
- const safeUnit=Boolean(m&&purchase&&purchase===sale);
- const rop=safeUnit?Math.max(0,Math.ceil(r.q.qty/12/30*days[kind.toLowerCase()])):null;if(safeUnit)convertible++;
- return {r,kind,m,rop,safeUnit,problem:!m?(mm.length?'Duplicate master name':'Unmatched product name'):!safeUnit?'Unit conversion requires review':null};
+function parsePeriod(name){
+ const m=String(name).match(/From\s+(\d{2})_(\d{2})_(\d{4})\s+To\s+(\d{2})_(\d{2})_(\d{4})/i);
+ if(!m)throw Error('Report filename must include From DD_MM_YYYY To DD_MM_YYYY');
+ const start=new Date(Date.UTC(Number(m[3]),Number(m[2])-1,Number(m[1])));
+ const end=new Date(Date.UTC(Number(m[6]),Number(m[5])-1,Number(m[4])));
+ if(start.getUTCFullYear()!==Number(m[3])||start.getUTCMonth()!==Number(m[2])-1||start.getUTCDate()!==Number(m[1]))throw Error('Invalid start date');
+ if(end.getUTCFullYear()!==Number(m[6])||end.getUTCMonth()!==Number(m[5])-1||end.getUTCDate()!==Number(m[4]))throw Error('Invalid end date');
+ const expected=new Date(Date.UTC(start.getUTCFullYear(),start.getUTCMonth()+12,start.getUTCDate()));
+ if(expected.getTime()!==end.getTime())throw Error('Sales report must cover exactly 12 calendar months');
+ if(end.getTime()>Date.now()+86400000)throw Error('Report end date cannot be in the future');
+ return {start:start.toISOString().slice(0,10),end:end.toISOString().slice(0,10)};
+}
+function settings(){
+ const mult=Object.fromEntries([...root.querySelectorAll('[data-m]')].map(e=>[e.dataset.m,Number(e.value)]));
+ if(![mult.super,mult.high,mult.medium].every(Number.isFinite)||!(mult.super>mult.high&&mult.high>mult.medium&&mult.medium>0)||mult.super>1000)throw Error('Multipliers: Super > High > Medium > 0');
+ const cover=Object.fromEntries([...root.querySelectorAll('[data-rop-class]')].map(e=>[e.dataset.ropClass,Number(e.value)]));
+ if(Object.values(cover).some(v=>!Number.isInteger(v)||v<0||v>365))throw Error('Coverage days must be integers 0–365');
+ return {mult,cover};
+}
+function setStatus(s){status.textContent=s;status.setAttribute('aria-live','polite');resultInfo.textContent=s;}
+function invalidate(){serverPreview=null;lastBody=null;approve.disabled=true;}
+function rowsForServer(){
+ if(typeof state==='undefined'||!Array.isArray(state.master)||!state.master.length)throw Error('Master is not loaded. Sign in and refresh');
+ const lookup=new Map();
+ for(const m of state.master){const k=normalized(m.product_name);if(!lookup.has(k))lookup.set(k,[]);lookup.get(k).push(m);}
+ return records.map(r=>{const found=lookup.get(normalized(r.name))||[];return {name:r.name,code:found.length===1?found[0].product_code:null,profit:r.p,qty:r.q.qty,unit:r.q.unit,master:found.length===1?found[0]:null};});
+}
+function draw(rows){
+ thead.innerHTML='<th>Product</th><th>Net Profit (SAR)</th><th>Profitability</th><th>Avg. Monthly Sales</th><th>Reorder Point (Purchase Unit)</th><th>Status</th>';
+ tbody.innerHTML=rows.map(r=>'<tr><td>'+esc(r.name)+'</td><td>'+esc(Number(r.profit).toLocaleString('en-US',{maximumFractionDigits:2}))+'</td><td>'+esc(r.classification)+'</td><td>'+esc(Number(r.monthly_sales).toLocaleString('en-US',{maximumFractionDigits:3})+' '+r.report_unit)+'</td><td>'+esc(r.new_rop===null?'—':Number(r.new_rop).toLocaleString('en-US',{maximumFractionDigits:2})+(r.purchase_unit?' '+r.purchase_unit:''))+'</td><td>'+esc(r.review|| (r.changed?'Changed':'Unchanged'))+'</td></tr>').join('');
+ document.getElementById('ropgProducts').open=true;
+}
+function localPreview(rows,mult,cover){
+ const avg=records.filter(r=>r.p>0).reduce((a,r)=>a+r.p,0)/records.filter(r=>r.p>0).length;
+ if(!Number.isFinite(avg)||avg<=0)throw Error('Report has no positive profit');
+ let eligible=0,changed=0,skipped=0;const counts={Super:0,High:0,Medium:0,Low:0,Loss:0};
+ const results=rows.map(row=>{
+  const p=row.profit,classification=p<=0?'Loss':p>=avg*mult.super?'Super':p>=avg*mult.high?'High':p>=avg*mult.medium?'Medium':'Low';
+  counts[classification]++;
+  const m=row.master,unit=unitKey(row.unit);
+  const direct=m&&unit===unitKey(m.purchase_unit);
+  const option=m&&m.option_unit&&unit===unitKey(m.option_unit)&&Number(m.factor)>0;
+  let review=null,qty=null;
+  if(!m)review='Unmatched product';
+  else if(row.qty<0)review='Negative net quantity';
+  else if(direct)qty=row.qty;
+  else if(option)qty=row.qty/Number(m.factor);
+  else review='Unit conversion requires review';
+  const newRop=qty===null?null:Math.ceil(qty/12/30*cover[classification.toLowerCase()]);
+  if(review)skipped++;else eligible++;
+  const isChanged=!review&&(String(m.profitability_class||'')!==classification||Number(m.reorder_point)!==newRop||unitKey(m.reorder_point_unit)!==unitKey(m.purchase_unit));
+  if(isChanged)changed++;
+  return {name:row.name,profit:p,classification,monthly_sales:row.qty/12,report_unit:row.unit,new_rop:newRop,purchase_unit:m?.purchase_unit||null,review,changed:isChanged};
  });
- thead.innerHTML='<th>Product</th><th>Net profit (SAR)</th><th>Profitability</th><th>Avg monthly sales (report unit)</th><th>New ROP (purchase unit)</th><th>Review</th>';
- tbody.innerHTML=rows.map(x=>'<tr><td>'+esc(x.r.name)+'</td><td>'+esc(x.r.p.toLocaleString('en-US',{maximumFractionDigits:2}))+'</td><td>'+x.kind+'</td><td>'+esc((x.r.q.qty/12).toLocaleString('en-US',{maximumFractionDigits:3})+' '+x.r.q.unit)+'</td><td>'+esc(x.rop==null?'—':x.rop)+'</td><td>'+esc(x.problem||'Preview only')+'</td></tr>').join('');
- document.getElementById('ropgProducts').open=true;setStatus('Preview only | '+rows.length+' report products | '+matched+' unique name matches | '+convertible+' exact purchase-unit matches | mean profit '+mean.toFixed(2)+' SAR | Super '+counts.Super+' · High '+counts.High+' · Medium '+counts.Medium+' · Low '+counts.Low+' · Loss '+counts.Loss+'. Approval remains locked; no database writes.');
- }catch(e){setStatus('Generation blocked: '+e.message);} });
+ return {rows:results,eligible_rows:eligible,skipped_rows:skipped,changed_rows:changed,mean_positive_profit:avg,class_counts:counts};
+}
+function statusText(d,server){
+ const c=d.class_counts;
+ return (server?'Server verified':'Local preview only')+' · '+records.length+' products · '+d.eligible_rows+' eligible · '+d.skipped_rows+' need review · '+d.changed_rows+' changes · Avg profit '+Number(d.mean_positive_profit).toLocaleString('en-US',{maximumFractionDigits:2})+' SAR · Super '+c.Super+' · High '+c.High+' · Medium '+c.Medium+' · Low '+c.Low+' · Loss '+c.Loss;
+}
+const liveHost=()=>location.hostname==='byttaraai.github.io';
+upload.addEventListener('click',()=>picker.click());
+picker.addEventListener('change',async()=>{
+ invalidate();generate.disabled=true;records=null;const f=picker.files[0];if(!f)return;
+ try{
+  if(!/\.csv$/i.test(f.name)||f.size>8e6)throw Error('Upload a CSV smaller than 8MB');
+  const p=parsePeriod(f.name);const r=readRows(await f.text());
+  filename=f.name;period=p;records=r;generate.disabled=false;setStatus(r.length+' products loaded · '+p.start+' to '+p.end+' · Generate to preview. Nothing saved.');
+ }catch(e){setStatus('Upload blocked: '+e.message);}
+});
+root.querySelectorAll('[data-rop-class],[data-m]').forEach(input=>input.addEventListener('input',()=>{
+ invalidate();if(records)setStatus('Settings changed. Generate a fresh preview before approval.');
+}));
+generate.addEventListener('click',async()=>{
+ if(busy)return;busy=true;generate.disabled=true;invalidate();
+ try{
+  if(!records||!period)throw Error('Upload a valid 12-month CSV first');
+  if(typeof state==='undefined'||!Array.isArray(state.master)||!state.master.length)throw Error('Master data is not loaded');
+  const {mult,cover}=settings(),matched=rowsForServer();
+  if(liveHost()&&state.mode==='live'){
+    setStatus('Validating against live Master database; no changes yet.');
+    const body={p_rows:matched.map(({name,code,profit,qty,unit})=>({name,code,profit,qty,unit})),
+      p_start:period.start,p_end:period.end,p_cover:cover,p_mult:mult,p_file:filename,
+      p_revision:state.revision,p_request:null,p_approve:false};
+    const d=await rpc('purchasing_sales_generator_v104',body);
+    if(!d||!d.ok||d.approved)throw Error('Server did not confirm a safe preview');
+    lastBody=body;serverPreview=d;draw(d.rows);setStatus(statusText(d,true));
+    if(state.role==='admin'&&d.eligible_rows>0){approve.disabled=false;approve.title='Approve the server-verified eligible products in one atomic transaction';}
+  }else{
+    const d=localPreview(matched,mult,cover);draw(d.rows);setStatus(statusText(d,false)+' · Approval disabled outside live authenticated server');
+  }
+ }catch(e){setStatus('Generate blocked: '+(e?.message||String(e)));}finally{busy=false;generate.disabled=!records;}
+});
+approve.addEventListener('click',async()=>{
+ if(busy||!serverPreview||!lastBody||state?.role!=='admin')return;
+ if(!liveHost())return;
+ const d=serverPreview;
+ const msg='Approve '+d.changed_rows+' changed products in the Master Database?\n'+d.eligible_rows+' eligible products; '+d.skipped_rows+' unmatched or unverified products will NOT be updated.\n\nThis updates Profitability and Reorder Point together. It cannot be undone automatically.';
+ if(!window.confirm(msg))return;
+ busy=true;approve.disabled=true;generate.disabled=true;upload.disabled=true;
+ try{
+  const req=typeof crypto!=='undefined'&&typeof crypto.randomUUID==='function'?crypto.randomUUID():null;
+  if(!req)throw Error('Secure request ID is unavailable');
+  const out=await rpc('purchasing_sales_generator_v104',{...lastBody,p_request:req,p_approve:true});
+  if(!out||!out.ok||!out.approved)throw Error('Server did not confirm approval');
+  serverPreview=null;lastBody=null;setStatus('Approved · '+out.changed_rows+' master products updated atomically · '+out.skipped_rows+' excluded for review · Master revision '+out.master_revision+'. Refreshing dashboard.');
+  if(typeof loadLive==='function')await loadLive();
+ }catch(e){setStatus('Approval blocked; no partial changes committed: '+(e?.message||String(e)));}
+ finally{busy=false;upload.disabled=false;generate.disabled=!records;approve.disabled=true;}
+});
 })();
 </script>
 </section></section>
