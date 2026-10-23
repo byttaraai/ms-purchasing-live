@@ -1,0 +1,43 @@
+name: Prepare approved UI108 polish source blobs
+on:
+  push:
+    branches: [prepare/generator-ui108]
+permissions:
+  contents: write
+jobs:
+  assemble:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Reproduce exact local source and create unreferenced blobs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          import base64,hashlib,json,pathlib,subprocess,zlib
+          root=pathlib.Path('.')
+          changes=json.loads(zlib.decompress(base64.b64decode((root/'maintenance/ux108-changes.b64').read_text())))
+          output=[]
+          for spec in changes:
+              source=(root/spec['source']).read_bytes()
+              assert hashlib.sha256(source).hexdigest()==spec['base_sha256'],spec['source']
+              lines=source.decode().splitlines(True)
+              for edit in reversed(spec['edits']):
+                  lines[edit['i']:edit['j']]=[edit['text']]
+              content=''.join(lines).encode()
+              assert hashlib.sha256(content).hexdigest()==spec['output_sha256'],spec['target']
+              assert hashlib.sha1(b'blob '+str(len(content)).encode()+b'\0'+content).hexdigest()==spec['blob']
+              (root/spec['target']).write_bytes(content)
+              output.append((spec,content))
+          subprocess.run(['node','--check','assets/js/reorder-ux-v108.js'],check=True)
+          subprocess.run(['node','--test','tests/reorder-compact.cjs'],check=True)
+          subprocess.run(['python3','-m','py_compile','tests/run-reorder-compact.py'],check=True)
+          evidence=[]
+          for spec,content in output:
+              result=subprocess.run(['gh','api','--method','POST','repos/byttaraai/ms-purchasing-live/git/blobs','--input','-'],input=json.dumps({'content':base64.b64encode(content).decode(),'encoding':'base64'}),text=True,capture_output=True,check=True)
+              blob=json.loads(result.stdout)['sha']
+              assert blob==spec['blob']
+              evidence.append({'path':spec['target'],'sha':blob})
+          print('UI108_BLOBS='+json.dumps(evidence))
+          PY
