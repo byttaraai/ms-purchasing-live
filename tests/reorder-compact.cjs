@@ -4,8 +4,8 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const crypto=require('node:crypto');
 const html=fs.readFileSync('index.html','utf8');
-const css=fs.readFileSync('assets/css/reorder-generator-v107.css','utf8');
-const ui=fs.readFileSync('assets/js/reorder-ux-v107.js','utf8');
+const css=fs.readFileSync('assets/css/reorder-generator-v108.css','utf8');
+const ui=fs.readFileSync('assets/js/reorder-ux-v108.js','utf8');
 const {as102}=require('./reorder-preview-v103.cjs');
 const sha=value=>crypto.createHash('sha256').update(value).digest('hex');
 function sourceFunction(text,name){
@@ -41,6 +41,20 @@ test('scoped CSS fixes sticky header and independent toolbar without global over
  assert(css.includes('#ropGenerator .ux107-product-name'));
  assert(css.includes('#ropGenerator .ux107-dialog::backdrop'));
  assert(!/!important|@import|url\(/i.test(css));
- assert(html.includes('assets/css/reorder-generator-v107.css?v=107'));
- assert(html.includes('assets/js/reorder-ux-v107.js?v=107'));
+ assert(html.includes('assets/css/reorder-generator-v108.css?v=108'));
+ assert(html.includes('assets/js/reorder-ux-v108.js?v=108'));
+});
+
+test('Build108 final polish remains presentation only',()=>{
+ assert(css.includes('.ux107-table td{padding-top:6px;padding-bottom:6px}'));
+ assert(css.includes('prefers-reduced-motion:reduce'));
+ assert(ui.includes("dialog('ropgReportDialog','Report details')"));
+ assert(ui.includes('Preview verified \\u00b7 Not saved'));
+ assert(ui.includes('minimumFractionDigits:trim?0:precision'));
+ assert(ui.includes('number(r.monthly_sales,3,true)'));
+ assert(ui.includes('approve.classList.toggle(\'primary\',primaryApprove)'));
+ assert(ui.includes('aria-busy'));
+ assert(html.includes('ux.report({file:filename,start:period.start,end:period.end})'));
+ assert(html.includes('ux.calculating(true)'));
+ assert(html.includes('ux.calculating(false)'));
 });
