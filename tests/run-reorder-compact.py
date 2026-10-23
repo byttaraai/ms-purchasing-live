@@ -34,7 +34,7 @@ mock_extra=r'''
 window.qaGeneratorCalls=[];window.qaRpcFail=false;window.qaDelay=0;
 const oldQaFetch=window.fetch;
 window.fetch=async(url,options)=>{
- if(!String(url).endsWith('/purchasing_sales_generator_v110'))return oldQaFetch(url,options);
+ if(!String(url).endsWith('/purchasing_sales_generator_v111'))return oldQaFetch(url,options);
  const a=JSON.parse(options.body);qaGeneratorCalls.push(structuredClone(a));
  if(qaDelay)await new Promise(r=>setTimeout(r,qaDelay));
  if(qaRpcFail)return new Response(JSON.stringify({message:'Synthetic server validation failed'}),{status:400});
@@ -65,6 +65,10 @@ def csv_data(n=81):
   q='"120 '+unit+'"';name='"'+name.replace('"','""')+'"'
   rows.append(','.join([name,'',q,'0 SR','"0 '+unit+'"','0 SR',q,'0 SR','0 SR',str(profit)+' SR','','','']))
  return {'name':'Synthetic-From 01_10_2025 To 01_10_2026.csv','mimeType':'text/csv','buffer':('\n'.join(rows)+'\n').encode()}
+def recent_csv_data(n=81):
+ report=csv_data(n)
+ report['name']='Synthetic-From 01_06_2026 To 01_10_2026.csv'
+ return report
 def start(browser,width=1440,live=False):
  ctx=browser.new_context(viewport={'width':width,'height':1000 if width>700 else 844})
  errors=[];external=[]
@@ -102,7 +106,9 @@ try:
     geom=p.evaluate("()=>{const r=document.querySelector('#ropGenerator').getBoundingClientRect();return [...document.querySelectorAll('#ropgUpload,#ropgGenerate,#ropgApprove,#ropgSettings,#ropgProducts summary')].map(e=>{const b=e.getBoundingClientRect();return {x:b.x,right:b.right,y:b.y,width:b.width,leftLimit:r.left,rightLimit:r.right}})}")
     check(all(g['x']>=g['leftLimit'] and g['right']<=g['rightLimit']+1 for g in geom),str(width)+' all actions pinned visibly inside card')
     check(max(g['y'] for g in geom)-min(g['y'] for g in geom)<4,str(width)+' fixed actions share one row')
-    p.locator('#ropGenerator input[type=file]').set_input_files(csv_data())
+    p.locator('#ropGenerator input[type=file]').first.set_input_files(csv_data())
+    p.locator('#ropGenerator input[type=file]').nth(1).set_input_files(recent_csv_data())
+    p.locator('#rop111Complete').check()
     wait(p,"document.querySelectorAll('#ropgProducts tbody tr').length===25 && !document.querySelector('#ropgGenerate').disabled")
     check(p.locator('#ropgSummary [data-filter]').count()==4,str(width)+' single summary of four filter chips')
     check(not p.locator('#ropgProducts').evaluate('(e)=>e.open'),str(width)+' imported preview remains collapsed')
@@ -163,7 +169,9 @@ try:
   try:
    original=p.evaluate('JSON.stringify(state.master)')
    p.evaluate('qaDelay=900')
-   p.locator('#ropGenerator input[type=file]').set_input_files(csv_data())
+   p.locator('#ropGenerator input[type=file]').first.set_input_files(csv_data())
+   p.locator('#ropGenerator input[type=file]').nth(1).set_input_files(recent_csv_data())
+   p.locator('#rop111Complete').check()
    wait(p,"document.querySelector('#ropgGenerate').getAttribute('aria-busy')==='true'")
    check(p.locator('#ropgGenerate').inner_text().strip()=='Calculating\u2026','button clearly says Calculating during read-only verification')
    check(p.locator('#ropgApprove').is_disabled(),'approval stays gated during verification')
@@ -216,7 +224,9 @@ try:
   ctx,p,errors,external=start(browser,1440,live=True)
   try:
    p.evaluate('qaRpcFail=true;qaDelay=150')
-   p.locator('#ropGenerator input[type=file]').set_input_files(csv_data())
+   p.locator('#ropGenerator input[type=file]').first.set_input_files(csv_data())
+   p.locator('#ropGenerator input[type=file]').nth(1).set_input_files(recent_csv_data())
+   p.locator('#rop111Complete').check()
    wait(p,"document.querySelector('#ropgNotice').textContent.includes('Server verification unavailable') && !document.querySelector('#ropgGenerate').disabled")
    check(p.locator('#ropgApprove').is_disabled() and not p.locator('#ropgApprove').evaluate('(e)=>e.classList.contains("primary")'),'failed verification never highlights or unlocks Approve')
    check('Not saved' in p.locator('.ux107-verification').inner_text(),'failed verification remains visibly unsaved')
@@ -228,7 +238,7 @@ try:
    p.locator('#ropgProducts summary').click()
    p.locator('#ropGenerator').screenshot(path=str(screens/'verified.png'))
    # Rendering decimals never changes the original data used for purchase decisions.
-   p.locator('#ropGenerator input[type=file]').set_input_files({'name':'bad.csv','mimeType':'text/csv','buffer':b'invalid'})
+   p.locator('#ropGenerator input[type=file]').first.set_input_files({'name':'bad.csv','mimeType':'text/csv','buffer':b'invalid'})
    wait(p,"document.querySelector('#ropgNotice').textContent.includes('Upload blocked')")
    check(p.locator('#ropgApprove').is_disabled() and p.locator('#ropgSummary').is_hidden(),'invalid replacement clears old preview and approval')
    check(p.locator('#ropgGenerate').get_attribute('aria-busy')=='false','invalid file never leaves a calculating spinner')
@@ -236,7 +246,9 @@ try:
   finally:ctx.close()
   ctx,p,errors,external=start(browser,1440)
   try:
-   p.locator('#ropGenerator input[type=file]').set_input_files(csv_data(1561))
+   p.locator('#ropGenerator input[type=file]').first.set_input_files(csv_data(1561))
+   p.locator('#ropGenerator input[type=file]').nth(1).set_input_files(recent_csv_data(1561))
+   p.locator('#rop111Complete').check()
    wait(p,"document.querySelectorAll('#ropgProducts tbody tr').length===25 && !document.querySelector('#ropgGenerate').disabled")
    check(p.locator('#ropgSummary [data-filter=all] strong').inner_text()=='1,561','full size report retains all product counts')
    p.locator('#ropgProducts summary').click()
