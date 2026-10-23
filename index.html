@@ -121,7 +121,7 @@ let recentRecords=null,recentPeriod=null,recentFilename='';
 let records=null,filename='',period=null,serverPreview=null,lastBody=null,busy=false,previewSerial=0,debounceTimer=null;
 const ux=window.ROPGeneratorUX108.mount(root);
 root.insertBefore(recentPanel,root.querySelector('#ropgProducts'));
-root.querySelector('.ropg-version').textContent='v111';
+root.querySelector('.ropg-version').textContent='v112';
 
 const unitReview=window.ROPGeneratorUnitReview109.mount(root,{
  canEdit:()=>Boolean(serverPreview&&lastBody&&state?.mode==='live'&&state?.role==='admin'&&location.hostname==='byttaraai.github.io'&&!busy),
@@ -183,7 +183,7 @@ const nameMatch110=window.ROPGeneratorNameMatch110.mount(root,{
  }
 });
 
-root.querySelector('.ropg-version').textContent='v111';
+root.querySelector('.ropg-version').textContent='v112';
 const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\u0027':'&#39;'}[c]));
 const normalized=s=>String(s||'').normalize('NFKC').replace(/\s+/g,' ').trim().toLocaleLowerCase('en');
 const unitKey=s=>String(s||'').replace(/[()\[\]]/g,' ').replace(/\s+/g,' ').trim().toLocaleLowerCase('en');
@@ -302,7 +302,7 @@ async function generatePreview(){
      p_recent_rows:recentMatched,p_recent_start:recentPeriod.start,p_recent_end:recentPeriod.end,p_recent_complete:true,
      p_revision:state.revision,p_request:null,p_approve:false};
    try{
-    const d=await rpc('purchasing_sales_generator_v111',body);
+    const d=await rpc('purchasing_sales_generator_v112',body);
     if(token!==previewSerial)return;
     if(!d||!d.ok||d.approved||!Array.isArray(d.rows))throw Error('Server did not return a valid read-only preview');
     lastBody=body;serverPreview=d;draw(d.rows);ux.summary(d,true);
@@ -314,7 +314,7 @@ async function generatePreview(){
    }catch(error){
     if(token!==previewSerial)return;
     serverPreview=null;lastBody=null;approve.disabled=true;ux.summary(local,false);
-    setStatus(statusText(local,false)+' · Server verification unavailable: '+(error?.message||String(error))+' · Nothing saved. Approval remains disabled.');
+    setStatus(statusText(local,false)+' · Estimated counts are NOT server-verified · Server verification unavailable: '+(error?.message||String(error))+' · Nothing saved. Approval remains disabled.');
    }
   }
  }catch(error){
@@ -391,7 +391,7 @@ approve.addEventListener('click',async()=>{
  try{
   const req=typeof crypto!=='undefined'&&typeof crypto.randomUUID==='function'?crypto.randomUUID():null;
   if(!req)throw Error('Secure request ID is unavailable');
-  const out=await rpc('purchasing_sales_generator_v111',{...lastBody,p_request:req,p_approve:true});
+  const out=await rpc('purchasing_sales_generator_v112',{...lastBody,p_request:req,p_approve:true});
   if(!out||!out.ok||!out.approved)throw Error('Server did not confirm approval');
   serverPreview=null;lastBody=null;ux.saved(out);setStatus('Approved · '+out.changed_rows+' master products updated atomically · '+out.skipped_rows+' excluded for review · Master revision '+out.master_revision+'. Refreshing dashboard.');
   if(typeof loadLive==='function'){try{await loadLive();}catch(refreshError){setStatus('Approved \u00b7 '+out.changed_rows+' products saved. Dashboard refresh failed; refresh the page before another update.');}}
