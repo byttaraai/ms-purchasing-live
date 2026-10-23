@@ -34,7 +34,7 @@ mock_extra=r'''
 window.qaGeneratorCalls=[];window.qaRpcFail=false;window.qaDelay=0;
 const oldQaFetch=window.fetch;
 window.fetch=async(url,options)=>{
- if(!String(url).endsWith('/purchasing_sales_generator_v111'))return oldQaFetch(url,options);
+ if(!String(url).endsWith('/purchasing_sales_generator_v112'))return oldQaFetch(url,options);
  const a=JSON.parse(options.body);qaGeneratorCalls.push(structuredClone(a));
  if(qaDelay)await new Promise(r=>setTimeout(r,qaDelay));
  if(qaRpcFail)return new Response(JSON.stringify({message:'Synthetic server validation failed'}),{status:400});
