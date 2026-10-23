@@ -91,7 +91,8 @@
   <p class="ropg-note">These are draft example days, not approved settings. The 172 unclassified products are excluded until their classification is updated. Confirmed zero sales can generate zero ROP; missing sales data is never treated as zero.</p>
   <div class="ropg-status" role="status" hidden>Waiting for a real sales report. No calculation or database update has been performed.</div>
   <details class="ropg-details" id="ropgProducts"><summary><span><strong>Products &amp; Generated Reorder Points</strong><small>Collapsed by default · Opens for review</small></span><span class="ropg-chevron" aria-hidden="true">⌄</span></summary><div class="ropg-table-scroll"><table><thead hidden><tr><th>Product</th><th>Profitability</th><th>Avg. monthly sales</th><th>Current ROP</th><th>Generated ROP</th><th>Change</th></tr></thead><tbody><tr><td colspan="6" class="ropg-empty">No generated results yet. Upload a 12-month sales report to generate a read-only preview.</td></tr></tbody></table></div></details>
-<script src="assets/js/reorder-ux-v108.js?v=108"></script><script>
+<script src="assets/js/reorder-ux-v108.js?v=108"></script>
+<script src="assets/js/reorder-unit-review-v109.js?v=109"></script><script>
 (function(){
 'use strict';
 const root=document.getElementById('ropGenerator');
@@ -108,6 +109,35 @@ generate.disabled=true;generate.title='Validate the report before generating';
 approve.disabled=true;approve.title='Approval requires a server-verified preview and an Admin account';
 let records=null,filename='',period=null,serverPreview=null,lastBody=null,busy=false,previewSerial=0,debounceTimer=null;
 const ux=window.ROPGeneratorUX108.mount(root);
+
+const unitReview=window.ROPGeneratorUnitReview109.mount(root,{
+ canEdit:()=>Boolean(serverPreview&&lastBody&&state?.mode==='live'&&state?.role==='admin'&&location.hostname==='byttaraai.github.io'&&!busy),
+ save:async({code,reportUnit,multiplier})=>{
+  if(busy||!serverPreview||!lastBody||state?.role!=='admin'||state?.mode!=='live'||location.hostname!=='byttaraai.github.io')
+    throw Error('Admin access and a verified preview are required');
+  const matches=lastBody.p_rows.filter(r=>r.code===code&&unitKey(r.unit)===unitKey(reportUnit));
+  if(matches.length!==1)throw Error('Product or report unit no longer matches the verified preview');
+  const request=typeof crypto!=='undefined'&&typeof crypto.randomUUID==='function'?crypto.randomUUID():null;
+  if(!request)throw Error('Secure request identifier unavailable');
+  busy=true;approve.disabled=true;generate.disabled=true;upload.disabled=true;
+  let saved;
+  try{
+   saved=await rpc('purchasing_sales_unit_rule_v109',{
+    p_code:code,p_report_unit:reportUnit,p_purchase_multiplier:multiplier,
+    p_expected_revision:state.revision,p_request:request
+   });
+   if(!saved?.ok)throw Error('Server did not confirm the unit decision');
+   invalidate();
+   if(typeof loadLive!=='function')throw Error('Unit decision saved. Reload this page to verify the Master revision');
+   try{await loadLive();}catch(err){throw Error('Unit decision saved, but refresh failed. Reload before approval');}
+  }finally{
+   busy=false;upload.disabled=false;generate.disabled=!records;
+  }
+  await generatePreview();
+  return saved;
+ }
+});
+
 const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\u0027':'&#39;'}[c]));
 const normalized=s=>String(s||'').normalize('NFKC').replace(/\s+/g,' ').trim().toLocaleLowerCase('en');
 const unitKey=s=>String(s||'').replace(/[()\[\]]/g,' ').replace(/\s+/g,' ').trim().toLocaleLowerCase('en');
@@ -205,7 +235,7 @@ async function generatePreview(){
      p_start:period.start,p_end:period.end,p_cover:cover,p_mult:mult,p_file:filename,
      p_revision:state.revision,p_request:null,p_approve:false};
    try{
-    const d=await rpc('purchasing_sales_generator_v104',body);
+    const d=await rpc('purchasing_sales_generator_v109',body);
     if(token!==previewSerial)return;
     if(!d||!d.ok||d.approved||!Array.isArray(d.rows))throw Error('Server did not return a valid read-only preview');
     lastBody=body;serverPreview=d;draw(d.rows);ux.summary(d,true);
@@ -264,7 +294,7 @@ approve.addEventListener('click',async()=>{
  try{
   const req=typeof crypto!=='undefined'&&typeof crypto.randomUUID==='function'?crypto.randomUUID():null;
   if(!req)throw Error('Secure request ID is unavailable');
-  const out=await rpc('purchasing_sales_generator_v104',{...lastBody,p_request:req,p_approve:true});
+  const out=await rpc('purchasing_sales_generator_v109',{...lastBody,p_request:req,p_approve:true});
   if(!out||!out.ok||!out.approved)throw Error('Server did not confirm approval');
   serverPreview=null;lastBody=null;ux.saved(out);setStatus('Approved · '+out.changed_rows+' master products updated atomically · '+out.skipped_rows+' excluded for review · Master revision '+out.master_revision+'. Refreshing dashboard.');
   if(typeof loadLive==='function'){try{await loadLive();}catch(refreshError){setStatus('Approved \u00b7 '+out.changed_rows+' products saved. Dashboard refresh failed; refresh the page before another update.');}}

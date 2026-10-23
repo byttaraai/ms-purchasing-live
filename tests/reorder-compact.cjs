@@ -22,7 +22,7 @@ test('Build106 parser, maths, units, matching and report dates remain exact',()=
  for(const [name,hash] of Object.entries(expected))assert.equal(sha(sourceFunction(html,name)),hash,name);
  assert(html.includes("const liveHost=()=>location.hostname==='byttaraai.github.io';"));
  assert(html.includes("state.role==='admin'&&d.eligible_rows>0&&d.changed_rows>0"));
- assert(html.includes("const out=await rpc('purchasing_sales_generator_v104',{...lastBody,p_request:req,p_approve:true});"));
+ assert(html.includes("const out=await rpc('purchasing_sales_generator_v109',{...lastBody,p_request:req,p_approve:true});"));
  assert(html.includes('p_revision:state.revision,p_request:null,p_approve:false'));
 });
 test('presentation cannot make requests or recalculate product decisions',()=>{
@@ -57,4 +57,18 @@ test('Build108 final polish remains presentation only',()=>{
  assert(html.includes('ux.report({file:filename,start:period.start,end:period.end})'));
  assert(html.includes('ux.calculating(true)'));
  assert(html.includes('ux.calculating(false)'));
+});
+
+test('Build109 uses verified aliases while preserving explicit review decisions',()=>{
+ const addon=fs.readFileSync('assets/js/reorder-unit-review-v109.js','utf8');
+ assert(html.includes('assets/js/reorder-unit-review-v109.js?v=109'));
+ assert(html.includes("rpc('purchasing_sales_generator_v109'"));
+ assert(html.includes("rpc('purchasing_sales_unit_rule_v109'"));
+ assert(html.includes('p_expected_revision:state.revision'));
+ assert(addon.includes('global.ROPGeneratorUnitReview109'));
+ assert(addon.includes('Save unit decision &amp; recalculate'));
+ assert(addon.includes("canEdit()"));
+ assert(addon.includes('equals how many'));
+ assert(html.includes('saved=await rpc'));
+ assert(html.includes('await generatePreview();'));
 });
