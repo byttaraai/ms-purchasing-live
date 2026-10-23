@@ -22,7 +22,7 @@ test('Build106 parser, maths, units, matching and report dates remain exact',()=
  for(const [name,hash] of Object.entries(expected))assert.equal(sha(sourceFunction(html,name)),hash,name);
  assert(html.includes("const liveHost=()=>location.hostname==='byttaraai.github.io';"));
  assert(html.includes("state.role==='admin'&&d.eligible_rows>0&&d.changed_rows>0"));
- assert(html.includes("const out=await rpc('purchasing_sales_generator_v109',{...lastBody,p_request:req,p_approve:true});"));
+ assert(html.includes("const out=await rpc('purchasing_sales_generator_v110',{...lastBody,p_request:req,p_approve:true});"));
  assert(html.includes('p_revision:state.revision,p_request:null,p_approve:false'));
 });
 test('presentation cannot make requests or recalculate product decisions',()=>{
@@ -62,7 +62,7 @@ test('Build108 final polish remains presentation only',()=>{
 test('Build109 uses verified aliases while preserving explicit review decisions',()=>{
  const addon=fs.readFileSync('assets/js/reorder-unit-review-v109.js','utf8');
  assert(html.includes('assets/js/reorder-unit-review-v109.js?v=109'));
- assert(html.includes("rpc('purchasing_sales_generator_v109'"));
+ assert(html.includes("rpc('purchasing_sales_generator_v110'"));
  assert(html.includes("rpc('purchasing_sales_unit_rule_v109'"));
  assert(html.includes('p_expected_revision:state.revision'));
  assert(addon.includes('global.ROPGeneratorUnitReview109'));
@@ -71,4 +71,18 @@ test('Build109 uses verified aliases while preserving explicit review decisions'
  assert(addon.includes('equals how many'));
  assert(html.includes('saved=await rpc'));
  assert(html.includes('await generatePreview();'));
+});
+
+test('Build110 match-to-Master requires an explicit authorized selection',()=>{
+ const addon=fs.readFileSync('assets/js/reorder-name-review-v110.js','utf8');
+ assert(html.includes('assets/js/reorder-name-review-v110.js?v=110'));
+ assert(html.includes("rpc('purchasing_sales_name_match_v110'"));
+ assert(html.includes("rpc('purchasing_sales_generator_v110'"));
+ assert(html.includes('p_expected_revision:state.revision'));
+ assert(addon.includes('ROPGeneratorNameMatch110'));
+ assert(addon.includes('Confirm match &amp; recalculate'));
+ assert(addon.includes('Find Master product by name or code'));
+ assert(addon.includes('Suggestions are not automatic matches.'));
+ assert(addon.includes('new Option('));
+ assert(!addon.includes('fetch(') && !addon.includes('rpc('));
 });

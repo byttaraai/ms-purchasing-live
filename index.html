@@ -92,7 +92,8 @@
   <div class="ropg-status" role="status" hidden>Waiting for a real sales report. No calculation or database update has been performed.</div>
   <details class="ropg-details" id="ropgProducts"><summary><span><strong>Products &amp; Generated Reorder Points</strong><small>Collapsed by default · Opens for review</small></span><span class="ropg-chevron" aria-hidden="true">⌄</span></summary><div class="ropg-table-scroll"><table><thead hidden><tr><th>Product</th><th>Profitability</th><th>Avg. monthly sales</th><th>Current ROP</th><th>Generated ROP</th><th>Change</th></tr></thead><tbody><tr><td colspan="6" class="ropg-empty">No generated results yet. Upload a 12-month sales report to generate a read-only preview.</td></tr></tbody></table></div></details>
 <script src="assets/js/reorder-ux-v108.js?v=108"></script>
-<script src="assets/js/reorder-unit-review-v109.js?v=109"></script><script>
+<script src="assets/js/reorder-unit-review-v109.js?v=109"></script>
+<script src="assets/js/reorder-name-review-v110.js?v=110"></script><script>
 (function(){
 'use strict';
 const root=document.getElementById('ropGenerator');
@@ -130,6 +131,38 @@ const unitReview=window.ROPGeneratorUnitReview109.mount(root,{
    invalidate();
    if(typeof loadLive!=='function')throw Error('Unit decision saved. Reload this page to verify the Master revision');
    try{await loadLive();}catch(err){throw Error('Unit decision saved, but refresh failed. Reload before approval');}
+  }finally{
+   busy=false;upload.disabled=false;generate.disabled=!records;
+  }
+  await generatePreview();
+  return saved;
+ }
+});
+
+const nameMatch110=window.ROPGeneratorNameMatch110.mount(root,{
+ canEdit:()=>Boolean(serverPreview&&lastBody&&state?.mode==='live'&&state?.role==='admin'&&location.hostname==='byttaraai.github.io'&&!busy),
+ getMaster:()=>window.msAudit?.getState?.()?.master||state?.master||[],
+ save:async({reportName,productCode})=>{
+  if(busy||!serverPreview||!lastBody||state?.role!=='admin'||state?.mode!=='live'||location.hostname!=='byttaraai.github.io')
+   throw Error('Admin access and a verified preview are required');
+  const reportMatches=lastBody.p_rows.filter(r=>String(r.name||'').normalize('NFKC').replace(/\s+/g,' ').trim().toLowerCase()===String(reportName).normalize('NFKC').replace(/\s+/g,' ').trim().toLowerCase());
+  if(reportMatches.length!==1)throw Error('Report product has changed. Recalculate before matching');
+  if(!state.master.some(x=>x.product_code===productCode))throw Error('Selected code is no longer in the Master');
+  if(lastBody.p_rows.some(x=>x.code===productCode&&x.name!==reportName))
+   throw Error('This Master product already appears as a separate report row. Resolve duplicate sales rows first');
+  const request=typeof crypto!=='undefined'&&typeof crypto.randomUUID==='function'?crypto.randomUUID():null;
+  if(!request)throw Error('Secure request identifier unavailable');
+  busy=true;approve.disabled=true;generate.disabled=true;upload.disabled=true;
+  let saved;
+  try{
+   saved=await rpc('purchasing_sales_name_match_v110',{
+    p_report_name:reportName,p_product_code:productCode,
+    p_expected_revision:state.revision,p_request:request
+   });
+   if(!saved?.ok)throw Error('Server did not confirm the product match');
+   invalidate();
+   if(typeof loadLive!=='function')throw Error('Match saved. Reload to verify the latest Master revision');
+   try{await loadLive();}catch(e){throw Error('Match saved, but the Master refresh failed. Reload before approval');}
   }finally{
    busy=false;upload.disabled=false;generate.disabled=!records;
   }
@@ -235,7 +268,7 @@ async function generatePreview(){
      p_start:period.start,p_end:period.end,p_cover:cover,p_mult:mult,p_file:filename,
      p_revision:state.revision,p_request:null,p_approve:false};
    try{
-    const d=await rpc('purchasing_sales_generator_v109',body);
+    const d=await rpc('purchasing_sales_generator_v110',body);
     if(token!==previewSerial)return;
     if(!d||!d.ok||d.approved||!Array.isArray(d.rows))throw Error('Server did not return a valid read-only preview');
     lastBody=body;serverPreview=d;draw(d.rows);ux.summary(d,true);
@@ -294,7 +327,7 @@ approve.addEventListener('click',async()=>{
  try{
   const req=typeof crypto!=='undefined'&&typeof crypto.randomUUID==='function'?crypto.randomUUID():null;
   if(!req)throw Error('Secure request ID is unavailable');
-  const out=await rpc('purchasing_sales_generator_v109',{...lastBody,p_request:req,p_approve:true});
+  const out=await rpc('purchasing_sales_generator_v110',{...lastBody,p_request:req,p_approve:true});
   if(!out||!out.ok||!out.approved)throw Error('Server did not confirm approval');
   serverPreview=null;lastBody=null;ux.saved(out);setStatus('Approved · '+out.changed_rows+' master products updated atomically · '+out.skipped_rows+' excluded for review · Master revision '+out.master_revision+'. Refreshing dashboard.');
   if(typeof loadLive==='function'){try{await loadLive();}catch(refreshError){setStatus('Approved \u00b7 '+out.changed_rows+' products saved. Dashboard refresh failed; refresh the page before another update.');}}
