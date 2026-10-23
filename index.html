@@ -78,11 +78,11 @@
   <div class="ropg-controls" role="group" aria-label="Reorder generator controls; horizontally scroll on smaller screens">
   <div class="ropg-head"><div><span class="ropg-kicker">MASTER DATA · REORDER POINT</span><h3 id="ropgTitle">Reorder Point Generator</h3><span class="ropg-version" title="Generator UI build 108">v108</span><p>12-month sales · Profitability &amp; Reorder Point · Preview before approval</p></div><span class="ropg-pill">Preview Only</span></div>
   <div class="ropg-inputs">
-    <label>Super<input type="number" min="0" max="365" step="1" value="30" data-rop-class="super" aria-label="Super coverage days"><small>56 products</small></label>
-    <label>High<input type="number" min="0" max="365" step="1" value="25" data-rop-class="high" aria-label="High coverage days"><small>76 products</small></label>
-    <label>Medium<input type="number" min="0" max="365" step="1" value="20" data-rop-class="medium" aria-label="Medium coverage days"><small>342 products</small></label>
-    <label>Low<input type="number" min="0" max="365" step="1" value="15" data-rop-class="low" aria-label="Low coverage days"><small>313 products</small></label>
-    <label>Loss<input type="number" min="0" max="365" step="1" value="5" data-rop-class="loss" aria-label="Loss coverage days"><small>617 products</small></label>
+    <label>Super<input type="number" min="0" max="365" step="1" value="60" data-rop-class="super" aria-label="Super coverage days"><small>56 products</small></label>
+    <label>High<input type="number" min="0" max="365" step="1" value="50" data-rop-class="high" aria-label="High coverage days"><small>76 products</small></label>
+    <label>Medium<input type="number" min="0" max="365" step="1" value="40" data-rop-class="medium" aria-label="Medium coverage days"><small>342 products</small></label>
+    <label>Low<input type="number" min="0" max="365" step="1" value="30" data-rop-class="low" aria-label="Low coverage days"><small>313 products</small></label>
+    <label>Loss<input type="number" min="0" max="365" step="1" value="10" data-rop-class="loss" aria-label="Loss coverage days"><small>617 products</small></label>
   </div>
   <div class="ropg-toolbar"><button type="button" class="btn" id="ropgUpload" title="Upload the confirmed 12-month sales CSV">Upload 12-month CSV</button><button type="button" class="btn primary" id="ropgGenerate" disabled title="Generate becomes available after a validated sales import">Generate preview</button><button type="button" class="btn" id="ropgApprove" disabled>Approve &amp; update Master</button></div>
   </div>
@@ -93,7 +93,7 @@
   <details class="ropg-details" id="ropgProducts"><summary><span><strong>Products &amp; Generated Reorder Points</strong><small>Collapsed by default · Opens for review</small></span><span class="ropg-chevron" aria-hidden="true">⌄</span></summary><div class="ropg-table-scroll"><table><thead hidden><tr><th>Product</th><th>Profitability</th><th>Avg. monthly sales</th><th>Current ROP</th><th>Generated ROP</th><th>Change</th></tr></thead><tbody><tr><td colspan="6" class="ropg-empty">No generated results yet. Upload a 12-month sales report to generate a read-only preview.</td></tr></tbody></table></div></details>
 <script src="assets/js/reorder-ux-v108.js?v=111"></script>
 <script src="assets/js/reorder-unit-review-v109.js?v=109"></script>
-<link rel="stylesheet" href="assets/css/reorder-4m-v111.css?v=111">
+<link rel="stylesheet" href="assets/css/reorder-4m-v111.css?v=114">
 <script src="assets/js/reorder-name-review-v110.js?v=110"></script><script>
 (function(){
 'use strict';
@@ -104,9 +104,11 @@ const status=root.querySelector('.ropg-status'),tbody=root.querySelector('tbody'
 const picker=document.createElement('input');picker.type='file';picker.accept='.csv,text/csv';picker.hidden=true;root.appendChild(picker);
 const recentPicker=document.createElement('input');recentPicker.type='file';recentPicker.accept='.csv,text/csv';recentPicker.hidden=true;root.appendChild(recentPicker);
 const recentPanel=document.createElement('section');recentPanel.className='rop111-panel';recentPanel.hidden=true;recentPanel.setAttribute('aria-label','Four-month sales report');
-recentPanel.innerHTML='<div class="rop111-top"><strong>Last 4 months <span class="rop111-required">Required</span></strong><button type="button" class="btn" id="rop111UploadRecent">Upload 4-month CSV</button></div>'
- +'<small id="rop111RecentStatus" role="status">Upload a complete 4-month sales report, ending on the same date as the annual report.</small>'
- +'<label class="rop111-confirm"><input id="rop111Complete" type="checkbox"> I confirm this is the complete, unfiltered all-products sales report for these 4 months. Products absent from it had no recorded sales.</label>';
+recentPanel.innerHTML='<div class="rop114-strip">'
+ +'<div class="rop114-info"><span class="rop114-title">Last 4 months <span class="rop111-required">Required</span></span>'
+ +'<small id="rop111RecentStatus" role="status">Upload a complete 4-month sales report ending on the annual report end date.</small></div>'
+ +'<label class="rop111-confirm rop114-confirm" title="Required before calculating"><input id="rop111Complete" type="checkbox"><span>I confirm the report is complete and unfiltered</span></label>'
+ +'<button type="button" class="btn rop114-upload" id="rop111UploadRecent">Upload 4-month CSV</button></div>';
 root.insertBefore(recentPanel,root.querySelector('#ropgProducts'));
 const recentButton=recentPanel.querySelector('#rop111UploadRecent'),recentStatus=recentPanel.querySelector('#rop111RecentStatus'),recentComplete=recentPanel.querySelector('#rop111Complete');
 recentButton.addEventListener('click',()=>recentPicker.click());

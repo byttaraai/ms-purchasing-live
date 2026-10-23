@@ -117,3 +117,20 @@ test('Build113 only changes recent four-month cutoff to ten units server-side',(
  assert(html.includes("root.querySelector('.ropg-version').textContent='v113'"));
  assert(html.includes('p_recent_complete:true'));
 });
+
+test('Build114 coverage defaults and full-width recent-report strip remain presentation only',()=>{
+ const wanted={super:60,high:50,medium:40,low:30,loss:10};
+ for(const [name,value] of Object.entries(wanted))
+   assert(html.includes('value="'+value+'" data-rop-class="'+name+'"'));
+ assert(html.includes('rop114-strip'));
+ assert(html.includes('rop114-info'));
+ assert(html.includes('rop114-confirm'));
+ assert(html.includes('rop114-upload'));
+ assert(html.includes('id="rop111Complete"'));
+ assert(html.includes('id="rop111UploadRecent"'));
+ assert(html.includes('assets/css/reorder-4m-v111.css?v=114'));
+ const sheet=fs.readFileSync('assets/css/reorder-4m-v111.css','utf8');
+ assert(sheet.includes('#ropGenerator .rop114-strip{display:flex'));
+ assert(sheet.includes('width:100%;max-width:none'));
+ assert(!sheet.includes('!important'));
+});
