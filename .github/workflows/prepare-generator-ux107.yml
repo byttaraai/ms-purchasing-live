@@ -1,0 +1,16 @@
+name: Prepare approved Generator UX107 source blobs
+on:
+  push:
+    branches: [prepare/generator-ux107]
+permissions:
+  contents: write
+jobs:
+  assemble:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Verify exact source and create unreferenced blobs only
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 maintenance/prepare-ux107.py
