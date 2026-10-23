@@ -120,6 +120,7 @@ approve.disabled=true;approve.title='Approval requires a server-verified preview
 let recentRecords=null,recentPeriod=null,recentFilename='';
 let records=null,filename='',period=null,serverPreview=null,lastBody=null,busy=false,previewSerial=0,debounceTimer=null;
 const ux=window.ROPGeneratorUX108.mount(root);
+root.insertBefore(recentPanel,root.querySelector('#ropgProducts'));
 root.querySelector('.ropg-version').textContent='v111';
 
 const unitReview=window.ROPGeneratorUnitReview109.mount(root,{
