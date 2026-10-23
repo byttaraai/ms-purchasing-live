@@ -91,7 +91,7 @@
   <p class="ropg-note">These are draft example days, not approved settings. The 172 unclassified products are excluded until their classification is updated. Confirmed zero sales can generate zero ROP; missing sales data is never treated as zero.</p>
   <div class="ropg-status" role="status" hidden>Waiting for a real sales report. No calculation or database update has been performed.</div>
   <details class="ropg-details" id="ropgProducts"><summary><span><strong>Products &amp; Generated Reorder Points</strong><small>Collapsed by default · Opens for review</small></span><span class="ropg-chevron" aria-hidden="true">⌄</span></summary><div class="ropg-table-scroll"><table><thead hidden><tr><th>Product</th><th>Profitability</th><th>Avg. monthly sales</th><th>Current ROP</th><th>Generated ROP</th><th>Change</th></tr></thead><tbody><tr><td colspan="6" class="ropg-empty">No generated results yet. Upload a 12-month sales report to generate a read-only preview.</td></tr></tbody></table></div></details>
-<script src="assets/js/reorder-ux-v108.js?v=108"></script>
+<script src="assets/js/reorder-ux-v108.js?v=111"></script>
 <script src="assets/js/reorder-unit-review-v109.js?v=109"></script>
 <link rel="stylesheet" href="assets/css/reorder-4m-v111.css?v=111">
 <script src="assets/js/reorder-name-review-v110.js?v=110"></script><script>
@@ -182,6 +182,7 @@ const nameMatch110=window.ROPGeneratorNameMatch110.mount(root,{
  }
 });
 
+root.querySelector('.ropg-version').textContent='v111';
 const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\u0027':'&#39;'}[c]));
 const normalized=s=>String(s||'').normalize('NFKC').replace(/\s+/g,' ').trim().toLocaleLowerCase('en');
 const unitKey=s=>String(s||'').replace(/[()\[\]]/g,' ').replace(/\s+/g,' ').trim().toLocaleLowerCase('en');
@@ -337,7 +338,7 @@ picker.addEventListener('change',async()=>{
   filename=file.name;period=p;records=r;
   recentPanel.hidden=false;
   recentStatus.textContent='Annual report verified. Upload the four-month report ending '+period.end+'.';
-  ux.report({file:filename,start:period.start,end:period.end});
+  ux.report({file:filename,start:period.start,end:period.end,recent_file:recentFilename,recent_start:recentPeriod?.start,recent_end:recentPeriod?.end});
   setStatus(r.length+' products loaded · '+p.start+' to '+p.end+' · Calculating profit classes and reorder points...');
   void generatePreview();
  }catch(error){
@@ -356,7 +357,7 @@ recentPicker.addEventListener('change',async()=>{
   if(recent.start!==start)throw Error('Four-month start date must be '+start);
   recentRecords=rows;recentPeriod=recent;recentFilename=file.name;
   recentStatus.textContent=rows.length+' recent products · '+recent.start+' to '+recent.end+' · Confirm full scope below to calculate.';
-  ux.report({file:filename,start:period.start,end:period.end});
+  ux.report({file:filename,start:period.start,end:period.end,recent_file:recentFilename,recent_start:recentPeriod?.start,recent_end:recentPeriod?.end});
   setStatus('Four-month report loaded. Confirm it is a complete all-products export, then calculate.');
  }catch(error){
   recentStatus.textContent='Four-month report rejected: '+(error?.message||String(error));
@@ -366,7 +367,7 @@ recentPicker.addEventListener('change',async()=>{
 recentComplete.addEventListener('change',()=>{
  invalidate();clearTable();
  if(recentRecords&&recentComplete.checked){
-  ux.report({file:filename,start:period.start,end:period.end});
+  ux.report({file:filename,start:period.start,end:period.end,recent_file:recentFilename,recent_start:recentPeriod?.start,recent_end:recentPeriod?.end});
   void generatePreview();
  }else if(recentRecords){setStatus('Four-month completeness must be confirmed. No Master change is allowed.');}
 });
