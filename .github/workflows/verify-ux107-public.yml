@@ -1,0 +1,28 @@
+name: Verify served Generator UX107 assets
+on:
+  push:
+    branches: [verify/generator-ux107-public]
+permissions: {}
+jobs:
+  public-static-verification:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Verify deployed HTML CSS and JS using unauthenticated GET requests
+        run: |
+          python3 - <<'PY'
+          import hashlib,json,urllib.request
+          base='https://byttaraai.github.io/ms-purchasing-live/'
+          commit='b3f212a6106058dcc5aaec8c99c15a2a2b230009'
+          expected=[('','05b1a2e6a6e15dc2a5c566adcfd6cf700e9c5379'),('assets/css/reorder-generator-v107.css','2da77683cd40527307d4a1cd763637a62cba4376'),('assets/js/reorder-ux-v107.js','3474f9b732e1440eacb417d4494976165786a37d')]
+          evidence=[]
+          for path,wanted in expected:
+              request=urllib.request.Request(base+path+'?verify='+commit,headers={'Cache-Control':'no-cache'})
+              with urllib.request.urlopen(request,timeout=30) as response:
+                  data=response.read();status=response.status
+              actual=hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()
+              assert status==200,(path,status)
+              assert actual==wanted,(path,actual,wanted)
+              evidence.append({'path':path or 'index.html','status':status,'bytes':len(data),'blob':actual})
+          print('UX107_PUBLIC_VERIFIED='+json.dumps({'main':commit,'assets':evidence,'authenticated_requests':0,'business_data_access':False}))
+          PY
