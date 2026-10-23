@@ -9,3 +9,15 @@
 #ropGenerator .rop111-confirm input{margin-top:2px;flex:0 0 auto;accent-color:#6540eb;width:16px;height:16px}
 #ropGenerator .ux111-zero-rule{color:#9b5900;font-size:10px;font-weight:600;line-height:1.2;margin-top:2px;display:block}
 @media(max-width:640px){#ropGenerator .rop111-top{align-items:stretch}#ropGenerator .rop111-top button{width:100%}#ropGenerator .rop111-panel{padding:12px}}
+
+/* Build 114: full-width compact one-line recent sales import strip. */
+#ropGenerator .rop111-panel{width:100%;max-width:none;box-sizing:border-box;margin:8px 0 12px;padding:10px 14px}
+#ropGenerator .rop114-strip{display:flex;align-items:center;gap:16px;width:100%;min-height:42px}
+#ropGenerator .rop114-info{display:flex;align-items:center;gap:12px;min-width:0;flex:1 1 auto}
+#ropGenerator .rop114-title{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:700;white-space:nowrap}
+#ropGenerator .rop114-info small{margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11px}
+#ropGenerator .rop114-confirm{display:flex;align-items:center;gap:7px;margin:0;flex:0 1 auto;white-space:nowrap;font-size:11px}
+#ropGenerator .rop114-confirm input{margin:0}
+#ropGenerator .rop114-upload{flex:0 0 auto;white-space:nowrap}
+@media(max-width:1080px){#ropGenerator .rop114-strip{flex-wrap:wrap;row-gap:10px}#ropGenerator .rop114-info{flex-basis:100%}#ropGenerator .rop114-confirm{flex:1 1 auto}}
+@media(max-width:640px){#ropGenerator .rop114-info{display:block}#ropGenerator .rop114-title{display:flex}#ropGenerator .rop114-info small{white-space:normal;margin-top:4px}#ropGenerator .rop114-confirm{white-space:normal;align-items:flex-start}#ropGenerator .rop114-upload{width:auto;max-width:100%}}
