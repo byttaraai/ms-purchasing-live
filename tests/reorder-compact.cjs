@@ -22,7 +22,7 @@ test('Build106 parser, maths, units, matching and report dates remain exact',()=
  for(const [name,hash] of Object.entries(expected))assert.equal(sha(sourceFunction(html,name)),hash,name);
  assert(html.includes("const liveHost=()=>location.hostname==='byttaraai.github.io';"));
  assert(html.includes("state.role==='admin'&&d.eligible_rows>0&&d.changed_rows>0"));
- assert(html.includes("const out=await rpc('purchasing_sales_generator_v110',{...lastBody,p_request:req,p_approve:true});"));
+ assert(html.includes("const out=await rpc('purchasing_sales_generator_v111',{...lastBody,p_request:req,p_approve:true});"));
  assert(html.includes('p_revision:state.revision,p_request:null,p_approve:false'));
 });
 test('presentation cannot make requests or recalculate product decisions',()=>{
@@ -42,7 +42,7 @@ test('scoped CSS fixes sticky header and independent toolbar without global over
  assert(css.includes('#ropGenerator .ux107-dialog::backdrop'));
  assert(!/!important|@import|url\(/i.test(css));
  assert(html.includes('assets/css/reorder-generator-v108.css?v=108'));
- assert(html.includes('assets/js/reorder-ux-v108.js?v=108'));
+ assert(html.includes('assets/js/reorder-ux-v108.js?v=111'));
 });
 
 test('Build108 final polish remains presentation only',()=>{
@@ -54,7 +54,7 @@ test('Build108 final polish remains presentation only',()=>{
  assert(ui.includes('number(r.monthly_sales,3,true)'));
  assert(ui.includes('approve.classList.toggle(\'primary\',primaryApprove)'));
  assert(ui.includes('aria-busy'));
- assert(html.includes('ux.report({file:filename,start:period.start,end:period.end})'));
+ assert(html.includes('ux.report({file:filename,start:period.start,end:period.end,recent_file:recentFilename'));
  assert(html.includes('ux.calculating(true)'));
  assert(html.includes('ux.calculating(false)'));
 });
@@ -62,7 +62,7 @@ test('Build108 final polish remains presentation only',()=>{
 test('Build109 uses verified aliases while preserving explicit review decisions',()=>{
  const addon=fs.readFileSync('assets/js/reorder-unit-review-v109.js','utf8');
  assert(html.includes('assets/js/reorder-unit-review-v109.js?v=109'));
- assert(html.includes("rpc('purchasing_sales_generator_v110'"));
+ assert(html.includes("rpc('purchasing_sales_generator_v111'"));
  assert(html.includes("rpc('purchasing_sales_unit_rule_v109'"));
  assert(html.includes('p_expected_revision:state.revision'));
  assert(addon.includes('global.ROPGeneratorUnitReview109'));
@@ -77,7 +77,7 @@ test('Build110 match-to-Master requires an explicit authorized selection',()=>{
  const addon=fs.readFileSync('assets/js/reorder-name-review-v110.js','utf8');
  assert(html.includes('assets/js/reorder-name-review-v110.js?v=110'));
  assert(html.includes("rpc('purchasing_sales_name_match_v110'"));
- assert(html.includes("rpc('purchasing_sales_generator_v110'"));
+ assert(html.includes("rpc('purchasing_sales_generator_v111'"));
  assert(html.includes('p_expected_revision:state.revision'));
  assert(addon.includes('ROPGeneratorNameMatch110'));
  assert(addon.includes('Confirm match &amp; recalculate'));
@@ -85,4 +85,20 @@ test('Build110 match-to-Master requires an explicit authorized selection',()=>{
  assert(addon.includes('Suggestions are not automatic matches.'));
  assert(addon.includes('new Option('));
  assert(!addon.includes('fetch(') && !addon.includes('rpc('));
+});
+
+test('Build111 validates trailing four-month sales and keeps both imports mandatory',()=>{
+ const css111=fs.readFileSync('assets/css/reorder-4m-v111.css','utf8');
+ assert(html.includes('id="rop111UploadRecent"'));
+ assert(html.includes('id="rop111Complete"'));
+ assert(html.includes('p_recent_rows:recentMatched'));
+ assert(html.includes('p_recent_start:recentPeriod.start'));
+ assert(html.includes('p_recent_complete:true'));
+ assert(html.includes("rpc('purchasing_sales_generator_v111'"));
+ assert(html.includes('if(!recentRecords||!recentPeriod)throw Error'));
+ assert(html.includes('recent.end!==period.end'));
+ assert(html.includes("root.querySelector('.ropg-version').textContent='v111'"));
+ assert(ui.includes('ux111-zero-rule'));
+ assert(css111.includes('#ropGenerator .rop111-panel'));
+ assert(!/!important|@import|url\(/i.test(css111));
 });
