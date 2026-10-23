@@ -68,7 +68,7 @@ test('Build109 uses verified aliases while preserving explicit review decisions'
  assert(addon.includes('global.ROPGeneratorUnitReview109'));
  assert(addon.includes('Save unit decision &amp; recalculate'));
  assert(addon.includes("canEdit()"));
- assert(addon.includes('1 report unit'));
+ assert(addon.includes('equals how many'));
  assert(html.includes('saved=await rpc'));
  assert(html.includes('await generatePreview();'));
 });
