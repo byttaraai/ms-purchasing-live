@@ -1,0 +1,98 @@
+/* Build 107. All presentation is scoped to the existing generator. */
+#ropGenerator{position:relative;display:grid;grid-template-columns:minmax(0,1fr) auto 32px;align-items:center;gap:0 12px;box-sizing:border-box;width:100%;min-width:0;margin-top:18px;padding:12px;background:var(--card,#fff);border:1px solid var(--line,#e5e7eb);border-radius:14px;box-shadow:0 3px 14px rgba(15,23,42,.025);overflow:visible;color:var(--text,#192544)}
+#ropGenerator [hidden]{display:none}
+#ropGenerator .ropg-controls{grid-column:1;grid-row:1;display:flex;align-items:center;gap:22px;min-width:0;max-width:100%;height:36px;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;white-space:nowrap}
+#ropGenerator .ropg-head,#ropGenerator .ropg-inputs{flex:0 0 auto;min-width:0}
+#ropGenerator .ropg-head>div{display:flex;align-items:center;gap:6px}
+#ropGenerator .ropg-head h3{margin:0;font-size:14px;line-height:1.3;font-weight:750;white-space:nowrap}
+#ropGenerator .ropg-version{font-size:9px;font-weight:600;color:var(--muted,#8090a7)}
+#ropGenerator .ropg-kicker,#ropGenerator .ropg-head p,#ropGenerator .ropg-pill,#ropGenerator .ropg-summary,#ropGenerator .ropg-input-head,#ropGenerator .ropg-inputs small,#ropGenerator .ropg-note,#ropGenerator .ropg-soon{display:none}
+#ropGenerator .ropg-inputs{display:flex;align-items:center;gap:11px;white-space:nowrap}
+#ropGenerator .ux107-days-label{font-size:10px;letter-spacing:.04em;color:var(--muted,#697386);font-weight:700;text-transform:uppercase}
+#ropGenerator .ropg-inputs label{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:650}
+#ropGenerator .ropg-inputs input{box-sizing:border-box;width:44px;height:32px;min-width:0;padding:0 5px;margin:0;border:1px solid var(--line,#d6dce6);border-radius:7px;background:var(--card,#fff);color:inherit;font:inherit;font-variant-numeric:tabular-nums}
+#ropGenerator .ropg-toolbar{grid-column:2;grid-row:1;display:flex;align-items:center;gap:6px;margin:0;white-space:nowrap}
+#ropGenerator .ropg-toolbar .btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;flex:0 0 auto;box-sizing:border-box;height:32px;min-height:32px;width:auto;padding:0 9px;margin:0;border-radius:7px;font-size:11px;line-height:1;white-space:nowrap}
+#ropGenerator .ropg-toolbar .btn svg{display:block;width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#ropGenerator .ropg-toolbar .btn:disabled{opacity:.48;cursor:not-allowed}
+#ropGenerator button:focus-visible,#ropGenerator input:focus-visible,#ropGenerator select:focus-visible,#ropGenerator summary:focus-visible{outline:2px solid var(--primary,#633cff);outline-offset:2px}
+#ropGenerator .ropg-details{grid-column:1/-1;grid-row:auto;min-width:0;width:100%;margin:0;padding:0;border:0;position:static}
+#ropGenerator .ropg-details summary{position:absolute;right:12px;top:14px;display:flex;align-items:center;justify-content:center;box-sizing:border-box;width:32px;height:32px;margin:0;padding:0;border:1px solid var(--line,#e5e7eb);border-radius:7px;list-style:none;cursor:pointer;background:var(--card,#fff);color:var(--muted,#697386)}
+#ropGenerator .ropg-details summary::-webkit-details-marker{display:none}
+#ropGenerator .ropg-details summary:hover{background:var(--bg,#f5f7fc);color:var(--primary,#633cff)}
+#ropGenerator .ropg-chevron{font-size:20px;line-height:1;transition:transform .15s}
+#ropGenerator .ropg-details[open] .ropg-chevron{transform:rotate(180deg)}
+#ropGenerator .ropg-details:not([open])>:not(summary){display:none}
+#ropGenerator .ux107-live,#ropGenerator .ux107-sr,#ropGenerator .ropg-details summary>span:first-child{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
+#ropGenerator .ux107-summary{grid-column:1/-1;display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:10px 0 0}
+#ropGenerator .ux107-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 9px;font-family:inherit;font-size:11px;line-height:1.2;border:1px solid var(--line,#e2e7f0);border-radius:7px;background:#fff;color:var(--muted,#697386);cursor:pointer;white-space:nowrap}
+#ropGenerator .ux107-chip strong{font-size:12px;color:var(--text,#192544);font-variant-numeric:tabular-nums}
+#ropGenerator .ux107-chip[aria-pressed=true]{border-color:#b6a6ff;background:#f1edff;color:#5434bd}
+#ropGenerator .ux107-chip-changed strong{color:#23815f}
+#ropGenerator .ux107-chip-review strong{color:#a76506}
+#ropGenerator .ux107-verification{margin-left:auto;display:inline-flex;align-items:center;gap:5px;font-size:10px;line-height:1.4;color:#7c8699}
+#ropGenerator .ux107-verification.is-verified{color:#258462}
+#ropGenerator .ux107-verification.is-verified:before{content:'\2713';font-weight:800}
+#ropGenerator .ux107-notice{grid-column:1/-1;margin-top:9px;padding:8px 10px;font-size:12px;line-height:1.5;border-radius:7px;background:#f5f7fc;color:var(--muted,#697386);overflow-wrap:anywhere}
+#ropGenerator .ux107-notice[data-kind=warning]{background:#fff7e7;color:#8e6015}
+#ropGenerator .ux107-notice[data-kind=success]{background:#eef9f3;color:#237854}
+#ropGenerator .ux107-filters{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:13px;padding:12px 0;border-top:1px solid var(--line,#e5e7eb)}
+#ropGenerator .ux107-filters label{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted,#697386)}
+#ropGenerator .ux107-search{flex:1 1 210px;max-width:360px}
+#ropGenerator .ux107-search input{width:100%;min-width:100px}
+#ropGenerator .ux107-filters input,#ropGenerator .ux107-filters select,#ropGenerator .ux107-pagination select{height:32px;box-sizing:border-box;padding:0 8px;font:inherit;font-size:11px;border:1px solid var(--line,#dbe2ed);border-radius:7px;background:#fff;color:var(--text,#192544)}
+#ropGenerator .ux107-text-button{padding:4px 0;border:0;background:transparent;color:var(--primary,#633cff);font:inherit;font-size:11px;cursor:pointer}
+#ropGenerator .ux107-filtered-count{margin-left:auto;font-size:11px;color:var(--muted,#697386)}
+#ropGenerator .ropg-table-scroll{box-sizing:border-box;width:100%;min-width:0;max-width:100%;max-height:min(58vh,520px);margin:0;overflow:auto;border:1px solid var(--line,#e5e7eb);border-radius:8px}
+#ropGenerator .ux107-table{table-layout:fixed;width:100%;min-width:900px;border-collapse:separate;border-spacing:0;font-size:12px;white-space:normal;margin:0}
+#ropGenerator .ux107-col-product{width:29%}#ropGenerator .ux107-col-profit{width:13%}#ropGenerator .ux107-col-class{width:11%}#ropGenerator .ux107-col-sales{width:17%}#ropGenerator .ux107-col-rop{width:15%}#ropGenerator .ux107-col-status{width:15%}
+#ropGenerator .ux107-table th,#ropGenerator .ux107-table td{padding:11px 13px;vertical-align:middle;text-align:left;border:0;border-bottom:1px solid var(--line,#e8ecf4);white-space:normal;line-height:1.4}
+#ropGenerator .ux107-table th{position:sticky;top:0;z-index:2;background:#f4f6fc;color:#4f6280;font-size:11px;font-weight:700;box-shadow:0 1px 0 #dfe6f1}
+#ropGenerator .ux107-table th small{display:block;margin-top:2px;font-size:10px;font-weight:400;color:#7e8ca3}
+#ropGenerator .ux107-table tbody tr:last-child td{border-bottom:0}
+#ropGenerator .ux107-table tbody tr:hover{background:#f9faff}
+#ropGenerator .ux107-table .ux107-number{text-align:right;font-variant-numeric:tabular-nums}
+#ropGenerator .ux107-product-name{display:block;font-weight:550;overflow-wrap:anywhere;word-break:normal;white-space:normal}
+#ropGenerator .ux107-product-code{display:block;font-size:10px;margin-top:3px;color:#8190a6;overflow-wrap:anywhere}
+#ropGenerator .ux107-unit{display:block;margin-top:3px;font-size:10px;color:#8190a6;overflow-wrap:anywhere}
+#ropGenerator .ux107-negative{color:#b34c5b}
+#ropGenerator .ux107-rating{display:inline-flex;align-items:center;border-radius:5px;padding:3px 7px;font-size:10px;font-weight:650;background:#f1f4f8;color:#62718a}
+#ropGenerator .ux107-rating-super{color:#6540b7;background:#f2ecff}#ropGenerator .ux107-rating-high{color:#227a5d;background:#ebf8f1}#ropGenerator .ux107-rating-medium{color:#3c668f;background:#eef4fc}#ropGenerator .ux107-rating-low{color:#8a733a;background:#fcf7e9}#ropGenerator .ux107-rating-loss{color:#a25360;background:#fff0f2}
+#ropGenerator .ux107-state{font-size:11px;color:#8693a5}#ropGenerator .ux107-state.is-change{color:#2f8162}
+#ropGenerator .ux107-review-button{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:0;border:0;background:none;cursor:pointer;color:#a76c16;font:inherit;font-size:11px;text-align:left}
+#ropGenerator .ux107-review-button span{font-size:10px;color:#8a7b62}
+#ropGenerator .ropg-empty{text-align:center;padding:25px 12px;white-space:normal;color:#7e8da5}
+#ropGenerator .ux107-pagination{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding-top:11px;font-size:11px;color:var(--muted,#697386)}
+#ropGenerator .ux107-pagination label{display:flex;align-items:center;gap:6px}
+#ropGenerator .ux107-page-buttons{display:flex;align-items:center;gap:10px;margin-left:auto}
+#ropGenerator .ux107-page-buttons button{padding:5px 8px;background:#fff;border:1px solid var(--line,#dfe5f0);border-radius:6px;font:inherit;color:#526580;cursor:pointer}
+#ropGenerator .ux107-page-buttons button:disabled{opacity:.4;cursor:default}
+#ropGenerator .ux107-dialog{position:fixed;inset:0;box-sizing:border-box;margin:auto;width:min(580px,calc(100vw - 32px));max-width:calc(100vw - 32px);max-height:calc(100vh - 40px);padding:0;border:1px solid var(--line,#dfe5ef);border-radius:15px;background:#fff;color:var(--text,#192544);box-shadow:0 20px 90px #18264533;overflow:auto}
+#ropGenerator .ux107-dialog::backdrop{background:#1d294b66;backdrop-filter:blur(2px)}
+#ropGenerator .ux107-dialog-head{display:flex;align-items:center;gap:12px;justify-content:space-between;padding:19px 22px 14px;border-bottom:1px solid #edf0f6}
+#ropGenerator .ux107-dialog-head h3{margin:0;font-size:19px;line-height:1.35}
+#ropGenerator .ux107-close{display:flex;align-items:center;justify-content:center;flex:none;width:30px;height:30px;font-size:23px;line-height:1;border:1px solid #e4e9f3;border-radius:7px;background:#fff;color:#7b87a0;cursor:pointer}
+#ropGenerator .ux107-dialog-body{padding:16px 22px;font-size:13px;line-height:1.55}
+#ropGenerator .ux107-dialog-body h4{margin:15px 0 8px;font-size:13px}
+#ropGenerator .ux107-dialog-body p{margin:0 0 12px}
+#ropGenerator .ux107-dialog-foot{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:13px 22px 17px;border-top:1px solid #edf0f6}
+#ropGenerator .ux107-dialog-foot .btn{height:35px;font-size:12px;padding:0 13px;border-radius:8px}
+#ropGenerator .ux107-muted{color:#7a89a2;font-size:12px;line-height:1.6}
+#ropGenerator .ux107-mean{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:14px;background:#f6f8fd;border-radius:10px;margin-bottom:17px}
+#ropGenerator .ux107-mean span{font-size:12px;color:#71819b}#ropGenerator .ux107-mean strong{font-size:18px;white-space:nowrap;font-variant-numeric:tabular-nums}
+#ropGenerator .ropg-multipliers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:5px 0 12px;padding:0;border:0;white-space:normal}
+#ropGenerator .ropg-multipliers label{display:flex;flex-direction:column;align-items:stretch;gap:6px;font-size:12px;font-weight:650;white-space:normal}
+#ropGenerator .ropg-multipliers input{box-sizing:border-box;width:100%;min-width:0;height:37px;padding:0 10px;border:1px solid #dce3f0;border-radius:7px;background:#fff;font:inherit;color:inherit}
+#ropGenerator .ux107-rule-note{font-size:11px;line-height:1.55;color:#7b89a1}
+#ropGenerator .ux107-distribution{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin:16px 0}
+#ropGenerator .ux107-distribution>div{display:flex;flex-direction:column;align-items:center;gap:7px;padding:10px 2px;border:1px solid #e9edf5;border-radius:8px}
+#ropGenerator .ux107-distribution strong{font-size:18px;font-variant-numeric:tabular-nums}#ropGenerator .ux107-distribution small{font-size:10px;color:#8a97ad}
+#ropGenerator .ux107-review-name{font-size:16px;overflow-wrap:anywhere}
+#ropGenerator .ux107-review-reason{margin:14px 0;padding:10px 12px;background:#fff7e7;color:#926619;border:1px solid #f5e6c6;border-radius:8px;font-size:12px;overflow-wrap:anywhere}
+#ropGenerator .ux107-facts{margin:16px 0}
+#ropGenerator .ux107-facts>div{display:grid;grid-template-columns:1fr 1fr;gap:20px;padding:8px 0;border-bottom:1px solid #edf0f5}
+#ropGenerator .ux107-facts dt{font-size:12px;color:#8090a7}#ropGenerator .ux107-facts dd{margin:0;font-size:12px;overflow-wrap:anywhere;text-align:right}
+#ropGenerator .ux107-confirm-lead{font-size:16px}#ropGenerator .ux107-confirm-counts{display:flex;gap:15px;flex-wrap:wrap;padding:10px 0 16px;color:#74849d;font-size:12px}#ropGenerator .ux107-confirm-counts b{color:#243958}
+#ropGenerator .ux107-confirm-settings{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}#ropGenerator .ux107-confirm-settings span{padding:5px 8px;border-radius:6px;background:#f3f5fa;font-size:11px}#ropGenerator .ux107-confirm-settings strong{margin-left:5px}
+#ropGenerator .ux107-wrap{overflow-wrap:anywhere}
+@media(max-width:650px){#ropGenerator{gap:0 7px;padding:10px}#ropGenerator .ropg-controls{gap:16px}#ropGenerator .ropg-details summary{top:12px;right:10px}#ropGenerator .ropg-toolbar{gap:4px}#ropGenerator .ropg-toolbar .btn{width:31px;padding:0}#ropGenerator .ux107-action-label{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}#ropGenerator .ux107-summary{gap:5px}#ropGenerator .ux107-chip{font-size:10px;padding:5px 7px}#ropGenerator .ux107-chip strong{font-size:11px}#ropGenerator .ux107-verification{margin-left:0}#ropGenerator .ux107-filters{gap:8px}#ropGenerator .ux107-filters label{font-size:10px}#ropGenerator .ux107-filtered-count{margin-left:0}#ropGenerator .ux107-pagination{gap:9px}#ropGenerator .ux107-page-buttons{margin-left:0}#ropGenerator .ux107-dialog-body,#ropGenerator .ux107-dialog-head{padding:15px}#ropGenerator .ux107-mean{align-items:flex-start;flex-direction:column;gap:5px}#ropGenerator .ux107-distribution{grid-template-columns:repeat(3,minmax(0,1fr))}}

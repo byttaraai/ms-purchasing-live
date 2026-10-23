@@ -1,183 +1,188 @@
-"""Actual-page compact generator verification; synthetic state and blocked external IO."""
+"""Actual page UX regression, offline synthetic sales and mocked RPC only."""
 from pathlib import Path
 from functools import partial
-from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
-import json, runpy, shutil, threading, time
+from http.server import ThreadingHTTPServer,SimpleHTTPRequestHandler
+import runpy,json,threading,shutil,time,os,re
 from playwright.sync_api import sync_playwright
 ROOT=Path(__file__).resolve().parents[1]
 qa=runpy.run_path(str(ROOT/'tests/browser-v82.py'))
 class Quiet(SimpleHTTPRequestHandler):
-    def log_message(self,*args): pass
+ def log_message(self,*args):pass
 server=ThreadingHTTPServer(('127.0.0.1',0),partial(Quiet,directory=str(ROOT)))
-threading.Thread(target=server.serve_forever,daemon=True).start()
-origin='http://127.0.0.1:'+str(server.server_port)
-pagefile=ROOT/'reorder-compact-qa.html'
+threading.Thread(target=server.serve_forever,daemon=True).start();origin='http://127.0.0.1:'+str(server.server_port)
 checks=[]
 def check(ok,label):
-    assert ok,label
-    checks.append(label)
-    print('PASS '+label,flush=True)
-def wait_state(page,expression):
-    deadline=time.monotonic()+30
-    while time.monotonic()<deadline:
-        if page.evaluate('() => ('+expression+')'): return
-        page.wait_for_timeout(50)
-    raise AssertionError('Timed out: '+expression)
+ assert ok,label
+ checks.append(label); print('PASS '+label,flush=True)
+def wait(p,expr):
+ end=time.monotonic()+25
+ while time.monotonic()<end:
+  if p.evaluate('()=>('+expr+')'):return
+  p.wait_for_timeout(40)
+ raise AssertionError('Timed out '+expr)
+def make_fixture():
+ f=json.loads(json.dumps(qa['fixture']))
+ for i in range(80):
+  r=qa['row']('UX%04d'%i,50,profit='Medium')
+  r['product_name']='Product %04d long descriptive name for a veterinary purchase pack'%i
+  if i==2:r['product_name']='Product 0002 <img src=x onerror=alert(1)> & safe name'
+  f['rows'].append(r);f['master'].append(dict(r))
+ return f
+fixture=make_fixture()
+base_mock=qa['mock']
+mock_extra=r'''
+window.qaGeneratorCalls=[];window.qaRpcFail=false;window.qaDelay=0;
+const oldQaFetch=window.fetch;
+window.fetch=async(url,options)=>{
+ if(!String(url).endsWith('/purchasing_sales_generator_v104'))return oldQaFetch(url,options);
+ const a=JSON.parse(options.body);qaGeneratorCalls.push(structuredClone(a));
+ if(qaDelay)await new Promise(r=>setTimeout(r,qaDelay));
+ if(qaRpcFail)return new Response(JSON.stringify({message:'Synthetic server validation failed'}),{status:400});
+ const pos=a.p_rows.filter(r=>r.profit>0),avg=pos.reduce((s,r)=>s+r.profit,0)/pos.length;
+ let changed=0,eligible=0,skipped=0;const classes={Super:0,High:0,Medium:0,Low:0,Loss:0};
+ const rows=a.p_rows.map((r,i)=>{
+  const cls=r.profit<=0?'Loss':r.profit>=avg*a.p_mult.super?'Super':r.profit>=avg*a.p_mult.high?'High':r.profit>=avg*a.p_mult.medium?'Medium':'Low';classes[cls]++;
+  const m=qaFixture.master.find(m=>m.product_code===r.code);
+  const review=!m?'Unmatched product name':r.unit!=='Piece'?'Unverified unit conversion':null;
+  const rop=review?null:Math.ceil(r.qty/12/30*a.p_cover[cls.toLowerCase()]);
+  const isChanged=!review&&i!==0;
+  if(review)skipped++;else eligible++;if(isChanged)changed++;
+  return {name:r.name,code:r.code,profit:r.profit,classification:cls,monthly_sales:r.qty/12,report_unit:r.unit,purchase_unit:m?.purchase_unit||null,new_rop:rop,eligible:!review,changed:isChanged,review};
+ });
+ if(a.p_approve){for(const r of rows.filter(r=>r.changed)){const m=qaFixture.master.find(m=>m.product_code===r.code);m.profitability_class=r.classification;m.reorder_point=r.new_rop;}qaFixture.master_revision++;}
+ return new Response(JSON.stringify({ok:true,approved:a.p_approve,master_revision:qaFixture.master_revision,rows,source_rows:rows.length,eligible_rows:eligible,skipped_rows:skipped,changed_rows:changed,unchanged_rows:eligible-changed,mean_positive_profit:avg,class_counts:classes}),{status:200,headers:{'Content-Type':'application/json'}});
+};
+'''
+mock='window.qaFixture='+json.dumps(fixture)+';\n'+base_mock+mock_extra+"\naddEventListener('load',()=>{void msAudit.loadLive();});"
+html=(ROOT/'index.html').read_text().replace('</head>','<script>'+mock+'</script></head>',1)
+pagefile=ROOT/'reorder-ux107-qa.html';pagefile.write_text(html)
+def csv_data(n=81):
+ names=[r['product_name'] for r in fixture['master'] if r['product_code'].startswith('UX')]
+ rows=['Product Name,Supplier,Sales,,Refunds,,Net Sales,,Total Cost,Profit,,Profit percentage,',',,Quantity,Value,Quantity,Value,Quantity,Value,,Value,Percentage,To Sales,To Cost']
+ for i in range(n):
+  name=names[i] if i<len(names) else 'Unmatched synthetic product %04d'%i
+  unit='Box 3' if 76<=i<80 else 'Piece'; profit=(100000 if i==1 else -100 if i%17==0 else 500+i*111)
+  q='"120 '+unit+'"';name='"'+name.replace('"','""')+'"'
+  rows.append(','.join([name,'',q,'0 SR','"0 '+unit+'"','0 SR',q,'0 SR','0 SR',str(profit)+' SR','','','']))
+ return {'name':'Synthetic-From 01_10_2025 To 01_10_2026.csv','mimeType':'text/csv','buffer':('\n'.join(rows)+'\n').encode()}
+def start(browser,width=1440,live=False):
+ ctx=browser.new_context(viewport={'width':width,'height':1000 if width>700 else 844})
+ errors=[];external=[]
+ # Offline harness: every real repository asset is inlined without modification.
+ # No navigation or outbound network is needed in this execution environment.
+ def style(m):return '<style>'+ (ROOT/m.group(1).split('?')[0]).read_text()+'</style>'
+ def script(m):return '<script>'+ (ROOT/m.group(1).split('?')[0]).read_text().replace('</script','<\\/script')+'</script>'
+ doc=re.sub(r'<link rel="stylesheet" href="([^"]+)">',style,html)
+ doc=re.sub(r'<script src="([^"]+)"></script>',script,doc)
+ storage="""<script>for(const k of ['localStorage','sessionStorage']){const data=new Map();Object.defineProperty(window,k,{value:{getItem:k=>data.has(k)?data.get(k):null,setItem:(k,v)=>data.set(k,String(v)),removeItem:k=>data.delete(k),clear:()=>data.clear()}});}</script>"""
+ doc=doc.replace('<head>','<head>'+storage+'<script>if(!crypto.randomUUID)Object.defineProperty(crypto,\"randomUUID\",{value:()=>\"77777777-7777-4777-8777-777777777777\"});</script>',1)
+ if live:
+  old="const liveHost=()=>location.hostname==='byttaraai.github.io';"
+  assert doc.count(old)==1
+  doc=doc.replace(old,'const liveHost=()=>true; // QA only: exercise mocked server path offline')
+ ctx.route('**/*',lambda r:(external.append(r.request.url),r.abort()))
+ p=ctx.new_page();p.on('pageerror',lambda e:(errors.append(str(e)),print('PAGE_ERROR',str(e),flush=True)));p.on('console',lambda m:print('CONSOLE',m.text[:250],flush=True) if os.environ.get('QA_DEBUG') else None)
+ p.set_content(doc,wait_until='load')
+ try:wait(p,"typeof state!=='undefined' && state.taskAssistant?.tasks?.some(t=>t.focus==='data')")
+ except Exception:
+  print('START_ERRORS',errors,flush=True);raise
+ p.evaluate("go('daily-tasks');document.querySelector('#ropGenerator').scrollIntoView({block:'center'})")
+ return ctx,p,errors,external
+screens=Path(os.environ.get('MS_UX107_SCREENSHOTS',str(ROOT/'tests'/'.ux107-artifacts')));screens.mkdir(parents=True,exist_ok=True)
 try:
-    fixture=json.loads(json.dumps(qa['fixture']))
-    mock='window.qaFixture='+json.dumps(fixture)+';\n'+qa['mock']+"\naddEventListener('load',()=>{void msAudit.loadLive();});"
-    pagefile.write_text((ROOT/'index.html').read_text().replace('</head>','<script>'+mock+'</script></head>',1))
-    with sync_playwright() as pw:
-        chrome=shutil.which('google-chrome') or shutil.which('chromium') or shutil.which('chromium-browser')
-        assert chrome,'Chromium is required'
-        browser=pw.chromium.launch(executable_path=chrome,headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
-        for width,height in [(1920,1080),(1440,1000),(1280,900),(1100,768),(1024,768),(768,1024),(390,844)]:
-            ctx=browser.new_context(viewport={'width':width,'height':height})
-            external=[];errors=[]
-            def route(r):
-                if r.request.url.startswith(origin+'/'):r.continue_()
-                else:external.append(r.request.url);r.abort()
-            ctx.route('**/*',route)
-            p=ctx.new_page();p.on('pageerror',lambda e:errors.append(str(e)))
-            label=str(width)+'x'+str(height)
-            try:
-                p.goto(origin+'/reorder-compact-qa.html',wait_until='load')
-                wait_state(p,"state.taskAssistant?.tasks?.some(t=>t.focus==='data')")
-                p.evaluate("go('daily-tasks');window.scrollTo(0,0)")
-                p.wait_for_timeout(100)
-                master_before=p.evaluate('JSON.stringify(state.master)')
-                check(not p.locator('#ropgProducts').evaluate('(e)=>e.open'),label+' table initially collapsed')
-                check(p.locator('#ropgProducts thead').is_hidden(),label+' empty table has no misleading header')
-                check(p.locator('#ropGenerator .ropg-status').is_hidden(),label+' clean one-line card before import')
-                check(not p.locator('#ropgProducts .ropg-table-scroll').is_visible(),label+' no hidden table leakage')
-                for selector in ['.ropg-summary','.ropg-input-head','.ropg-kicker','.ropg-head p','.ropg-note','.ropg-pill']:
-                    check(not p.locator('#ropGenerator '+selector).is_visible(),label+' removed visual clutter '+selector)
-                geom=p.evaluate("""()=>{const q=document.querySelector('#ropGenerator'),r=q.getBoundingClientRect();const controls=q.querySelector('.ropg-controls'),disclosure=q.querySelector('.ropg-details summary');const nodes=[...q.querySelectorAll('.ropg-head h3,.ropg-inputs input,.ropg-multipliers input,.ropg-toolbar button,.ropg-details summary')].map(e=>{const b=e.getBoundingClientRect();return {x:b.x-r.x,y:b.y-r.y,w:b.width,h:b.height}});const a=disclosure.getBoundingClientRect();return {height:r.height,left:r.left,right:r.right,width:r.width,scroll:q.scrollWidth,client:q.clientWidth,controlsScroll:controls.scrollWidth,controlsClient:controls.clientWidth,arrow:{x:a.x-r.x,y:a.y-r.y,w:a.width,h:a.height},nodes};}""")
-                print('COMPACT_GEOMETRY='+json.dumps({'viewport':width,**geom}),flush=True)
-                check(geom['height']<=72,label+' single compact row at most 72px including scrollbar')
-                centers=[n['y']+n['h']/2 for n in geom['nodes']]
-                check(max(centers)-min(centers)<2,label+' title inputs actions and arrow share one row')
-                check(all(n['w']>0 and n['h']>0 for n in geom['nodes']),label+' controls not clipped to zero')
-                check(geom['left']>=-1 and geom['right']<=width+1,label+' card stays inside viewport')
-                check(all(geom['nodes'][i]['x']+geom['nodes'][i]['w']<=geom['nodes'][i+1]['x']+1 for i in range(len(geom['nodes'])-2)),label+' no overlapping scroll-strip controls (arrow separately anchored)')
-                check(geom['scroll']<=geom['client']+1,label+' generator root never scrolls horizontally')
-                check(geom['arrow']['w']<=34 and geom['arrow']['h']<=34,label+' arrow is a small independent control')
-                check(geom['arrow']['x']>=geom['width']-56,label+' arrow anchored at right edge')
-                if width>=1920:check(geom['controlsScroll']<=geom['controlsClient']+1,label+' wide desktop shows all controls with no strip scroll')
-                if width<1100:check(geom['controlsScroll']>geom['controlsClient'],label+' narrow screens scroll only the controls strip')
-                check(p.locator('#ropGenerator .ropg-multipliers input').count()==3,label+' three profit multiplier controls in main row')
-                check(not p.locator('#ropgUpload').is_disabled(),label+' CSV upload enabled')
-                for selector in ['#ropgGenerate','#ropgApprove']:
-                    check(p.locator(selector).is_disabled(),label+' unapproved action still disabled '+selector)
-                values=p.locator('#ropGenerator [data-rop-class]').evaluate_all('(es)=>es.map(e=>e.value)')
-                check(values==['30','25','20','15','5'],label+' draft example days unchanged')
-                p.get_by_label('Super coverage days',exact=True).fill('42')
-                summary=p.locator('#ropgProducts summary')
-                p.locator('#ropgTitle').click()
-                check(not p.locator('#ropgProducts').evaluate('(e)=>e.open'),label+' title click never opens product table')
-                p.get_by_label('Super coverage days',exact=True).click()
-                check(not p.locator('#ropgProducts').evaluate('(e)=>e.open'),label+' day input click never opens table')
-                summary.click()
-                check(p.locator('#ropgProducts .ropg-table-scroll').is_visible(),label+' arrow opens native product table')
-                opened=p.locator('#ropGenerator').bounding_box()['height']
-                check(opened>geom['height']+30,label+' expanded table below the row')
-                p.keyboard.press('Enter')
-                check(not p.locator('#ropgProducts').evaluate('(e)=>e.open'),label+' Enter closes native table')
-                p.keyboard.press('Space')
-                check(p.locator('#ropgProducts').evaluate('(e)=>e.open'),label+' Space opens native table')
-                summary.click()
-                check(not p.locator('#ropgProducts .ropg-table-scroll').is_visible(),label+' arrow closes table again')
-                check(p.get_by_label('Super coverage days',exact=True).input_value()=='42',label+' disclosure preserves edited draft')
-                check(p.evaluate('JSON.stringify(state.master)')==master_before,label+' master data unchanged')
-                # Validate a real CSV upload/generation path against synthetic master records.
-                sample=p.evaluate("""()=>state.master.slice(0,3).map(x=>({name:x.product_name,unit:x.purchase_unit}))""")
-                assert len(sample)==3 and all(x['name'] and x['unit'] for x in sample)
-                def csv_field(x):
-                    x=str(x)
-                    return '"'+x.replace('"','""')+'"'
-                lines=['Product Name,Supplier,Sales,,Refunds,,Net Sales,,Total Cost,Profit,,Profit percentage,',
-                       ',,Quantity,Value,Quantity,Value,Quantity,Value,,Value,Percentage,To Sales,To Cost']
-                for j,m in enumerate(sample):
-                    q='120 ('+m['unit']+')'
-                    amount=[3000,1500,-200][j]
-                    lines.append(','.join([csv_field(m['name']),'',csv_field(q),'0 SR',csv_field('0 ('+m['unit']+')'),'0 SR',csv_field(q),'0 SR','0 SR',str(amount)+' SR','','','']))
-                raw=('\n'.join(lines)+'\n').encode('utf-8')
-                p.locator('#ropGenerator input[type=file]').set_input_files({'name':'Sample-From 01_10_2025 To 01_10_2026.csv','mimeType':'text/csv','buffer':raw})
-                wait_state(p,"document.querySelectorAll('#ropgProducts tbody tr').length===3 && !document.querySelector('#ropgGenerate').disabled")
-                check(p.locator('#ropGenerator .ropg-status').is_visible(),label+' import and preview state is visible')
-                check('Medium 2' in p.locator('#ropGenerator .ropg-status').inner_text(),label+' profitability generated automatically on upload')
-                check(not p.locator('#ropgProducts').evaluate('(e)=>e.open'),label+' generated table stays collapsed until the arrow is used')
-                summary.click()
-                check(p.locator('#ropgProducts tbody tr').count()==3,label+' arrow reveals three calculated products')
-                summary.click()
-                check(not p.locator('#ropgProducts').evaluate('(e)=>e.open'),label+' arrow hides data without deleting the rows')
-                check(p.locator('#ropgProducts tbody tr').count()==3,label+' all generated rows persist after collapse')
-                p.locator('#ropGenerator [data-m=super]').fill('3.2')
-                wait_state(p,"document.querySelector('#ropGenerator .ropg-status').textContent.includes('Local preview only') && !document.querySelector('#ropgGenerate').disabled")
-                check('Medium 2' in p.locator('#ropGenerator .ropg-status').inner_text(),label+' multiplier edit automatically recalculates preview')
-                p.locator('#ropgGenerate').click()
-                wait_state(p,"!document.querySelector('#ropgGenerate').disabled")
-                check(p.locator('#ropgProducts tbody tr').count()==3,label+' Generate can also be rerun manually')
-                check(p.locator('#ropgProducts tbody tr').count()==3,label+' three source products in preview')
-                check(p.locator('#ropgProducts thead th').count()==6,label+' all six product headers generated')
-                table_geo=p.evaluate("()=>{const q=document.querySelector('#ropGenerator'),t=q.querySelector('.ropg-table-scroll');return {rootWidth:q.clientWidth,rootScroll:q.scrollWidth,tableWidth:t.clientWidth,tableScroll:t.scrollWidth}}")
-                check(table_geo['rootScroll']<=table_geo['rootWidth']+1,label+' generated table never pushes the whole generator horizontally')
-                check(table_geo['tableWidth']<=table_geo['rootWidth'],label+' table scroll remains inside the card')
-                check(p.locator('#ropgApprove').is_disabled(),label+' production approval remains safely locked')
-                check(p.evaluate('JSON.stringify(state.master)')==master_before,label+' CSV preview does not modify master')
-
-                check(p.evaluate("getComputedStyle(document.querySelector('.topbar')).position==='sticky'"),label+' sticky header unchanged')
-                check(p.locator('.continuous-footer #printSelectedBtn').count()==1,label+' footer print placement unchanged')
-                check(not external and not errors,label+' no external network or page errors '+str((external,errors)))
-            finally:ctx.close()
-        # Cache-regression: a browser can receive an obsolete stylesheet while running
-        # the latest HTML. Critical inline layout styles must keep the generator usable.
-        ctx=browser.new_context(viewport={'width':1440,'height':900})
-        errors=[]
-        def guard_external(route):
-            if route.request.url.startswith(origin+'/'):route.continue_()
-            else:route.abort()
-        ctx.route('**/*',guard_external)
-        old_css='#ropGenerator{display:grid;grid-template-columns:max-content 1fr max-content 32px;overflow-x:auto}#ropGenerator .ropg-details summary{position:absolute;inset:0;width:auto;height:auto}#ropGenerator .ropg-status{position:absolute;width:1px;height:1px;clip-path:inset(50%)}'
-        ctx.route('**/assets/css/reorder-generator-v106.css*',lambda r:r.fulfill(status=200,content_type='text/css',body=old_css))
-        p=ctx.new_page()
-        p.on('pageerror',lambda e:errors.append(str(e)))
-        try:
-            p.goto(origin+'/reorder-compact-qa.html',wait_until='load')
-            wait_state(p,"state.taskAssistant?.tasks?.some(t=>t.focus==='data')")
-            p.evaluate("go('daily-tasks')")
-            metrics=p.evaluate("""()=>{let r=document.querySelector('#ropGenerator'),t=r.querySelector('#ropgTitle'),m=r.querySelector('[data-m=super]'),a=r.querySelector('#ropgProducts summary');return {display:getComputedStyle(r).display,overflow:getComputedStyle(r).overflowX,yTitle:t.getBoundingClientRect().y,yMultiplier:m.getBoundingClientRect().y,arrowWidth:a.getBoundingClientRect().width,scroll:r.scrollWidth,client:r.clientWidth,documentScroll:document.documentElement.scrollWidth,documentClient:document.documentElement.clientWidth}}""")
-            print('STALE_CSS_METRICS='+json.dumps(metrics),flush=True)
-            check(metrics['display']=='block','stale-CSS defense keeps root block layout')
-            check(abs(metrics['yTitle']-metrics['yMultiplier'])<14,'stale-CSS defense keeps title and profit multipliers on same row')
-            check(metrics['arrowWidth']==32,'stale-CSS defense prevents full-card arrow hitbox')
-            check(metrics['overflow']=='clip','stale-CSS defense clips horizontal spill without affecting table scrolling')
-            check(metrics['documentScroll']<=metrics['documentClient']+1,'stale-CSS defense prevents document-wide horizontal overflow')
-            rows=['Product Name,Supplier,Sales,,Refunds,,Net Sales,,Total Cost,Profit,,Profit percentage,',
-                  ',,Quantity,Value,Quantity,Value,Quantity,Value,,Value,Percentage,To Sales,To Cost']
-            first=p.evaluate("()=>state.master.slice(0,3).map(x=>({name:x.product_name,unit:x.purchase_unit}))")
-            names=[x['name'] for x in first]+['Synthetic Test Product '+str(i).zfill(4) for i in range(4,1562)]
-            unit=first[0]['unit']
-            for i,name in enumerate(names):
-                sales_unit=first[i]['unit'] if i<3 else unit
-                q='120 ('+sales_unit+')'
-                name='"'+name.replace('"','""')+'"'
-                rows.append(','.join([name,'','"'+q+'"','0 SR','"0 ('+sales_unit+')"','0 SR','"'+q+'"','0 SR','0 SR',str(100+i%31)+' SR','','','']))
-            raw=('\n'.join(rows)+'\n').encode('utf-8')
-            p.locator('#ropGenerator input[type=file]').set_input_files({'name':'Sample-From 01_10_2025 To 01_10_2026.csv','mimeType':'text/csv','buffer':raw})
-            wait_state(p,"document.querySelectorAll('#ropgProducts tbody tr').length===1561 && !document.querySelector('#ropgGenerate').disabled")
-            check('1561 products' in p.locator('#ropGenerator .ropg-status').inner_text(),'full-size synthetic CSV generates a visible 1561-product result summary')
-            check(not p.locator('#ropgProducts').evaluate('(e)=>e.open'),'full-size results stay collapsed until arrow')
-            p.locator('#ropgProducts summary').click()
-            check(p.locator('#ropgProducts tbody tr').count()==1561,'full-size expanded results contain all 1561 synthetic products')
-            check(p.locator('#ropgProducts thead th').count()==6,'full-size expanded results keep all six table columns')
-            p.locator('#ropgProducts summary').click()
-            check(p.locator('#ropgProducts tbody tr').count()==1561,'full-size results are preserved after closing the arrow')
-            check(p.locator('#ropgApprove').is_disabled(),'full-size local preview cannot accidentally approve master changes')
-            check(not errors,'full-size stale-CSS browser test has no JavaScript errors '+str(errors))
-        finally:ctx.close()
-        browser.close()
+ with sync_playwright() as pw:
+  browser=pw.chromium.launch(executable_path=shutil.which('chromium') or shutil.which('google-chrome'),headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
+  for width in ([] if os.environ.get('QA_LIVE_ONLY') else [1920,1440,1280,1024,768,390]):
+   ctx,p,errors,external=start(browser,width)
+   try:
+    original=p.evaluate('JSON.stringify(state.master)')
+    check(not p.locator('#ropgProducts').evaluate('(e)=>e.open'),str(width)+' initially collapsed')
+    check(p.locator('#ropGenerator').bounding_box()['height']<80,str(width)+' initial compact row')
+    check(p.locator('#ropgSettingsDialog [data-m]').count()==3,str(width)+' multipliers inside settings dialog')
+    geom=p.evaluate("()=>{const r=document.querySelector('#ropGenerator').getBoundingClientRect();return [...document.querySelectorAll('#ropgUpload,#ropgGenerate,#ropgApprove,#ropgSettings,#ropgProducts summary')].map(e=>{const b=e.getBoundingClientRect();return {x:b.x,right:b.right,y:b.y,width:b.width,leftLimit:r.left,rightLimit:r.right}})}")
+    check(all(g['x']>=g['leftLimit'] and g['right']<=g['rightLimit']+1 for g in geom),str(width)+' all actions pinned visibly inside card')
+    check(max(g['y'] for g in geom)-min(g['y'] for g in geom)<4,str(width)+' fixed actions share one row')
+    p.locator('#ropGenerator input[type=file]').set_input_files(csv_data())
+    wait(p,"document.querySelectorAll('#ropgProducts tbody tr').length===25 && !document.querySelector('#ropgGenerate').disabled")
+    check(p.locator('#ropgSummary [data-filter]').count()==4,str(width)+' single summary of four filter chips')
+    check(not p.locator('#ropgProducts').evaluate('(e)=>e.open'),str(width)+' imported preview remains collapsed')
+    p.locator('#ropgProducts summary').click()
+    check(p.locator('#ropgProducts thead').is_visible(),str(width)+' real table header visible')
+    check(p.locator('#ropgProducts th[scope=col]').count()==6,str(width)+' all six accessible headers')
+    check(p.locator('#ropgProducts .ux107-product img').count()==0,str(width)+' product HTML escaped')
+    check(p.locator('#ropgProducts .ux107-product-code').first.inner_text()=='UX0000',str(width)+' master code below name')
+    p.locator('#ropgNextPage').click();check('26' in p.locator('#ropgPageRange').inner_text(),str(width)+' pagination advances')
+    p.locator('#ropgPageSize').select_option('50');check(p.locator('#ropgProducts tbody tr').count()==50,str(width)+' 50 rows option')
+    p.locator('#ropgSearch').fill('UX0002');check(p.locator('#ropgProducts tbody tr').count()==1 and 'UX0002' in p.locator('#ropgProducts tbody').inner_text(),str(width)+' search matches code')
+    p.locator('#ropgClearFilters').click();p.locator('#ropgClassFilter').select_option('Loss');check(all(x=='Loss' for x in p.locator('tbody .ux107-rating').all_text_contents()),str(width)+' classification filter')
+    p.locator('#ropgClearFilters').click();p.locator('#ropgSummary [data-filter=review]').click()
+    check(p.locator('#ropgProducts tbody tr').count()==5,str(width)+' review chip filters five excluded rows')
+    p.locator('[data-review-index="76"]').click()
+    check(p.locator('#ropgReviewDialog').is_visible(),str(width)+' review dialog opens')
+    check('Box 3' in p.locator('#ropgReviewDialog').inner_text() and 'Piece' in p.locator('#ropgReviewDialog').inner_text(),str(width)+' review shows report and Master units')
+    check(p.locator('#ropgReviewDialog input').count()==0,str(width)+' review is read only')
+    p.keyboard.press('Escape');p.locator('#ropgSettings').click()
+    check(p.locator('#ropgSettingsDialog').is_visible(),str(width)+' settings opens modal')
+    check('SAR' in p.locator('#ropgMeanProfit').inner_text(),str(width)+' average profit appears in settings')
+    p.locator('[data-m=super]').fill('3.2');wait(p,"document.querySelector('.ropg-status').textContent.includes('Local preview only') && !document.querySelector('#ropgGenerate').disabled")
+    p.keyboard.press('Escape')
+    check(not p.locator('#ropgSettingsDialog').is_visible(),str(width)+' Escape closes settings')
+    p.locator('#ropgClearFilters').click()
+    if width==1440:
+     p.locator('#ropGenerator').screenshot(path=str(screens/'generator-desktop.png'))
+     p.locator('#ropgSettings').click();p.locator('#ropgSettingsDialog').screenshot(path=str(screens/'settings.png'));p.keyboard.press('Escape')
+    p.locator('.ropg-table-scroll').evaluate('(e)=>e.scrollTop=240')
+    top=p.evaluate("()=>({head:document.querySelector('#ropgProducts th').getBoundingClientRect().top,box:document.querySelector('.ropg-table-scroll').getBoundingClientRect().top})")
+    check(abs(top['head']-top['box'])<3,str(width)+' headers remain pinned inside scroller')
+    p.locator('#ropgProducts summary').click();p.locator('#ropgProducts summary').click()
+    check(p.locator('#ropgProducts tbody tr').count()==50,str(width)+' collapse preserves filters and rows')
+    check(p.evaluate('JSON.stringify(state.master)')==original,str(width)+' UI never changes Master')
+    check(p.locator('#ropgApprove').is_disabled(),str(width)+' local approval gate preserved')
+    check(not errors and not external,str(width)+' no JS errors or external IO '+str((errors,external)))
+   finally:ctx.close()
+  # Mock the authenticated live-host path, without a single request leaving the test.
+  ctx,p,errors,external=start(browser,1440,live=True)
+  try:
+   original=p.evaluate('JSON.stringify(state.master)')
+   p.locator('#ropGenerator input[type=file]').set_input_files(csv_data())
+   wait(p,"!document.querySelector('#ropgApprove').disabled")
+   check(p.locator('#ropgApprove').inner_text().strip()=='Approve \u00b7 75','authoritative changed count on approval button')
+   check(p.locator('#ropgSummary [data-filter=unchanged] strong').inner_text()=='1','server unchanged count')
+   p.locator('#ropgSummary [data-filter=review]').click()
+   check(p.locator('#ropgProducts tbody tr').count()==5,'server review filter')
+   p.locator('#ropgApprove').click()
+   check(p.locator('#ropgConfirmDialog').is_visible(),'explicit confirm modal')
+   check('75' in p.locator('#ropgConfirmDialog').inner_text() and '5 excluded' in p.locator('#ropgConfirmDialog').inner_text(),'confirm shows full changed and excluded counts despite filter')
+   check('30 days' in p.locator('#ropgConfirmDialog').inner_text() and '1.5' in p.locator('#ropgConfirmDialog').inner_text(),'confirmation uses preview coverage and multipliers')
+   p.locator('#ropgCancelApproval').click()
+   check(p.evaluate('qaGeneratorCalls.filter(c=>c.p_approve).length')==0,'cancel makes no write request')
+   check(p.evaluate('JSON.stringify(state.master)')==original,'cancel preserves Master')
+   p.locator('#ropgApprove').click()
+   p.evaluate("(()=>{const e=document.querySelector('[data-rop-class=super]');e.value='31';e.dispatchEvent(new Event('input',{bubbles:true}));})()")
+   wait(p,"!document.querySelector('#ropgConfirmDialog').open && !document.querySelector('#ropgApprove').disabled")
+   check(p.evaluate('qaGeneratorCalls.filter(c=>c.p_approve).length')==0,'stale confirmation cancelled after settings changed')
+   p.locator('#ropgApprove').click();p.locator('#ropgConfirmDialog').screenshot(path=str(screens/'confirmation.png'));p.locator('#ropgConfirmApproval').click()
+   wait(p,"document.querySelector('#ropgNotice').textContent.includes('Approved') && !document.querySelector('#ropgUpload').disabled")
+   check(p.evaluate('qaGeneratorCalls.filter(c=>c.p_approve).length')==1,'exactly one confirmed mocked save')
+   check(p.evaluate('qaGeneratorCalls.find(c=>c.p_approve).p_rows.length')==81,'approval includes original report, never filtered/page subset')
+   check(p.evaluate("(()=>{const w=qaGeneratorCalls.find(c=>c.p_approve),r=qaGeneratorCalls.filter(c=>!c.p_approve).at(-1);return JSON.stringify(w.p_rows)===JSON.stringify(r.p_rows)&&JSON.stringify(w.p_cover)===JSON.stringify(r.p_cover)&&JSON.stringify(w.p_mult)===JSON.stringify(r.p_mult)&&w.p_revision===r.p_revision;})()"),'approval payload matches the verified preview exactly')
+   check('75' in p.locator('#ropgNotice').inner_text(),'success shows actual server updated count')
+   check(p.locator('#ropgApprove').is_disabled(),'approval locked after save')
+   check(not errors and not external,'mocked live path has no JS errors or external IO '+str((errors,external)))
+  finally:ctx.close()
+  ctx,p,errors,external=start(browser,1440)
+  try:
+   p.locator('#ropGenerator input[type=file]').set_input_files(csv_data(1561))
+   wait(p,"document.querySelectorAll('#ropgProducts tbody tr').length===25 && !document.querySelector('#ropgGenerate').disabled")
+   check(p.locator('#ropgSummary [data-filter=all] strong').inner_text()=='1,561','full size report retains all product counts')
+   p.locator('#ropgProducts summary').click()
+   check('63' in p.locator('#ropgPageLabel').inner_text(),'full size report has 63 pages at 25 rows')
+   check(p.locator('#ropgProducts tbody tr').count()==25,'full report renders only current page')
+   p.locator('#ropgNextPage').click();p.locator('#ropgProducts summary').click();p.locator('#ropgProducts summary').click()
+   check('Page 2' in p.locator('#ropgPageLabel').inner_text(),'full size table keeps page on collapse')
+   check(not errors and not external,'full size report has no errors or external writes')
+  finally:ctx.close()
+  browser.close()
 finally:
-    server.shutdown()
-    for name in ['reorder-compact-qa.html','quest-qa.html','quest-smoke.html']:(ROOT/name).unlink(missing_ok=True)
-print(json.dumps({'compact_assertions':len(checks),'viewport_profiles':7,'production_requests':0}))
+ server.shutdown();pagefile.unlink(missing_ok=True)
+print(json.dumps({'ux107_assertions':len(checks),'viewports':6,'real_production_requests':0}))
