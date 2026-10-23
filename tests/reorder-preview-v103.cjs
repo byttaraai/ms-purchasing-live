@@ -2,7 +2,7 @@
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const crypto=require('node:crypto');
-const link='<link rel="stylesheet" href="assets/css/reorder-generator-v107.css?v=107">';
+const link='<link rel="stylesheet" href="assets/css/reorder-generator-v108.css?v=108">';
 const sectionStart='<section class="ropg-section" id="ropGenerator"';
 const sectionEnd='</section>\n<section class="hidden" data-panel="tasks-assistant">';
 function as102(html){
