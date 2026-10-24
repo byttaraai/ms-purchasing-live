@@ -1,7 +1,33 @@
 /* Build 116: isolated annual forecast presentation. No database writes or estimates. */
 (function(){
 'use strict';
-const root=document.getElementById('purchaseForecast116');if(!root)return;
+const anchor=document.getElementById('ropGenerator');if(!anchor)return;
+const root=document.createElement('section');root.id='purchaseForecast116';root.setAttribute('aria-label','Purchase Forecast Generator');
+anchor.insertAdjacentElement('afterend',root);
+root.innerHTML=`
+  <div class="pf-head"><div><span class="pf-kicker">PURCHASE PLANNING · ANNUAL FORECAST</span><h3>Purchase Forecast Generator <small id="pfYear" class="pf-muted"></small></h3><span id="pfSourceStatus" class="pf-muted" role="status">Loading product master…</span></div><span class="pf-state">UI Preview · No forecast approved</span></div>
+  <div class="pf-controls">
+    <label>Monthly Sales Upload <button id="pfMonthUpload" class="pf-btn" type="button">Update Month ▴</button></label>
+    <label>Annual Growth % <input id="pfGrowth" type="number" min="-100" max="100" step=".1" value="0" aria-label="Annual growth percentage"></label>
+    <label>Forecast <button id="pfGenerate" class="pf-btn pf-btn-primary" type="button" disabled title="Requires approved monthly history, mapping rules and a validated annual model">Generate Forecast</button></label>
+    <div class="pf-muted" id="pfGrowthStatus" role="status">Growth draft: 0% · not saved</div>
+  </div>
+  <div id="pfUploadHelp" class="pf-note" hidden>Monthly update workflow will become available after the secured upload and review endpoint is implemented. All 12 history batches are staged, not approved. No upload or save is performed from this preview.</div>
+  <div class="pf-note">Historical sales are isolated and staged (12 months). Forecast numbers remain unavailable until monthly reports, product matching, unit rules and forecast model are approved. Master and Reorder Point Generator remain untouched.</div>
+  <div class="pf-summary"><span><strong>Annual Base</strong> · pending</span><span><strong>3M Trend</strong> · pending</span><span><strong>Annual Trend</strong> · pending</span><span><strong>Confidence</strong> · pending</span></div>
+  <div class="pf-table-card">
+    <div class="pf-header">
+      <strong id="pfTableTitle" style="font-size:13px">Annual Forecast Overview</strong>
+      <label class="pf-filter-label">Product <input id="pfSearch" placeholder="Search by name or code" aria-label="Search forecast products"></label>
+      <label class="pf-filter-label">Supplier <select id="pfSupplier"><option value="">All suppliers</option></select></label>
+      <label class="pf-filter-label">Profitability <select id="pfProfit"><option value="">All ratings</option><option value="super">Super</option><option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option><option value="loss">Loss</option><option value="unclassified">Unclassified</option></select></label>
+      <label class="pf-filter-label">Month <select id="pfMonth" aria-label="Forecast month"><option value="annual">Full year</option></select></label>
+      <button type="button" id="pfReset" class="pf-btn">Clear</button>
+      <button type="button" id="pfRefresh" class="pf-btn">Refresh</button>
+    </div>
+    <div class="pf-scroll"><table aria-label="Annual product forecast table"><thead><tr><th style="min-width:230px">Product</th><th>Annual Base Forecast</th><th>Trend (3M / Annual)</th><th>Confidence</th><th>Base + Growth (Final)</th></tr></thead><tbody id="pfTableBody"></tbody></table><div id="pfEmpty" class="pf-empty" hidden>No matching products.</div></div>
+    <div class="pf-footer"><span class="pf-muted" id="pfCount">0 products</span><span class="pf-muted" id="pfScopeNote">Annual overview · 12 future months</span><div class="pf-footer-actions"><button type="button" class="pf-btn" id="pfPrev">Previous</button><button type="button" class="pf-btn" id="pfNext">Next</button></div></div>
+  </div>`;
 const q=id=>root.querySelector('#'+id);
 const html=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const nf=n=>new Intl.NumberFormat('en-US').format(n);
