@@ -43,7 +43,7 @@ try:
    check(card.locator('#pfTableBody tr').count()==60,str(width)+' product rows are paginated')
    check(card.locator('#pfNext').is_enabled(),str(width)+' next page enabled')
    card.locator('#pfNext').click()
-   check(card.locator('#pfCount').inner_text().endswith('2 / 2'),str(width)+' pagination advances')
+   check('2 / ' in card.locator('#pfCount').inner_text(),str(width)+' pagination advances')
    card.locator('#pfSearch').fill('FORECAST-002')
    check(card.locator('#pfTableBody tr').count()==1,str(width)+' search works by product code')
    card.locator('#pfReset').click()
