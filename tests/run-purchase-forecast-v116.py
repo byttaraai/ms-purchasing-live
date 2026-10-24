@@ -27,7 +27,7 @@ def check(x,name):
 try:
  with sync_playwright() as playwright:
   browser=playwright.chromium.launch(executable_path=shutil.which('chromium') or shutil.which('google-chrome'),headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
-  for width in (1440,390):
+  for width in (1920,1440,1280,1024,390):
    ctx=browser.new_context(viewport={'width':width,'height':900})
    page=ctx.new_page()
    errors=[]
@@ -39,6 +39,24 @@ try:
    check(not card.evaluate('(e)=>e.closest(".hidden")!==null'),str(width)+' visible on Dashboard')
    check(page.locator('#ropGenerator').count()==1,str(width)+' original ROP remains')
    check(card.locator('thead th').count()==5,str(width)+' 5 annual columns')
+   geometry=card.locator('.pf-header').evaluate('''e=>{
+      const bounds=e.getBoundingClientRect();
+      const ids=['pfSearch','pfSupplier','pfProfit','pfMonth','pfReset','pfRefresh'];
+      const controls=ids.map(id=>{const r=e.querySelector('#'+id).getBoundingClientRect();return {id,top:r.top,left:r.left,right:r.right};});
+      const title=e.querySelector('#pfTableTitle');
+      return {scrollWidth:e.scrollWidth,clientWidth:e.clientWidth,left:bounds.left,right:bounds.right,controls,
+        titleFits:title.scrollWidth<=title.clientWidth+1,
+        titleTop:title.getBoundingClientRect().top};
+   }''')
+   check(geometry['scrollWidth']<=geometry['clientWidth']+1,str(width)+' header has no horizontal overflow')
+   check(all(x['left']>=geometry['left']-1 and x['right']<=geometry['right']+1 for x in geometry['controls']),str(width)+' each filter and action fits header')
+   if width>=1220:
+    tops=[x['top'] for x in geometry['controls']]+[geometry['titleTop']]
+    check(max(tops)-min(tops)<3,str(width)+' title, filters and both actions share one desktop row')
+    check(geometry['titleFits'],str(width)+' annual header title is fully visible')
+   if width<760:
+    actions=[x['top'] for x in geometry['controls'] if x['id'] in ('pfReset','pfRefresh')]
+    check(max(actions)-min(actions)<3,str(width)+' mobile actions stay adjacent')
    check(card.locator('#pfGenerate').is_disabled(),str(width)+' pending-approval generate gated')
    check(card.locator('#pfTableBody tr').count()==60,str(width)+' product rows are paginated')
    check(card.locator('#pfNext').is_enabled(),str(width)+' next page enabled')
