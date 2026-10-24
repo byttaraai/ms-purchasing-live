@@ -22,11 +22,17 @@ test('Forecast annual UI contains exact agreed columns and header filters',()=>{
   assert(js.includes('staged, not approved'));
   assert(js.includes('pfGenerate')&&js.includes('disabled'));
 });
-test('No Supabase writes, browser network calls or guessed forecast maths',()=>{
- assert(!/\brpc\s*\(|\bfetch\s*\(|\.from\s*\(|\.insert\s*\(|\.update\s*\(|\.delete\s*\(/.test(js));
+test('Staged historical preview is read-only and cannot approve anything',()=>{
+ assert(js.includes('purchasing_forecast_history_preview_v118')); assert(js.includes("method:'POST'"));
+ assert(!/\.insert\s*\(|\.update\s*\(|\.delete\s*\(|p_approve|approved_at/.test(js));
  assert(!js.includes('normalized_net_purchase_qty'));
  assert(!js.includes('purchasing_sales_generator'));
  assert(!/Forecast\s*=/.test(js));
+ assert(js.includes('Historical actuals (staged)'));
+ assert(js.includes('Not assessed'));
+ assert(js.includes('Pending model'));
+ assert(js.includes('Last 3M vs previous 3M'));
+
 });
 test('Legacy Reorder Point integrity and approval code remains in original HTML',()=>{
  assert(html.includes("rpc('purchasing_sales_generator_v113'"));
