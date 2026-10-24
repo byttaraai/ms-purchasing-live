@@ -1,7 +1,7 @@
 /* Build 116: isolated annual forecast presentation. No database writes or estimates. */
 (function(){
 'use strict';
-const anchor=document.getElementById('ropGenerator');if(!anchor)return;
+const anchor=document.getElementById('ropGenerator');if(!anchor||typeof anchor.insertAdjacentElement!=='function')return;
 const root=document.createElement('section');root.id='purchaseForecast116';root.setAttribute('aria-label','Purchase Forecast Generator');
 anchor.insertAdjacentElement('afterend',root);
 root.innerHTML=`
