@@ -31,11 +31,12 @@ root.innerHTML=`
 const q=id=>root.querySelector('#'+id);
 const html=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const nf=n=>new Intl.NumberFormat('en-US').format(n);
-const view={rows:[],page:0,size:60};
+const view={rows:[],page:0,size:60,history:new Map(),loading:false,serial:0};
 const year=q('pfYear'),month=q('pfMonth'),search=q('pfSearch'),supplier=q('pfSupplier'),profit=q('pfProfit'),growth=q('pfGrowth');
 function load(){
  const st=window.msAudit&&typeof window.msAudit.getState==='function'?window.msAudit.getState():null;
  const raw=st&&Array.isArray(st.master)?st.master:[];
+ view.history.clear();
  view.rows=raw.map(x=>({code:String(x.product_code||''),name:String(x.product_name||''),supplier:String(x.supplier||''),profit:String(x.profitability_class||'Unclassified')}));
  const suppliers=[...new Set(view.rows.map(x=>x.supplier).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
  const before=supplier.value;
@@ -48,7 +49,17 @@ function filtered(){const term=search.value.trim().toLocaleLowerCase();return vi
 function render(){
  const rows=filtered(),total=Math.max(1,Math.ceil(rows.length/view.size));view.page=Math.min(view.page,total-1);
  const filteredRows=rows.slice(view.page*view.size,(view.page+1)*view.size);
- q('pfTableBody').innerHTML=filteredRows.map(r=>'<tr><td><div class="pf-product">'+html(r.name)+'<small>'+html(r.code)+' · '+html(r.supplier||'Supplier not assigned')+'</small></div></td><td><span class="pf-pending">Awaiting approval</span></td><td><span class="pf-trend">— / —</span><div class="pf-muted">3M / overall</div></td><td><span class="pf-trend">Pending</span></td><td><span class="pf-pending">—</span><div class="pf-muted">Base + annual growth</div></td></tr>').join('');
+ q('pfTableBody').innerHTML=filteredRows.map(r=>{
+   const h=view.history.get(r.code),loaded=h!==undefined,valid=h&&h.matched_rows>0&&h.unit_count===1;
+   const n=x=>Number(x).toLocaleString('en-US',{maximumFractionDigits:2});
+   const total=valid?'<strong>'+n(h.historical_12m)+'</strong><div class="pf-muted">'+html(h.selling_unit)+' · Historical actuals (staged) · '+n(h.months_covered||0)+'/12 months with matched sales</div>':loaded?'<span class="pf-pending">No matched sales</span>':'<span class="pf-pending">Loading history…</span>';
+   const trend=valid&&h.last_3m!==null&&h.previous_3m!==null&&Number(h.previous_3m)!==0?((Number(h.last_3m)-Number(h.previous_3m))/Math.abs(Number(h.previous_3m))*100):null;
+   const direction=trend===null?'—':trend>3?'↑ '+n(trend)+'%':trend< -3?'↓ '+n(trend)+'%':'→ '+n(trend)+'%';
+   const trendCell=valid?'<span class="pf-trend">'+html(direction)+'</span><div class="pf-muted">Last 3M vs previous 3M · historical</div>':'<span class="pf-pending">—</span>';
+   const codeinfo=h&&h.review_rows?'<div class="pf-muted">'+n(h.review_rows)+' rows need review</div>':'';
+   return '<tr><td><div class="pf-product">'+html(r.name)+'<small>'+html(r.code)+' · '+html(r.supplier||'Supplier not assigned')+'</small>'+codeinfo+'</div></td><td>'+total+'</td><td>'+trendCell+'</td><td><span class="pf-trend">Not assessed</span></td><td><span class="pf-pending">Pending model</span><div class="pf-muted">Base + annual growth</div></td></tr>';
+ }).join('');
+ void loadHistory(filteredRows.map(r=>r.code));
  q('pfEmpty').hidden=rows.length>0;
  q('pfCount').textContent=nf(rows.length)+' products · '+nf(view.page+1)+' / '+nf(total);
  q('pfPrev').disabled=view.page===0;
@@ -57,6 +68,34 @@ function render(){
  q('pfScopeNote').textContent=m==='annual'?'Annual overview · 12 future months':'Selected month layout reserved · monthly purchase logic comes in next stage';
  const g=Number(growth.value);
  q('pfGrowthStatus').textContent=growth.value!==''&&Number.isFinite(g)&&g>=-100&&g<=100?'Growth draft: '+g.toLocaleString('en-US')+'% · not saved':'Enter annual growth between -100% and +100%';
+}
+async function loadHistory(codes){
+ if(!codes.length||view.loading)return;
+ const missing=codes.filter(code=>!view.history.has(code));
+ if(!missing.length)return;
+ const token=++view.serial;
+ view.loading=true;
+ try{
+  if(window.LOCAL_FIXTURE){for(const code of missing)view.history.set(code,{matched_rows:0,review_rows:0});return;}
+  const audit=window.msAudit,st=audit&&audit.getState&&audit.getState();
+  const session=st&&st.session;
+  if(!session||!session.access_token)return;
+  const response=await fetch('https://mpxpbbpqnvoinyjmuuvf.supabase.co/rest/v1/rpc/purchasing_forecast_history_preview_v118',{
+   method:'POST',headers:{'apikey':'sb_publishable_4shFOVEi5Ib0I8KRZYzsMA_Sahkf8PB','Authorization':'Bearer '+session.access_token,'Content-Type':'application/json'},
+   body:JSON.stringify({p_codes:missing})
+  });
+  if(!response.ok)throw Error('Sales history preview unavailable ('+response.status+')');
+  const data=await response.json();
+  if(token!==view.serial)return;
+  for(const item of (data.rows||[]))view.history.set(item.code,item);
+  const visibleMonth=String(data.last_month||'');
+  q('pfSourceStatus').textContent=view.rows.length.toLocaleString('en-US')+' Master products · historical sales through '+visibleMonth+' · staged only';
+ }catch(err){
+  q('pfSourceStatus').textContent='Historical data could not be read · '+String(err.message||err);
+ }finally{
+  view.loading=false;
+  if(token===view.serial)requestAnimationFrame(()=>{const current=filtered().slice(view.page*view.size,(view.page+1)*view.size);if(current.some(r=>view.history.has(r.code)))render();});
+ }
 }
 function months(){
  const d=new Date();const today=new Date(d.getFullYear(),d.getMonth(),1);
