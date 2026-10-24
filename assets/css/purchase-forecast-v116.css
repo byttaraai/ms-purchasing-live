@@ -40,7 +40,7 @@
 @media (min-width: 1220px) {
   #purchaseForecast116 .pf-header {
     display: grid;
-    grid-template-columns: minmax(156px,.93fr) minmax(168px,1.24fr) minmax(142px,1.1fr) minmax(126px,.79fr) minmax(166px,1.1fr) auto auto;
+    grid-template-columns: minmax(188px,.93fr) minmax(168px,1.24fr) minmax(142px,1.1fr) minmax(126px,.79fr) minmax(166px,1.1fr) auto auto;
     align-items: end;
     gap: 10px;
   }
