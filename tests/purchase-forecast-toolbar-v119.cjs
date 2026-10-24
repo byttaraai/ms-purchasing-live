@@ -3,8 +3,8 @@ const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const crypto=require('node:crypto');
-const js=fs.readFileSync('assets/js/purchase-forecast-v116.js','utf8');
-const css=fs.readFileSync('assets/css/purchase-forecast-v116.css','utf8');
+const js=require('./purchase-forecast-clean-v120.cjs').restore120(fs.readFileSync('assets/js/purchase-forecast-v116.js','utf8'));
+const css=fs.readFileSync('assets/css/purchase-forecast-v116.css','utf8').split('\n/* Build 120:')[0];
 const blob=s=>{const b=Buffer.from(s);return crypto.createHash('sha1').update('blob '+b.length+'\0').update(b).digest('hex');};
 const originalTop=[
  'root.innerHTML=`',

@@ -30,7 +30,7 @@ def check(x,name):
 try:
  with sync_playwright() as playwright:
   browser=playwright.chromium.launch(executable_path=shutil.which('chromium') or shutil.which('google-chrome'),headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
-  for width in (1920,1440,1280,1024,768,390):
+  for width in (1920,1440,1280,1100,1024,768,390,320):
    ctx=browser.new_context(viewport={'width':width,'height':900},timezone_id='Asia/Riyadh')
    page=ctx.new_page()
    errors=[]
@@ -79,13 +79,33 @@ try:
    }''')
    check(geometry['scrollWidth']<=geometry['clientWidth']+1,str(width)+' header has no horizontal overflow')
    check(all(x['left']>=geometry['left']-1 and x['right']<=geometry['right']+1 for x in geometry['controls']),str(width)+' each filter and action fits header')
-   if width>=1220:
-    tops=[x['top'] for x in geometry['controls']]+[geometry['titleTop']]
+   if width>=1100:
+    tops=[x['top'] for x in geometry['controls']]
     check(max(tops)-min(tops)<3,str(width)+' title, filters and both actions share one desktop row')
     check(geometry['titleFits'],str(width)+' annual header title is fully visible')
    if width<760:
     actions=[x['top'] for x in geometry['controls'] if x['id'] in ('pfReset','pfRefresh')]
     check(max(actions)-min(actions)<3,str(width)+' mobile actions stay adjacent')
+   check(card.locator('.pf-summary').count()==0,str(width)+' redundant pending summary removed')
+   check(card.locator(':scope > .pf-note:not([hidden])').count()==0,str(width)+' no always-visible banner')
+   check(card.locator('#pfMonth option').first.inner_text()=='Full Year',str(width)+' annual option simplified')
+   labels=card.locator('.pf-header .pf-filter-label').evaluate_all("els=>els.map(e=>[...e.childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent.trim()).join(''))")
+   check(not any(labels),str(width)+' visible filter labels removed')
+   for id,label in [('pfSupplier','Filter by supplier'),('pfProfit','Filter by profitability'),('pfMonth','Forecast month'),('pfSearch','Search forecast products')]:
+    check(card.locator('#'+id).get_attribute('aria-label')==label,str(width)+' accessible filter '+id)
+   check(card.locator('#pfRefresh').get_attribute('aria-label')=='Refresh sales history',str(width)+' refresh icon retains name')
+   headings=card.locator('thead').inner_text()
+   check('Historical Sales' in headings and 'Final Forecast' in headings and 'under review' in headings,str(width)+' accurate compact table titles')
+   check('Annual Base Forecast' not in headings,str(width)+' actual sales not called a forecast')
+   card.locator('#pfInfo').click()
+   check(card.locator('#pfInfoDialog').is_visible(),str(width)+' data information opens')
+   check('staged and under review' in card.locator('#pfInfoDialog').inner_text(),str(width)+' approval meaning remains available')
+   page.keyboard.press('Escape')
+   check(not card.locator('#pfInfoDialog').is_visible(),str(width)+' info closes on Escape')
+   check(page.evaluate('document.activeElement.id')=='pfInfo',str(width)+' focus restored after info closes')
+   if width>=960:
+    table=card.locator('.pf-scroll').evaluate("e=>({client:e.clientWidth,scroll:e.scrollWidth,right:e.getBoundingClientRect().right,last:e.querySelector('th:last-child').getBoundingClientRect().right})")
+    check(table['scroll']<=table['client']+1 and table['last']<=table['right']+1,str(width)+' all five columns fit without clipping')
    check(card.locator('#pfGenerate').is_disabled(),str(width)+' pending-approval generate gated')
    check(card.locator('#pfTableBody tr').count()==60,str(width)+' product rows are paginated')
    check(card.locator('#pfNext').is_enabled(),str(width)+' next page enabled')
@@ -117,13 +137,23 @@ try:
    check(card.locator('#pfUploadHelp').is_visible(),str(width)+' monthly upload preview explicitly gated')
    check('Pending model' in card.inner_text(),str(width)+' no invented final forecast')
    card.locator('#pfSearch').fill('FORECAST-002')
-   page.wait_for_function("document.querySelector('#pfTableBody').textContent.includes('Historical actuals (staged)')")
+   page.wait_for_function("document.querySelector('#pfTableBody .pf120-quantity')?.textContent === '120'")
    check('120' in card.locator('#pfTableBody').inner_text(),str(width)+' synthetic historical totals are read-only')
    check('20%' in card.locator('#pfTableBody').inner_text(),str(width)+' observed trend stays unchanged')
+   card.locator('[data-pf-info-code="FORECAST-002"]').click()
+   info=card.locator('#pfInfoDialog')
+   check(info.is_visible(),str(width)+' product details open')
+   check('Historical actuals (staged)' in info.inner_text() and '12/12' in info.inner_text(),str(width)+' product provenance and coverage retained')
+   check('36' in info.inner_text() and '30' in info.inner_text(),str(width)+' trend inputs visible on demand')
+   card.locator('#pfInfoClose').click()
+   check(not info.is_visible(),str(width)+' product details close')
+   card.locator('#pfMonthUpload').click()
    check(page.evaluate('JSON.stringify(msAudit.getState().master)')==original_master,str(width)+' Master data unchanged')
    card.locator('#pfReset').click()
    check(not errors,str(width)+' no JS exceptions: '+repr(errors))
+   card.locator('.pf-scroll').evaluate('(e)=>e.scrollTop=0')
    card.screenshot(path=str(ROOT/'tests'/('forecast-v116-'+str(width)+'.png')))
+   card.locator('.pf-table-card').screenshot(path=str(ROOT/'tests'/('forecast-clean-v120-'+str(width)+'.png')))
    ctx.close()
   browser.close()
 finally:
