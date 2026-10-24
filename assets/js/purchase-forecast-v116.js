@@ -5,12 +5,13 @@ const anchor=document.getElementById('ropGenerator');if(!anchor||typeof anchor.i
 const root=document.createElement('section');root.id='purchaseForecast116';root.setAttribute('aria-label','Purchase Forecast Generator');
 anchor.insertAdjacentElement('afterend',root);
 root.innerHTML=`
-  <div class="pf-head"><div><span class="pf-kicker">PURCHASE PLANNING · ANNUAL FORECAST</span><h3>Purchase Forecast Generator <small id="pfYear" class="pf-muted"></small></h3><span id="pfSourceStatus" class="pf-muted" role="status">Loading product master…</span></div><span class="pf-state">UI Preview · No forecast approved</span></div>
-  <div class="pf-controls">
-    <label>Monthly Sales Upload <button id="pfMonthUpload" class="pf-btn" type="button">Update Month ▴</button></label>
-    <label>Annual Growth % <input id="pfGrowth" type="number" min="-100" max="100" step=".1" value="0" aria-label="Annual growth percentage"></label>
-    <label>Forecast <button id="pfGenerate" class="pf-btn pf-btn-primary" type="button" disabled title="Requires approved monthly history, mapping rules and a validated annual model">Generate Forecast</button></label>
-    <div class="pf-muted" id="pfGrowthStatus" role="status">Growth draft: 0% · not saved</div>
+  <div class="pf-toolbar" data-ui-build="119">
+    <div class="pf-head"><div><h3>Purchase Forecast <small id="pfYear" class="pf-muted"></small></h3><span id="pfSourceStatus" class="pf-muted" role="status">Loading product master…</span></div></div>
+    <div class="pf-controls" role="group" aria-label="Purchase forecast controls">
+      <label>Monthly Sales <button id="pfMonthUpload" class="pf-btn" type="button">Update Month ▴</button></label>
+      <label class="pf-growth-control">Annual Growth % <span class="pf-growth-field"><input id="pfGrowth" type="number" min="-100" max="100" step=".1" value="0" aria-label="Annual growth percentage" aria-describedby="pfGrowthStatus"><span class="pf-muted" id="pfGrowthStatus" role="status" title="Draft percentage; not saved or applied">Draft · 0%</span></span></label>
+      <label>Forecast <button id="pfGenerate" class="pf-btn pf-btn-primary" type="button" disabled title="Requires approved monthly history, mapping rules and a validated annual model">Generate Forecast</button></label>
+    </div>
   </div>
   <div id="pfUploadHelp" class="pf-note" hidden>Monthly update workflow will become available after the secured upload and review endpoint is implemented. All 12 history batches are staged, not approved. No upload or save is performed from this preview.</div>
   <div class="pf-note">Historical sales are isolated and staged (12 months). Forecast numbers remain unavailable until monthly reports, product matching, unit rules and forecast model are approved. Master and Reorder Point Generator remain untouched.</div>
@@ -42,7 +43,7 @@ function load(){
  const before=supplier.value;
  supplier.innerHTML='<option value="">All suppliers</option>'+suppliers.map(s=>'<option value="'+html(s)+'">'+html(s)+'</option>').join('');
  if(suppliers.includes(before))supplier.value=before;
- q('pfSourceStatus').textContent=view.rows.length?nf(view.rows.length)+' Master products · sales history staged / not approved':'Waiting for product Master to load';
+ q('pfSourceStatus').textContent=view.rows.length?nf(view.rows.length)+' products · Loading sales history':'Waiting for product Master to load';
  view.page=0;render();
 }
 function filtered(){const term=search.value.trim().toLocaleLowerCase();return view.rows.filter(r=>(!term||(r.name+' '+r.code).toLocaleLowerCase().includes(term))&&(!supplier.value||r.supplier===supplier.value)&&(!profit.value||r.profit.toLocaleLowerCase()===profit.value));}
@@ -67,7 +68,7 @@ function render(){
  const m=month.value; q('pfTableTitle').textContent=m==='annual'?'Annual Forecast Overview':'Forecast view · '+month.options[month.selectedIndex].text;
  q('pfScopeNote').textContent=m==='annual'?'Annual overview · 12 future months':'Selected month layout reserved · monthly purchase logic comes in next stage';
  const g=Number(growth.value);
- q('pfGrowthStatus').textContent=growth.value!==''&&Number.isFinite(g)&&g>=-100&&g<=100?'Growth draft: '+g.toLocaleString('en-US')+'% · not saved':'Enter annual growth between -100% and +100%';
+ q('pfGrowthStatus').textContent=growth.value!==''&&Number.isFinite(g)&&g>=-100&&g<=100?'Draft · '+g.toLocaleString('en-US')+'%':'Enter annual growth between -100% and +100%';
 }
 async function loadHistory(codes){
  if(!codes.length||view.loading)return;
@@ -89,7 +90,7 @@ async function loadHistory(codes){
   if(token!==view.serial)return;
   for(const item of (data.rows||[]))view.history.set(item.code,item);
   const visibleMonth=String(data.last_month||'');
-  q('pfSourceStatus').textContent=view.rows.length.toLocaleString('en-US')+' Master products · historical sales through '+visibleMonth+' · staged only';
+  q('pfSourceStatus').textContent=view.rows.length.toLocaleString('en-US')+' products · Sales through '+visibleMonth;
  }catch(err){
   q('pfSourceStatus').textContent='Historical data could not be read · '+String(err.message||err);
  }finally{

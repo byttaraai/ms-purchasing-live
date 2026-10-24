@@ -1,4 +1,4 @@
-"""Build 116 annual forecast visual/interaction smoke test, synthetic Master only."""
+"""Annual forecast visual/interaction regression, synthetic Master only."""
 from pathlib import Path
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
@@ -30,18 +30,44 @@ def check(x,name):
 try:
  with sync_playwright() as playwright:
   browser=playwright.chromium.launch(executable_path=shutil.which('chromium') or shutil.which('google-chrome'),headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
-  for width in (1920,1440,1280,1024,390):
-   ctx=browser.new_context(viewport={'width':width,'height':900})
+  for width in (1920,1440,1280,1024,768,390):
+   ctx=browser.new_context(viewport={'width':width,'height':900},timezone_id='Asia/Riyadh')
    page=ctx.new_page()
    errors=[]
    page.on('pageerror',lambda e:errors.append(str(e)))
    page.goto(base+'/forecast-v116-smoke.html',wait_until='load')
    page.locator('#pfTableBody tr').first.wait_for(timeout=25000)
    card=page.locator('#purchaseForecast116')
+   original_master=page.evaluate('JSON.stringify(msAudit.getState().master)')
    check(card.count()==1,str(width)+' one forecast UI section')
    check(not card.evaluate('(e)=>e.closest(".hidden")!==null'),str(width)+' visible on Dashboard')
    check(page.locator('#ropGenerator').count()==1,str(width)+' original ROP remains')
    check(card.locator('thead th').count()==5,str(width)+' 5 annual columns')
+   toolbar=card.locator('.pf-toolbar[data-ui-build="119"]')
+   check(toolbar.count()==1,str(width)+' one combined title/control toolbar')
+   check(card.locator('.pf-kicker,.pf-state').count()==0,str(width)+' redundant heading and status badge removed')
+   check(toolbar.locator('#pfGrowthStatus').is_visible(),str(width)+' small growth draft remains visible')
+   layout=toolbar.evaluate('''e=>{
+      const box=e.getBoundingClientRect();
+      const boxes=['.pf-head','.pf-controls','#pfMonthUpload','#pfGrowth','#pfGenerate'].map(s=>{
+        const x=e.querySelector(s),r=x.getBoundingClientRect();
+        return {selector:s,left:r.left,right:r.right,top:r.top,bottom:r.bottom,height:r.height};
+      });
+      return {left:box.left,right:box.right,height:box.height,scroll:e.scrollWidth,client:e.clientWidth,boxes,
+        titleSize:parseFloat(getComputedStyle(e.querySelector('h3')).fontSize),
+        innerBorder:getComputedStyle(e.querySelector('.pf-controls')).borderTopWidth};
+   }''')
+   check(layout['scroll']<=layout['client']+1,str(width)+' toolbar has no horizontal overflow')
+   check(all(x['left']>=layout['left']-1 and x['right']<=layout['right']+1 for x in layout['boxes']),str(width)+' all toolbar content fits')
+   check(layout['titleSize']==19,str(width)+' compact 19px forecast title')
+   check(layout['innerBorder']=='0px',str(width)+' separate controls card removed')
+   if width>=960:
+    head,controls=layout['boxes'][:2]
+    check(head['right']<=controls['left'],str(width)+' title and controls share a horizontal row')
+    tops=[x['top'] for x in layout['boxes'][2:]]
+    check(max(tops)-min(tops)<2,str(width)+' inputs and actions align')
+    check(layout['height']<=86,str(width)+' compact toolbar height')
+   toolbar.screenshot(path=str(ROOT/'tests'/('forecast-toolbar-v119-'+str(width)+'.png')))
    geometry=card.locator('.pf-header').evaluate('''e=>{
       const bounds=e.getBoundingClientRect();
       const ids=['pfSearch','pfSupplier','pfProfit','pfMonth','pfReset','pfRefresh'];
@@ -83,13 +109,18 @@ try:
    check('Forecast view' in card.locator('#pfTableTitle').inner_text(),str(width)+' month view label switches')
    card.locator('#pfGrowth').fill('12.5')
    check('12.5%' in card.locator('#pfGrowthStatus').inner_text(),str(width)+' annual growth draft input works')
+   card.locator('#pfGrowth').fill('101')
+   check('between -100%' in card.locator('#pfGrowthStatus').inner_text(),str(width)+' original growth validation remains visible')
+   check(not card.locator('#pfGrowth').evaluate('(e)=>e.checkValidity()'),str(width)+' input validation remains enforced')
+   card.locator('#pfGrowth').fill('20')
    card.locator('#pfMonthUpload').click()
    check(card.locator('#pfUploadHelp').is_visible(),str(width)+' monthly upload preview explicitly gated')
    check('Pending model' in card.inner_text(),str(width)+' no invented final forecast')
    card.locator('#pfSearch').fill('FORECAST-002')
-   page.wait_for_timeout(350)
-   check('Historical actuals (staged)' in card.inner_text(),str(width)+' staged actual sales appear')
+   page.wait_for_function("document.querySelector('#pfTableBody').textContent.includes('Historical actuals (staged)')")
    check('120' in card.locator('#pfTableBody').inner_text(),str(width)+' synthetic historical totals are read-only')
+   check('20%' in card.locator('#pfTableBody').inner_text(),str(width)+' observed trend stays unchanged')
+   check(page.evaluate('JSON.stringify(msAudit.getState().master)')==original_master,str(width)+' Master data unchanged')
    card.locator('#pfReset').click()
    check(not errors,str(width)+' no JS exceptions: '+repr(errors))
    card.screenshot(path=str(ROOT/'tests'/('forecast-v116-'+str(width)+'.png')))

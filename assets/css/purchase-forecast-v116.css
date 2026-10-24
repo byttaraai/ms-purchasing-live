@@ -105,3 +105,100 @@
   padding: 5px 12px;
   white-space: nowrap;
 }
+
+/* Build 119: one compact title/control toolbar; presentation only. */
+#purchaseForecast116 .pf-toolbar {
+  display: grid;
+  grid-template-columns: minmax(260px,1fr) auto;
+  align-items: center;
+  gap: 24px;
+  min-height: 80px;
+  padding: 8px 0 12px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--line,#e4e8ef);
+}
+#purchaseForecast116 .pf-toolbar .pf-head,
+#purchaseForecast116 .pf-toolbar .pf-head > div { min-width: 0; }
+#purchaseForecast116 .pf-toolbar h3 {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 5px;
+  font-size: 19px;
+  line-height: 1.3;
+}
+#purchaseForecast116 .pf-toolbar #pfYear {
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+#purchaseForecast116 .pf-toolbar #pfSourceStatus {
+  display: block;
+  font-size: 11px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+#purchaseForecast116 .pf-toolbar .pf-controls {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: flex-end;
+  gap: 12px;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  min-width: 0;
+}
+#purchaseForecast116 .pf-toolbar .pf-controls > label {
+  flex: 0 0 auto;
+  min-width: 0;
+  margin: 0;
+  gap: 5px;
+  font-size: 11px;
+}
+#purchaseForecast116 .pf-toolbar .pf-controls .pf-btn {
+  height: 34px;
+  min-height: 34px;
+  white-space: nowrap;
+}
+#purchaseForecast116 .pf-toolbar .pf-growth-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 176px;
+  min-height: 34px;
+}
+#purchaseForecast116 .pf-toolbar #pfGrowth {
+  flex: 0 0 76px;
+  width: 76px;
+  height: 34px;
+}
+#purchaseForecast116 .pf-toolbar #pfGrowthStatus {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 959px) {
+  #purchaseForecast116 .pf-toolbar {
+    grid-template-columns: minmax(0,1fr);
+    gap: 14px;
+  }
+  #purchaseForecast116 .pf-toolbar .pf-controls { justify-content: flex-start; }
+}
+@media (max-width: 519px) {
+  #purchaseForecast116 .pf-toolbar .pf-controls {
+    display: grid;
+    grid-template-columns: minmax(0,1fr) minmax(0,1.2fr);
+    gap: 12px;
+  }
+  #purchaseForecast116 .pf-toolbar .pf-controls > label:last-child { grid-column: 1 / -1; }
+  #purchaseForecast116 .pf-toolbar .pf-growth-field { width: 100%; gap: 6px; }
+  #purchaseForecast116 .pf-toolbar #pfGrowth { flex-basis: 64px; width: 64px; }
+  #purchaseForecast116 .pf-toolbar .pf-controls .pf-btn,
+  #purchaseForecast116 .pf-toolbar #pfGrowth { min-height: 40px; height: 40px; }
+}
