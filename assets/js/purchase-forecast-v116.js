@@ -62,7 +62,7 @@ function months(){
  const d=new Date();const today=new Date(d.getFullYear(),d.getMonth(),1);
  // Forecast starts after the last fully closed month; never treat current month as complete.
  let options='<option value="annual">Full year · Annual overview</option>';
- for(let i=1;i<=12;i++){const m=new Date(today.getFullYear(),today.getMonth()+i,1),value=m.toISOString().slice(0,7);options+='<option value="'+value+'">'+m.toLocaleString('en-US',{month:'long',year:'numeric'})+'</option>';}
+ for(let i=1;i<=12;i++){const m=new Date(today.getFullYear(),today.getMonth()+i,1),value=m.getFullYear()+'-'+String(m.getMonth()+1).padStart(2,'0');options+='<option value="'+value+'">'+m.toLocaleString('en-US',{month:'long',year:'numeric'})+'</option>';}
  month.innerHTML=options;year.textContent=String(today.getFullYear())+'–'+String(today.getFullYear()+1);
 }
 for(const c of [month,search,supplier,profit,growth])c.addEventListener(c===search||c===growth?'input':'change',()=>{view.page=0;render();});
