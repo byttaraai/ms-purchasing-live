@@ -82,7 +82,7 @@ try:
    check('12.5%' in card.locator('#pfGrowthStatus').inner_text(),str(width)+' annual growth draft input works')
    card.locator('#pfMonthUpload').click()
    check(card.locator('#pfUploadHelp').is_visible(),str(width)+' monthly upload preview explicitly gated')
-   check('Awaiting approval' in card.inner_text(),str(width)+' no invented forecast values')
+   check('Pending model' in card.inner_text(),str(width)+' no invented forecast values')
    check(not errors,str(width)+' no JS exceptions: '+repr(errors))
    card.screenshot(path=str(ROOT/'tests'/('forecast-v116-'+str(width)+'.png')))
    ctx.close()
