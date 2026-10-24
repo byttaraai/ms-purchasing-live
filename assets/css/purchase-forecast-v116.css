@@ -1,0 +1,36 @@
+/* Build 116: isolated Purchase Forecast annual UI; no legacy selectors are modified. */
+#purchaseForecast116{margin-top:22px;border:1px solid var(--line,#dce2ec);border-radius:16px;background:var(--surface,#fff);padding:18px;box-shadow:0 4px 18px rgba(20,35,65,.035)}
+#purchaseForecast116 *{box-sizing:border-box}
+#purchaseForecast116 .pf-head,#purchaseForecast116 .pf-controls,#purchaseForecast116 .pf-header,#purchaseForecast116 .pf-footer{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+#purchaseForecast116 .pf-kicker{font-size:10px;letter-spacing:.13em;color:#7561af;font-weight:800}
+#purchaseForecast116 h3{margin:3px 0 4px;font-size:21px;line-height:1.2}
+#purchaseForecast116 .pf-muted{color:var(--muted,#65718a);font-size:12px}
+#purchaseForecast116 .pf-state{font-size:11px;padding:6px 11px;border:1px solid #ead8a3;background:#fff8df;color:#856313;border-radius:100px;font-weight:700}
+#purchaseForecast116 .pf-controls{margin:16px 0 12px;padding:13px;border:1px solid var(--line,#e4e8ef);border-radius:12px;background:var(--bg,#f8f9fc);justify-content:flex-start}
+#purchaseForecast116 .pf-controls label,#purchaseForecast116 .pf-filter-label{display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:700;color:var(--muted,#596581)}
+#purchaseForecast116 input,#purchaseForecast116 select{height:34px;border:1px solid var(--line,#dce2ec);background:var(--surface,#fff);border-radius:8px;padding:5px 9px;color:inherit;min-width:0;max-width:100%}
+#purchaseForecast116 .pf-controls input{width:110px}
+#purchaseForecast116 .pf-btn{min-height:34px;border:1px solid var(--line,#dce2ec);background:var(--surface,#fff);border-radius:8px;padding:6px 12px;color:inherit;cursor:pointer;font-weight:700;font-size:12px}
+#purchaseForecast116 .pf-btn:disabled{opacity:.55;cursor:not-allowed}
+#purchaseForecast116 .pf-btn-primary{background:#6945db;color:#fff;border-color:#6945db}
+#purchaseForecast116 .pf-note{padding:10px 12px;background:rgba(235,180,65,.09);border:1px solid rgba(200,155,65,.3);border-radius:9px;color:var(--muted,#6e6659);font-size:12px}
+#purchaseForecast116 .pf-table-card{border:1px solid var(--line,#dce2ec);border-radius:12px;overflow:hidden;margin-top:12px}
+#purchaseForecast116 .pf-header{padding:12px;background:var(--bg,#f8f9fc);justify-content:flex-start;border-bottom:1px solid var(--line,#e4e8ef)}
+#purchaseForecast116 .pf-header input{width:230px}
+#purchaseForecast116 .pf-header select{min-width:140px}
+#purchaseForecast116 .pf-scroll{overflow:auto;max-height:540px}
+#purchaseForecast116 table{width:100%;border-collapse:separate;border-spacing:0;min-width:820px;font-size:12px}
+#purchaseForecast116 th{text-align:left;position:sticky;top:0;z-index:1;background:var(--bg,#f6f8fc);font-size:11px;color:var(--muted,#5e6882);padding:12px;border-bottom:1px solid var(--line,#dce2ec)}
+#purchaseForecast116 td{padding:12px;vertical-align:middle;border-bottom:1px solid var(--line,#edf0f5)}
+#purchaseForecast116 tbody tr:last-child td{border-bottom:0}
+#purchaseForecast116 .pf-product{display:flex;flex-direction:column;gap:3px;font-weight:700}
+#purchaseForecast116 .pf-product small{font-size:10px;color:var(--muted,#65718a);font-weight:400}
+#purchaseForecast116 .pf-pending{color:var(--muted,#8a91a5)}
+#purchaseForecast116 .pf-trend{font-size:11px;display:inline-block;background:var(--bg,#f2f4f8);padding:5px 9px;border-radius:7px;color:var(--muted,#68738c)}
+#purchaseForecast116 .pf-footer{padding:10px 12px;background:var(--bg,#fafbfe);border-top:1px solid var(--line,#dce2ec)}
+#purchaseForecast116 .pf-footer-actions{display:flex;align-items:center;gap:9px}
+#purchaseForecast116 .pf-empty{padding:26px;text-align:center;color:var(--muted,#748099)}
+#purchaseForecast116 .pf-summary{display:flex;gap:12px;flex-wrap:wrap;margin:10px 0 0}
+#purchaseForecast116 .pf-summary span{font-size:11px;color:var(--muted,#667085)}
+#purchaseForecast116 .pf-summary strong{color:inherit;font-weight:800}
+@media(max-width:760px){#purchaseForecast116{padding:12px}#purchaseForecast116 .pf-head{align-items:flex-start}#purchaseForecast116 .pf-controls>*{flex:1 1 140px}#purchaseForecast116 .pf-controls input{width:100%}#purchaseForecast116 .pf-header>*{flex:1 1 140px}#purchaseForecast116 .pf-header input{width:100%}}
