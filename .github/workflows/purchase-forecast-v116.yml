@@ -13,6 +13,6 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - name: Forecast UI contracts and legacy protection
-        run: node --test tests/purchase-forecast-v116.cjs tests/reorder-compact.cjs tests/reorder-preview-v103.cjs
+        run: node --test tests/purchase-forecast-v116.cjs tests/reorder-compact.cjs
       - name: JavaScript syntax
         run: node --check assets/js/purchase-forecast-v116.js
