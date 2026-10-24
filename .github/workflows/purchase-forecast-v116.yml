@@ -16,3 +16,7 @@ jobs:
         run: node --test tests/purchase-forecast-v116.cjs tests/reorder-compact.cjs
       - name: JavaScript syntax
         run: node --check assets/js/purchase-forecast-v116.js
+      - name: Real desktop/mobile browser interaction smoke test
+        run: |
+          python3 -m pip install --disable-pip-version-check 'playwright==1.57.0' 'pyee==13.0.1' 'greenlet==3.5.1'
+          python3 tests/run-purchase-forecast-v116.py
