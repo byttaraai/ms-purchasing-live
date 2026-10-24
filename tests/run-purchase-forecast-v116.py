@@ -12,7 +12,10 @@ for i in range(85):
  row['product_name']='Annual forecast QA item '+str(i).zfill(3)
  row['supplier']='QA Supplier' if i%2 else 'Secondary Supplier'
  fixture['rows'].append(row);fixture['master'].append(dict(row))
-mock='<script>window.qaFixture='+json.dumps(fixture)+';\n'+qa['mock']+"\naddEventListener('load',()=>{void msAudit.loadLive()});</script>"
+mock_source=qa['mock'].replace(
+ "else if(path==='purchasing_workspace_revision_v47')",
+ "else if(path==='purchasing_forecast_history_preview_v118'){result={last_month:'2026-09',data_state:'staged_review_only',rows:args.p_codes.map(c=>({code:c,historical_12m:120,selling_unit:'Piece',last_3m:36,previous_3m:30,matched_rows:12,review_rows:0,months_covered:12,unit_count:1}))};}\n else if(path==='purchasing_workspace_revision_v47')")
+mock='<script>window.qaFixture='+json.dumps(fixture)+';\n'+mock_source+"\naddEventListener('load',()=>{void msAudit.loadLive()});</script>"
 doc=(ROOT/'index.html').read_text().replace('</head>',mock+'</head>',1)
 temp=ROOT/'forecast-v116-smoke.html'
 temp.write_text(doc)
@@ -82,7 +85,12 @@ try:
    check('12.5%' in card.locator('#pfGrowthStatus').inner_text(),str(width)+' annual growth draft input works')
    card.locator('#pfMonthUpload').click()
    check(card.locator('#pfUploadHelp').is_visible(),str(width)+' monthly upload preview explicitly gated')
-   check('Pending model' in card.inner_text(),str(width)+' no invented forecast values')
+   check('Pending model' in card.inner_text(),str(width)+' no invented final forecast')
+   card.locator('#pfSearch').fill('FORECAST-002')
+   page.wait_for_timeout(350)
+   check('Historical actuals (staged)' in card.inner_text(),str(width)+' staged actual sales appear')
+   check('120' in card.locator('#pfTableBody').inner_text(),str(width)+' synthetic historical totals are read-only')
+   card.locator('#pfReset').click()
    check(not errors,str(width)+' no JS exceptions: '+repr(errors))
    card.screenshot(path=str(ROOT/'tests'/('forecast-v116-'+str(width)+'.png')))
    ctx.close()
