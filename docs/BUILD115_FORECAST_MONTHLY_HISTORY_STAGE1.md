@@ -24,7 +24,7 @@ Stage 3: Forecast trend/seasonality/growth and 30-day purchase advance.
 Stage 4: table header filters and search.
 
 ## Stage 1 verification
-2026-10-24: month registry = 12; batches = 0; lines = 0; products in existing Master = 1,576. **History has not been populated because 12 monthly exports were not supplied.**
+2026-10-24: All 12 monthly reports (Oct 2025 through Sep 2026) have now been imported privately. Registry = 12; source batches = 12 (all `staged`, none approved); source product-month lines = 10,474; 1,648 distinct report product names. Source quantity/net-value reconciliation passed with only minor source-footer rounding. Exact unique Master-name and conservatively normalized equivalent purchase-unit mapping passed for 9,782 lines; 692 lines remain `needs_review` (412 unit-label differences across 56 products, 280 missing exact Master-name mapping across 184 products). There are 15 negative net-quantity source lines, preserved as refunds rather than zeroed. Report rows retain original input in `raw_payload`; `normalized_net_purchase_qty` is set only for matched lines. No forecast is computed, no batch is approved, and no existing Master row was mutated.
 
 ## Artifacts
 The monthly export preparation kit is distributed separately as `Monthly_Sales_History_Stage1_Package.zip` in conversation artifacts.
