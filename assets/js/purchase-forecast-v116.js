@@ -36,6 +36,7 @@ const year=q('pfYear'),month=q('pfMonth'),search=q('pfSearch'),supplier=q('pfSup
 function load(){
  const st=window.msAudit&&typeof window.msAudit.getState==='function'?window.msAudit.getState():null;
  const raw=st&&Array.isArray(st.master)?st.master:[];
+ view.history.clear();
  view.rows=raw.map(x=>({code:String(x.product_code||''),name:String(x.product_name||''),supplier:String(x.supplier||''),profit:String(x.profitability_class||'Unclassified')}));
  const suppliers=[...new Set(view.rows.map(x=>x.supplier).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
  const before=supplier.value;
@@ -51,7 +52,7 @@ function render(){
  q('pfTableBody').innerHTML=filteredRows.map(r=>{
    const h=view.history.get(r.code),loaded=h!==undefined,valid=h&&h.matched_rows>0&&h.unit_count===1;
    const n=x=>Number(x).toLocaleString('en-US',{maximumFractionDigits:2});
-   const total=valid?'<strong>'+n(h.historical_12m)+'</strong><div class="pf-muted">'+html(h.selling_unit)+' · Historical actuals (staged)</div>':loaded?'<span class="pf-pending">No matched sales</span>':'<span class="pf-pending">Loading history…</span>';
+   const total=valid?'<strong>'+n(h.historical_12m)+'</strong><div class="pf-muted">'+html(h.selling_unit)+' · Historical actuals (staged) · '+n(h.months_covered||0)+'/12 months with matched sales</div>':loaded?'<span class="pf-pending">No matched sales</span>':'<span class="pf-pending">Loading history…</span>';
    const trend=valid&&h.last_3m!==null&&h.previous_3m!==null&&Number(h.previous_3m)!==0?((Number(h.last_3m)-Number(h.previous_3m))/Math.abs(Number(h.previous_3m))*100):null;
    const direction=trend===null?'—':trend>3?'↑ '+n(trend)+'%':trend< -3?'↓ '+n(trend)+'%':'→ '+n(trend)+'%';
    const trendCell=valid?'<span class="pf-trend">'+html(direction)+'</span><div class="pf-muted">Last 3M vs previous 3M · historical</div>':'<span class="pf-pending">—</span>';
