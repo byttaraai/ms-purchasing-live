@@ -6,6 +6,8 @@ const link='<link rel="stylesheet" href="assets/css/reorder-generator-v108.css?v
 const sectionStart='<section class="ropg-section" id="ropGenerator"';
 const sectionEnd='</section>\n<section class="hidden" data-panel="tasks-assistant">';
 function as102(html){
+  // Build 116 is an additive, isolated UI: remove only its two resource tags for the frozen pre-generator comparison.
+  html=html.replace('<link rel="stylesheet" href="assets/css/purchase-forecast-v116.css?v=116">','').replace('<script src="assets/js/purchase-forecast-v116.js?v=116"></script>','');
   assert.equal(html.split(sectionStart).length-1,1,'one generator section');
   const start=html.indexOf(sectionStart);
   const end=html.indexOf(sectionEnd,start);
