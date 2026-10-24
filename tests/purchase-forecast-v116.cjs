@@ -17,7 +17,7 @@ test('Only scoped forecast stylesheet and script are installed once',()=>{
   assert(selectors.length>10);
 });
 test('Forecast annual UI contains exact agreed columns and header filters',()=>{
-  for(const s of ['Annual Base Forecast','Trend (3M / Annual)','Confidence','Base + Growth (Final)','pfSearch','pfSupplier','pfProfit','pfMonth','pfGrowth','pfGenerate','pfMonthUpload'])assert(js.includes(s),s);
+  for(const s of ['Historical Sales','Trend<span','Confidence','Final Forecast','pfSearch','pfSupplier','pfProfit','pfMonth','pfGrowth','pfGenerate','pfMonthUpload'])assert(js.includes(s),s);
   assert(js.includes("anchor.insertAdjacentElement('afterend',root)"));
   assert(js.includes('staged, not approved'));
   assert(js.includes('pfGenerate')&&js.includes('disabled'));
