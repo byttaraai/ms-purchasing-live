@@ -15,6 +15,7 @@ test('Dashboard Build122 adds only scoped CSS, preserves exact older stylesheet'
  for(const s of selectors)assert(s.startsWith('[data-panel="daily-tasks"]'),'CSS selector must stay within Dashboard: '+s);
 });
 test('Dashboard markup and freshness/action identifiers are unchanged',()=>{
- assert.equal(gitsha(html),'9a003f56f6c41e164452fb93ad4de56266800072');
+ assert.equal(html.split('assets/css/app-v57.css?v=123').length-1,1,'one cache-busted current stylesheet');
+ assert.equal(gitsha(html.replace('assets/css/app-v57.css?v=123','assets/css/app-v57.css?v=68')),'9a003f56f6c41e164452fb93ad4de56266800072');
  for(const id of ['inventoryFreshnessCard','inventoryFreshnessText','inventoryFreshnessAge','inventoryFreshnessStatus','goBosFromDashboard','openInventoryModal'])assert(html.includes('id="'+id+'"'),id);
 });
