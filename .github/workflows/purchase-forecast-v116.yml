@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - name: Forecast UI contracts and legacy protection
-        run: node --test tests/purchase-forecast-v116.cjs tests/reorder-compact.cjs tests/purchase-forecast-toolbar-v119.cjs tests/purchase-forecast-clean-v120.cjs
+        run: node --test tests/purchase-forecast-v116.cjs tests/reorder-compact.cjs tests/purchase-forecast-toolbar-v119.cjs tests/purchase-forecast-clean-v120.cjs tests/purchase-forecast-source-v125.cjs
       - name: JavaScript syntax
         run: node --check assets/js/purchase-forecast-v116.js
       - name: Real desktop/mobile browser interaction smoke test
@@ -24,10 +24,10 @@ jobs:
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: forecast-clean-v120-screenshots
+          name: forecast-source-v125-screenshots
           path: |
             tests/forecast-toolbar-v119-*.png
             tests/forecast-v116-*.png
-            tests/forecast-clean-v120-*.png
+            tests/forecast-source-v125-*.png
           if-no-files-found: ignore
           retention-days: 7

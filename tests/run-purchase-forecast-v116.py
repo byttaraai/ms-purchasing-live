@@ -3,7 +3,7 @@ from pathlib import Path
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from playwright.sync_api import sync_playwright
-import json,threading,runpy,shutil,datetime
+import json,threading,runpy,shutil,datetime,os,re
 ROOT=Path(__file__).resolve().parents[1]
 qa=runpy.run_path(str(ROOT/'tests/browser-v82.py'))
 fixture=json.loads(json.dumps(qa['fixture']))
@@ -12,10 +12,28 @@ for i in range(85):
  row['product_name']='Annual forecast QA item '+str(i).zfill(3)
  row['supplier']='QA Supplier' if i%2 else 'Secondary Supplier'
  fixture['rows'].append(row);fixture['master'].append(dict(row))
+periods=[f'{2025+(9+i)//12}-{(9+i)%12+1:02d}' for i in range(12)]
+def sales_product(code,name,quantities=None,unit='Piece',missing=()):
+ quantities=quantities or [10,10,10,9,9,9,9,9,9,12,12,12]
+ months=[{'month':period,'qty':quantities[i],'unit':unit,'source_rows':1,'unit_count':1,'invalid_rows':0,
+          'source':[{'file':'synthetic-sales.csv','row':i+3,'qty':quantities[i],'unit':unit}]} for i,period in enumerate(periods) if i not in missing]
+ return {'source_id':code,'source_name':name,'source_rows':len(months),'historical_12m':sum(m['qty'] for m in months),'selling_unit':unit,
+         'first_3m':sum(quantities[i] for i in range(3) if i not in missing),'last_3m':sum(quantities[i] for i in range(9,12) if i not in missing),
+         'first_3m_months':sum(i not in missing for i in range(3)),'last_3m_months':sum(i not in missing for i in range(9,12)),
+         'first_3m_errors':0,'last_3m_errors':0,'months_covered':len(months),'unit_count':1,'invalid_rows':0,'monthly':months}
+source_products=[sales_product('sales:'+str(i),'FORECAST-'+str(i).zfill(3)+' source report product') for i in range(122)]
+source_products.extend([
+ sales_product('sales:unlinked','Source only item - never in Master',unit='Box 30'),
+ sales_product('sales:negative','Source negative returns',[-2]+[0]*11),
+ sales_product('sales:partial','Source partial history',missing=(0,1)),
+ sales_product('sales:literal','Source <img src=x onerror=alert(1)> & literal name')
+])
+source_fixture={'source_mode':'sales_reports','ui_build':125,'first_month':periods[0],'last_month':periods[-1],
+ 'periods':periods,'source_rows':sum(x['source_rows'] for x in source_products),'rows':source_products}
 mock_source=qa['mock'].replace(
  "else if(path==='purchasing_workspace_revision_v47')",
- "else if(path==='purchasing_forecast_history_preview_v121'){result={last_month:'2026-09',data_state:'staged_review_only',rows:args.p_codes.map(c=>({code:c,historical_12m:120,selling_unit:'Piece',last_3m:36,previous_3m:30,first_3m:30,first_3m_months:3,last_3m_months:3,first_3m_review:0,last_3m_review:0,matched_rows:12,review_rows:0,months_covered:12,unit_count:1}))};}\n else if(path==='purchasing_workspace_revision_v47')")
-mock='<script>window.qaFixture='+json.dumps(fixture)+';\n'+mock_source+"\naddEventListener('load',()=>{void msAudit.loadLive()});</script>"
+ "else if(path==='purchasing_forecast_history_preview_v121'){if(args.p_codes.length)throw Error('Source view must not request Master codes');if(window.qaSalesFail)return new Response('{}',{status:503});result=structuredClone(window.qaSalesFixture); }\n else if(path==='purchasing_workspace_revision_v47')")
+mock='<script>window.qaFixture='+json.dumps(fixture)+';window.qaSalesFixture='+json.dumps(source_fixture)+';\n'+mock_source+"\naddEventListener('load',()=>{void msAudit.loadLive()});</script>"
 doc=(ROOT/'index.html').read_text().replace('</head>',mock+'</head>',1)
 temp=ROOT/'forecast-v116-smoke.html'
 temp.write_text(doc)
@@ -35,7 +53,15 @@ try:
    page=ctx.new_page()
    errors=[]
    page.on('pageerror',lambda e:errors.append(str(e)))
-   page.goto(base+'/forecast-v116-smoke.html',wait_until='load')
+   if os.environ.get('QA_OFFLINE'):
+    def inline_style(m):return '<style>'+ (ROOT/m.group(1).split('?')[0]).read_text()+'</style>'
+    def inline_script(m):return '<script>'+ (ROOT/m.group(1).split('?')[0]).read_text().replace('</script','<\\/script')+'</script>'
+    offline=re.sub(r'<link rel="stylesheet" href="([^"]+)">',inline_style,doc)
+    offline=re.sub(r'<script src="([^"]+)"></script>',inline_script,offline)
+    storage="<script>for(const k of ['localStorage','sessionStorage']){const d=new Map();Object.defineProperty(window,k,{value:{getItem:k=>d.get(k)||null,setItem:(k,v)=>d.set(k,String(v)),removeItem:k=>d.delete(k),clear:()=>d.clear()}})}</script>"
+    offline=offline.replace('<head>','<head>'+storage,1)
+    page.set_content(offline,wait_until='load')
+   else:page.goto(base+'/forecast-v116-smoke.html',wait_until='load')
    page.locator('#pfTableBody tr').first.wait_for(timeout=25000)
    card=page.locator('#purchaseForecast116')
    original_master=page.evaluate('JSON.stringify(msAudit.getState().master)')
@@ -114,19 +140,17 @@ try:
    card.locator('#pfSearch').fill('FORECAST-002')
    check(card.locator('#pfTableBody tr').count()==1,str(width)+' search works by product code')
    card.locator('#pfReset').click()
-   card.locator('#pfSupplier').select_option('Secondary Supplier')
-   check(card.locator('#pfTableBody tr').count()>0,str(width)+' supplier filter works')
+   check(card.locator('#pfSupplier').is_disabled(),str(width)+' supplier enrichment deferred without Master reads')
    card.locator('#pfReset').click()
-   card.locator('#pfProfit').select_option('high')
-   check(card.locator('#pfTableBody tr').count()>0,str(width)+' profitability filter works')
+   check(card.locator('#pfProfit').is_disabled(),str(width)+' profitability enrichment deferred')
    card.locator('#pfReset').click()
    options=card.locator('#pfMonth option')
    check(options.count()==13,str(width)+' annual + 12 months options')
    value=options.nth(1).get_attribute('value')
    label=options.nth(1).inner_text()
-   check(value.endswith('-'+datetime.datetime.strptime(label,'%B %Y').strftime('%m')) and value[:4]==label[-4:],str(width)+' month label matches month key')
+   check(value.endswith('-'+datetime.datetime.strptime(label,'%b %Y').strftime('%m')) and value[:4]==label[-4:],str(width)+' month label matches month key')
    card.locator('#pfMonth').select_option(value)
-   check('Forecast view' in card.locator('#pfTableTitle').inner_text(),str(width)+' month view label switches')
+   check('Sales' in card.locator('#pfTableTitle').inner_text(),str(width)+' month view label switches')
    card.locator('#pfGrowth').fill('12.5')
    check('12.5%' in card.locator('#pfGrowthStatus').inner_text(),str(width)+' annual growth draft input works')
    card.locator('#pfGrowth').fill('101')
@@ -136,24 +160,56 @@ try:
    card.locator('#pfMonthUpload').click()
    check(card.locator('#pfUploadHelp').is_visible(),str(width)+' monthly upload preview explicitly gated')
    check('Pending model' in card.inner_text(),str(width)+' no invented final forecast')
+   card.locator('#pfMonth').select_option('annual')
    card.locator('#pfSearch').fill('FORECAST-002')
-   page.wait_for_function("document.querySelector('#pfTableBody .pf120-quantity')?.textContent === '120'")
+   page.wait_for_function("() => document.querySelector('#pfTableBody .pf120-quantity')?.textContent === '120'")
    check('120' in card.locator('#pfTableBody').inner_text(),str(width)+' synthetic historical totals are read-only')
    check('+20%' in card.locator('#pfTableBody').inner_text(),str(width)+' annual first-vs-last trend calculated')
-   card.locator('[data-pf-info-code="FORECAST-002"]').click()
+   card.locator('[data-pf-info-code="sales:2"]').click()
    info=card.locator('#pfInfoDialog')
    check(info.is_visible(),str(width)+' product details open')
    check('Historical actuals (staged)' in info.inner_text() and '12/12' in info.inner_text(),str(width)+' product provenance and coverage retained')
    check('36' in info.inner_text() and '30' in info.inner_text(),str(width)+' trend inputs visible on demand')
    card.locator('#pfInfoClose').click()
    check(not info.is_visible(),str(width)+' product details close')
+   check(card.locator('#pfInfoDialog [data-sales-month]').count()==12,str(width)+' all twelve monthly quantities accessible')
    card.locator('#pfMonthUpload').click()
+   card.locator('#pfSearch').fill('Source only item')
+   check(card.locator('#pfTableBody .pf120-quantity').inner_text()=='120',str(width)+' unlinked source product is not excluded')
+   check('Box 30' in card.locator('#pfTableBody').inner_text(),str(width)+' original selling unit retained without purchase conversion')
+   check('No matched' not in card.locator('#pfTableBody').inner_text(),str(width)+' incorrect No Match placeholder removed')
+   card.locator('#pfMonth').select_option('2025-10')
+   check(card.locator('#pfTableBody .pf120-quantity').inner_text()=='10',str(width)+' selected month shows recorded quantity')
+   card.locator('#pfMonth').select_option('annual')
+   card.locator('#pfSearch').fill('Source negative returns')
+   check(card.locator('#pfTableBody .pf120-quantity').inner_text()=='-2',str(width)+' negative returns are never clamped')
+   card.locator('#pfSearch').fill('Source partial history')
+   card.locator('[data-pf-info-code="sales:partial"]').click()
+   check('Not reported' in card.locator('#pfInfoContent').inner_text(),str(width)+' missing months distinct from zero')
+   card.locator('#pfInfoClose').click()
+   card.locator('#pfSearch').fill('literal name')
+   check(card.locator('#pfTableBody img').count()==0,str(width)+' source names escaped safely')
+   card.locator('#pfSearch').fill('Critical A')
+   check(card.locator('#pfTableBody tr').count()==0,str(width)+' Master-only products are not included')
+   if width==1440:
+    page.evaluate('window.qaOldAudit=msAudit.getState;msAudit.getState=()=>({...qaOldAudit(),master:[]})')
+    card.locator('#pfRefresh').click()
+    page.wait_for_function("() => document.querySelector('#pfSourceStatus').textContent.includes('126 sales products')")
+    card.locator('#pfSearch').fill('Source only item')
+    check(card.locator('#pfTableBody .pf120-quantity').inner_text()=='120','empty Master cannot suppress sales')
+    page.evaluate('msAudit.getState=qaOldAudit;window.qaSalesFail=true')
+    card.locator('#pfRefresh').click()
+    page.wait_for_function("() => document.querySelector('#pfSourceStatus').textContent.includes('503')")
+    check(card.locator('#pfTableBody tr').count()==0,'failed fetch does not leave stale quantities')
+    page.evaluate('window.qaSalesFail=false')
+    card.locator('#pfRefresh').click()
+    page.wait_for_function("() => document.querySelector('#pfSourceStatus').textContent.includes('126 sales products')")
    check(page.evaluate('JSON.stringify(msAudit.getState().master)')==original_master,str(width)+' Master data unchanged')
    card.locator('#pfReset').click()
    check(not errors,str(width)+' no JS exceptions: '+repr(errors))
    card.locator('.pf-scroll').evaluate('(e)=>e.scrollTop=0')
    card.screenshot(path=str(ROOT/'tests'/('forecast-v116-'+str(width)+'.png')))
-   card.locator('.pf-table-card').screenshot(path=str(ROOT/'tests'/('forecast-clean-v120-'+str(width)+'.png')))
+   card.locator('.pf-table-card').screenshot(path=str(ROOT/'tests'/('forecast-source-v125-'+str(width)+'.png')))
    ctx.close()
   browser.close()
 finally:

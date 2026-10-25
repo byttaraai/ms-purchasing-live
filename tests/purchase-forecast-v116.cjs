@@ -11,7 +11,7 @@ const gitsha=(s)=>{const b=Buffer.from(s);return crypto.createHash('sha1').updat
 test('Build 116 preserves original pre-Reorder app exact blob',()=>assert.equal(gitsha(as102(html)),'d32029f93ea63f9f8537d342de59cabaef89649e'));
 test('Only scoped forecast stylesheet and script are installed once',()=>{
   assert.equal(html.split('assets/css/purchase-forecast-v116.css?v=116').length-1,1);
-  assert.equal(html.split('assets/js/purchase-forecast-v116.js?v=116').length-1,1);
+  assert.equal(html.split('assets/js/purchase-forecast-v116.js?v=125').length-1,1);
   assert(!css.includes('!important'));assert(!/@import\b/.test(css));
   const selectors=css.match(/(^|})\s*([^{}]+)\{/gm)||[];
   assert(selectors.length>10);
