@@ -3,7 +3,7 @@ const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const crypto=require('node:crypto');
-const js=require('./purchase-forecast-clean-v120.cjs').restore120(require('./purchase-forecast-trend-v121.cjs').restore121(fs.readFileSync('assets/js/purchase-forecast-v116.js','utf8')));
+const js=require('./purchase-forecast-clean-v120.cjs').restore120(require('./purchase-forecast-trend-v121.cjs').restore121(require('./forecast-source-v125-inverse.cjs').restore125(fs.readFileSync('assets/js/purchase-forecast-v116.js','utf8'))));
 const css=fs.readFileSync('assets/css/purchase-forecast-v116.css','utf8').split('\n/* Build 121:')[0].split('\n/* Build 120:')[0];
 const blob=s=>{const b=Buffer.from(s);return crypto.createHash('sha1').update('blob '+b.length+'\0').update(b).digest('hex');};
 const originalTop=[
@@ -45,7 +45,7 @@ test('UI removal cannot grant approval or remove history labels',()=>{
  assert(js.includes('Not assessed'));
 });
 test('Original application entry point is untouched',()=>{
- const html=fs.readFileSync('index.html','utf8');
+ const html=require('./forecast-source-v125-inverse.cjs').restore125Index(fs.readFileSync('index.html','utf8'));
  assert.equal(html.split('assets/css/app-v57.css?v=124').length-1,1,'current Dashboard stylesheet must be cache busted');
  assert.equal(blob(html.replace('assets/css/app-v57.css?v=124','assets/css/app-v57.css?v=68')),'9a003f56f6c41e164452fb93ad4de56266800072');
 });

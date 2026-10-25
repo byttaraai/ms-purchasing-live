@@ -50,7 +50,7 @@ function restore120(source){
 }
 module.exports={restore120};
 if(require.main===module){
- const source=require('./purchase-forecast-trend-v121.cjs').restore121(fs.readFileSync('assets/js/purchase-forecast-v116.js','utf8'));
+ const source=require('./purchase-forecast-trend-v121.cjs').restore121(require('./forecast-source-v125-inverse.cjs').restore125(fs.readFileSync('assets/js/purchase-forecast-v116.js','utf8')));
  const css=fs.readFileSync('assets/css/purchase-forecast-v116.css','utf8').split('\n/* Build 121:')[0];
  const blob=s=>{const b=Buffer.from(s);return crypto.createHash('sha1').update('blob '+b.length+'\0').update(b).digest('hex');};
  test('Build120 only changes approved display text, markup and info interaction',()=>assert.equal(blob(restore120(source)),'0f307eeac497767ea319a59544c859aecda578e8'));

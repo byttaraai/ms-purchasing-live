@@ -6,6 +6,7 @@ const link='<link rel="stylesheet" href="assets/css/reorder-generator-v108.css?v
 const sectionStart='<section class="ropg-section" id="ropGenerator"';
 const sectionEnd='</section>\n<section class="hidden" data-panel="tasks-assistant">';
 function as102(html){
+  html=require('./forecast-source-v125-inverse.cjs').restore125Index(html);
   // Build123: normalize only the approved cache-versioned stylesheet URL for the frozen historical baseline.
   if(html.includes('assets/css/app-v57.css?v=124'))html=html.replace('assets/css/app-v57.css?v=124','assets/css/app-v57.css?v=68');
   // Build 116 is an additive, isolated UI: remove only its two resource tags for the frozen pre-generator comparison.
