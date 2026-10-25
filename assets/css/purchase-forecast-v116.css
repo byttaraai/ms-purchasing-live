@@ -255,3 +255,8 @@
   #purchaseForecast116 .pf-header.pf120-header > .pf-filter-label > select,
   #purchaseForecast116 .pf-header.pf120-header > .pf-btn { min-height:40px; height:40px; }
 }
+
+/* Build 121: annual observed sales trend only. Decline is amber, never loss-red. */
+#purchaseForecast116 .pf-trend-up{color:#14845b;background:rgba(20,132,91,.10);font-weight:750}
+#purchaseForecast116 .pf-trend-down{color:#a66a16;background:rgba(204,144,40,.13);font-weight:750}
+#purchaseForecast116 .pf-trend-stable{color:var(--muted,#68738c);background:var(--bg,#f2f4f8);font-weight:700}
