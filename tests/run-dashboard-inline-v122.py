@@ -20,7 +20,7 @@ threading.Thread(target=server.serve_forever,daemon=True).start()
 try:
  with sync_playwright() as p:
   browser=p.chromium.launch(executable_path=shutil.which('chromium') or shutil.which('google-chrome'),headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
-  for width in (1920,1600,1440,1280,1024,768,390,320):
+  for width in (1920,1600,1440,1366,1280,1100,1024,960,900,899,768,390,320):
    ctx=browser.new_context(viewport={'width':width,'height':900},timezone_id='Asia/Riyadh')
    page=ctx.new_page()
    errors=[]
@@ -44,12 +44,14 @@ try:
    for item in ('heading','inventory','actions'):
     a=info[item]
     assert a['left']>=-2 and a['right']<=width+2,(width,item,'out of viewport',a)
-   if width>=1440:
+   if width>=900:
     y=[info[x]['y'] for x in ('heading','inventory','actions')]
     assert max(y)-min(y)<9,(width,'dashboard elements not on same row',y)
     assert info['heading']['right']<info['inventory']['left']+1
     assert info['inventory']['right']<info['actions']['left']+1
     assert page.locator('#inventoryFreshnessCard').evaluate('(e)=>getComputedStyle(e).boxShadow')=='none',(width,'separate inventory card shadow remains')
+   if width>=900:
+    assert info['container']['height']<125,(width,'single-row Dashboard is too tall',info['container'])
    assert root.locator('#inventoryFreshnessStatus').is_visible()
    assert root.locator('#inventoryFreshnessAge').is_visible()
    assert root.locator('#openInventoryModal').is_enabled()

@@ -7,7 +7,7 @@ const sectionStart='<section class="ropg-section" id="ropGenerator"';
 const sectionEnd='</section>\n<section class="hidden" data-panel="tasks-assistant">';
 function as102(html){
   // Build123: normalize only the approved cache-versioned stylesheet URL for the frozen historical baseline.
-  if(html.includes('assets/css/app-v57.css?v=123'))html=html.replace('assets/css/app-v57.css?v=123','assets/css/app-v57.css?v=68');
+  if(html.includes('assets/css/app-v57.css?v=124'))html=html.replace('assets/css/app-v57.css?v=124','assets/css/app-v57.css?v=68');
   // Build 116 is an additive, isolated UI: remove only its two resource tags for the frozen pre-generator comparison.
   html=html.replace('<link rel="stylesheet" href="assets/css/purchase-forecast-v116.css?v=116">','').replace('<script src="assets/js/purchase-forecast-v116.js?v=116"></script>','');
   assert.equal(html.split(sectionStart).length-1,1,'one generator section');
