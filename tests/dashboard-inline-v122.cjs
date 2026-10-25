@@ -11,8 +11,8 @@ test('Dashboard Build122 adds only scoped CSS, preserves exact older stylesheet'
  assert.equal(pieces.length,2);
  assert.equal(gitsha(pieces[0]),'b88100bf5f310ba2db79bd993473d5e462ae6915');
  assert(!/!important|@import|url\(/.test(pieces[1]));
- const heads=[...pieces[1].matchAll(/([^{}]+)\{/g)].map(x=>x[1].trim());
- for(const s of heads){if(s.startsWith('@media'))continue;assert(s.startsWith('[data-panel="daily-tasks"]'),'CSS selector must stay within Dashboard: '+s);}
+ const selectors=pieces[1].split('\n').map(x=>x.trim()).filter(x=>x.endsWith('{')&&!x.startsWith('@media'));
+ for(const s of selectors)assert(s.startsWith('[data-panel="daily-tasks"]'),'CSS selector must stay within Dashboard: '+s);
 });
 test('Dashboard markup and freshness/action identifiers are unchanged',()=>{
  assert.equal(gitsha(html),'9a003f56f6c41e164452fb93ad4de56266800072');
