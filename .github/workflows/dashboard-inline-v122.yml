@@ -1,0 +1,28 @@
+name: Verify Dashboard inline inventory toolbar
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  dashboard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Legacy DOM and stylesheet integrity
+        run: node --test tests/dashboard-inline-v122.cjs
+      - name: Responsive browser smoke checks
+        run: |
+          python3 -m pip install --disable-pip-version-check 'playwright==1.57.0' 'pyee==13.0.1' 'greenlet==3.5.1'
+          python3 tests/run-dashboard-inline-v122.py
+      - name: QA screenshots
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: dashboard-inline-v122-screenshots
+          path: tests/dashboard-inline-v122-*.png
+          if-no-files-found: ignore
+          retention-days: 7
