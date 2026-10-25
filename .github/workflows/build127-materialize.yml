@@ -1,0 +1,37 @@
+name: Prepare verified Build127 supplier patch
+on:
+  push:
+    branches: [build127-forecast-supplier-snapshots]
+permissions:
+  contents: write
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: build127-forecast-supplier-snapshots
+          fetch-depth: 2
+      - name: Verify and materialize tested supplier patch
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD^)" = "b719857ca73e1e6c4c7a75b6633e8aecd9d79c46"
+          python3 - <<'PY'
+          import hashlib,lzma,pathlib,subprocess
+          raw=b''.join(pathlib.Path('.build127/part'+str(i)+'.bin').read_bytes() for i in range(4))
+          patch=lzma.decompress(raw)
+          assert hashlib.sha256(patch).hexdigest()=='21ff174c9a26f829eae105248a3adc0e2881c5bd84ccd8ce2bd7dbbb348c8563'
+          subprocess.run(['git','apply','--check','--index'],input=patch,check=True)
+          subprocess.run(['git','apply','--index'],input=patch,check=True)
+          PY
+          node --check assets/js/purchase-forecast-v116.js
+          node --test tests/purchase-forecast-v116.cjs tests/reorder-compact.cjs tests/purchase-forecast-toolbar-v119.cjs tests/purchase-forecast-clean-v120.cjs tests/dashboard-inline-v122.cjs tests/purchase-forecast-source-v125.cjs
+      - name: Commit feature files on isolated branch
+        run: |
+          set -euo pipefail
+          git rm .build127/part0.bin .build127/part1.bin .build127/part2.bin .build127/part3.bin
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Build127: Saved Forecast suppliers with explicit Generate refresh'
+          git push origin HEAD:refs/heads/build127-forecast-supplier-snapshots
