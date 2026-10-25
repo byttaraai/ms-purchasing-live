@@ -11,15 +11,16 @@ root.innerHTML=`
       <button id="pfSettings" class="pf-btn pf126-settings" type="button" aria-haspopup="dialog" title="Profitability settings"><span aria-hidden="true">&#9881;</span> Settings</button>
       <label>Monthly Sales <button id="pfMonthUpload" class="pf-btn" type="button">Update Month ▴</button></label>
       <label class="pf-growth-control">Annual Growth % <span class="pf-growth-field"><input id="pfGrowth" type="number" min="-100" max="100" step=".1" value="0" aria-label="Annual growth percentage" aria-describedby="pfGrowthStatus"><span class="pf-muted" id="pfGrowthStatus" role="status" title="Draft percentage; not saved or applied">Draft · 0%</span></span></label>
-      <label>Forecast <button id="pfGenerate" class="pf-btn pf-btn-primary" type="button" disabled title="Requires approved monthly history, mapping rules and a validated annual model">Generate Forecast</button></label>
+      <label>Forecast <button id="pfGenerate" class="pf-btn pf-btn-primary" type="button" disabled title="Copy latest suppliers into Forecast; forecasting calculations are not active yet" aria-label="Generate: update saved suppliers">Generate</button></label>
     </div>
   </div>
+  <p id="pfSupplierSyncStatus" class="pf127-sync-status" role="status" aria-live="polite" hidden></p>
   <div id="pfUploadHelp" class="pf-note" hidden>Monthly update workflow will become available after the secured upload and review endpoint is implemented. All 12 history batches are staged, not approved. No upload or save is performed from this preview.</div>
   <div class="pf-table-card">
     <div class="pf-header pf120-header" data-ui-build="120">
       <div class="pf120-heading"><strong id="pfTableTitle">Forecast Overview</strong><button id="pfInfo" class="pf120-info" type="button" aria-label="About forecast data" aria-haspopup="dialog" title="About these figures">i</button></div>
       <label class="pf-filter-label"><input id="pfSearch" placeholder="Search sales product" aria-label="Search forecast products" title="Original product name in the sales reports"></label>
-      <label class="pf-filter-label"><select id="pfSupplier" aria-label="Filter by supplier" disabled title="Supplier details are a later step; sales do not depend on Master"><option value="">All suppliers</option></select></label>
+      <label class="pf-filter-label"><select id="pfSupplier" aria-label="Filter by supplier" disabled title="Filter saved Forecast suppliers"><option value="">All suppliers</option></select></label>
       <label class="pf-filter-label"><select id="pfProfit" aria-label="Filter by profitability" title="Annual recorded-profit rating"><option value="">All ratings</option><option value="super">Super</option><option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option><option value="loss">Loss</option><option value="review">Needs review</option></select></label>
       <label class="pf-filter-label"><select id="pfMonth" aria-label="Forecast month" title="Recorded sales period, not a forecast month"><option value="annual">Full Year</option></select></label>
       <button type="button" id="pfReset" class="pf-btn" title="Clear filters">Clear</button>
@@ -52,6 +53,69 @@ const view={rows:[],page:0,size:60,history:new Map(),loading:false,serial:0,peri
 const year=q('pfYear'),month=q('pfMonth'),search=q('pfSearch'),supplier=q('pfSupplier'),profit=q('pfProfit'),growth=q('pfGrowth');
 // Build125: identities and monthly quantities come only from the existing sales tables.
 function getForecastSession(){return window.msAudit?.getState?.()?.session||null;}
+// Build127: explicit server-side supplier snapshots. No live Master values drive sales.
+const supplierSync={busy:false,controller:null,serial:0};
+const supplierFields=['supplier','supplier_status','supplier_source_code','supplier_source_revision','supplier_synced_at'];
+function savedSupplier(h){return h?.supplier_status==='available'&&typeof h.supplier==='string'&&h.supplier.trim()?h.supplier.trim():null;}
+function supplierDescription(h){
+ const messages={missing_supplier:'Supplier is missing in the source. Add it there, then use Generate.',
+   unmatched_product:'A unique source product is not identified. Supplier needs review; sales remain available.',
+   ambiguous_product:'More than one source product matches. No supplier is guessed.',
+   not_synced:'Supplier has not been copied yet. Use Generate.'};
+ const text=savedSupplier(h)?'Saved supplier: '+savedSupplier(h):(messages[h?.supplier_status]||messages.not_synced);
+ return text+(h?.supplier_synced_at?' | Last copied: '+new Date(h.supplier_synced_at).toLocaleString('en-GB',{timeZone:'Asia/Riyadh'})+' (Riyadh)':'');
+}
+function canRefreshSuppliers(){return !!getForecastSession()?.user?.id&&['admin','purchasing'].includes(window.msAudit?.getState?.()?.role);}
+function supplierControls(){
+ const allowed=canRefreshSuppliers(),button=q('pfGenerate');
+ button.disabled=!allowed||view.loading||supplierSync.busy||!view.rows.length;
+ button.textContent=supplierSync.busy?'Updating suppliers...':'Generate';
+ button.title=allowed?'Copy latest supplier data into Forecast. Final Forecast remains pending the model.':'Purchasing access is required to refresh suppliers.';
+ q('pfRefresh').disabled=view.loading||supplierSync.busy;
+ supplier.disabled=view.loading||!view.rows.length;
+}
+function supplierOptions(){
+ const previous=supplier.value,names=[...new Set([...view.history.values()].map(savedSupplier).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+ supplier.innerHTML='<option value="">All suppliers</option><option value="required">Supplier required</option>'+names.map(name=>'<option value="supplier:'+html(name)+'">'+html(name)+'</option>').join('');
+ supplier.value=previous==='required'||names.some(name=>'supplier:'+name===previous)?previous:'';
+}
+function supplierMatches(h){return !supplier.value||(supplier.value==='required'?!savedSupplier(h):supplier.value==='supplier:'+savedSupplier(h));}
+function supplierMessage(text,error=false){const status=q('pfSupplierSyncStatus');status.textContent=text;status.hidden=!text;status.classList.toggle('pf127-sync-error',error);}
+function cancelSupplierSync(){supplierSync.serial++;supplierSync.controller?.abort();supplierSync.controller=null;supplierSync.busy=false;supplierMessage('');if(q('pfInfoDialog').open)q('pfInfoDialog').close();q('pfInfoContent').replaceChildren();}
+async function refreshSavedSuppliers(){
+ if(supplierSync.busy||view.loading||!canRefreshSuppliers()||!view.rows.length)return;
+ const session=getForecastSession(),identity=session.user.id,serial=++supplierSync.serial,loadSerial=view.serial;
+ const controller=new AbortController();supplierSync.controller=controller;supplierSync.busy=true;supplierControls();
+ supplierMessage('Updating saved suppliers from the source...');
+ const timeout=setTimeout(()=>controller.abort(),30000);
+ try{
+  const response=await fetch('https://mpxpbbpqnvoinyjmuuvf.supabase.co/rest/v1/rpc/purchasing_forecast_refresh_suppliers_v127',{
+   method:'POST',headers:{'apikey':'sb_publishable_4shFOVEi5Ib0I8KRZYzsMA_Sahkf8PB','Authorization':'Bearer '+session.access_token,'Content-Type':'application/json'},
+   body:JSON.stringify({}),signal:controller.signal
+  });
+  if(!response.ok)throw Error('Supplier update unavailable ('+response.status+')');
+  const result=await response.json();
+  if(serial!==supplierSync.serial||identity!==getForecastSession()?.user?.id||loadSerial!==view.serial)return;
+  if(result.ok!==true||result.forecast_computed!==false||!Array.isArray(result.rows))throw Error('Unexpected supplier update response');
+  const snapshots=new Map();
+  for(const item of result.rows){
+   if(!item.source_id||snapshots.has(item.source_id)||!['available','missing_supplier','unmatched_product','ambiguous_product'].includes(item.supplier_status))throw Error('Invalid supplier snapshot');
+   if((item.supplier_status==='available'&&!savedSupplier(item))||(item.supplier_status!=='available'&&item.supplier!==null))throw Error('Invalid supplier value');
+   snapshots.set(item.source_id,item);
+  }
+  if(view.rows.some(r=>!snapshots.has(r.code)))throw Error('Sales list changed. Refresh sales before trying again.');
+  for(const [id,h] of view.history){const item=snapshots.get(id);for(const key of supplierFields)h[key]=item[key]??null;}
+  supplierOptions();view.page=0;render();
+  supplierMessage('Suppliers saved: '+nf(Number(result.changed)||0)+' updated; '+nf(Number(result.required)||0)+' require a supplier. Forecast calculations are still pending.');
+ }catch(error){
+  if(serial===supplierSync.serial&&identity===getForecastSession()?.user?.id)
+   supplierMessage('Supplier update not confirmed. Previously loaded values remain visible. '+(error.name==='AbortError'?'Use Generate to retry.':String(error.message||error)),true);
+ }finally{
+  clearTimeout(timeout);
+  if(serial===supplierSync.serial){supplierSync.busy=false;supplierSync.controller=null;supplierControls();}
+ }
+}
+q('pfGenerate').addEventListener('click',refreshSavedSuppliers);
 function hasQuantity(value){return value!==null&&value!==undefined&&value!==''&&Number.isFinite(Number(value));}
 // Build126: private preview preferences; only multipliers are kept in browser storage.
 const profitModel=window.ForecastProfit126;
@@ -100,10 +164,11 @@ function monthLabel(value){
  return new Date(Date.UTC(y,m-1,1)).toLocaleDateString('en-US',{month:'short',year:'numeric',timeZone:'UTC'});
 }
 async function load(){
+ if(supplierSync.busy)return;
  const session=getForecastSession(),request=++view.serial;
  view.controller?.abort();view.controller=null;
  view.rows=[];view.history.clear();view.page=0;view.error=null;
- restoreProfitSettings();refreshProfitSummary();
+ restoreProfitSettings();refreshProfitSummary();supplierOptions();
  view.periods=[];view.firstMonth=null;view.lastMonth=null;view.sourceRows=0;
  if(!session?.access_token){view.loading=false;months();render();q('pfSourceStatus').textContent='Sign in to load sales reports';return;}
  view.controller=new AbortController();const controller=view.controller;
@@ -126,13 +191,13 @@ async function load(){
   }
   view.rows=data.rows.map(h=>({code:h.source_id,name:h.source_name}));
   for(const h of data.rows)view.history.set(h.source_id,h);
-  refreshProfitSummary();
+  refreshProfitSummary();supplierOptions();
   view.periods=data.periods;view.firstMonth=data.first_month;view.lastMonth=data.last_month;view.sourceRows=Number(data.source_rows)||0;
   months();q('pfSourceStatus').textContent=nf(view.rows.length)+' sales products \u00b7 '+monthLabel(view.firstMonth)+' - '+monthLabel(view.lastMonth);
  }catch(error){
   if(request!==view.serial)return;
   view.rows=[];view.history.clear();view.error=error.name==='AbortError'?'Sales request timed out. Use Refresh to retry.':String(error.message||error);
-  refreshProfitSummary();q('pfSourceStatus').textContent=view.error;
+  refreshProfitSummary();supplierOptions();q('pfSourceStatus').textContent=view.error;
  }finally{
   clearTimeout(timeout);
   if(request===view.serial){view.loading=false;view.controller=null;q('pfRefresh').disabled=false;render();}
@@ -140,7 +205,7 @@ async function load(){
 }
 function filtered(){
  const term=search.value.trim().toLocaleLowerCase(),period=month.value;
- return view.rows.filter(r=>(!term||r.name.toLocaleLowerCase().includes(term))&&(!profit.value||ratingFor(view.history.get(r.code)).toLowerCase()===profit.value)&&(period==='annual'||view.history.get(r.code)?.monthly.some(m=>m.month===period)));
+ return view.rows.filter(r=>(!term||r.name.toLocaleLowerCase().includes(term))&&supplierMatches(view.history.get(r.code))&&(!profit.value||ratingFor(view.history.get(r.code)).toLowerCase()===profit.value)&&(period==='annual'||view.history.get(r.code)?.monthly.some(m=>m.month===period)));
 }
 function render(){
  const rows=filtered(),total=Math.max(1,Math.ceil(rows.length/view.size));view.page=Math.min(view.page,total-1);
@@ -161,7 +226,7 @@ function render(){
    const trendCell=valid?'<span class="pf-trend '+state+'">'+html(direction)+'</span><div class="pf-muted" title="Last 3 months vs first 3 months of the trailing 12 months; historical, not a prediction">'+(trend===null?'Missing or non-comparable baseline':'Last 3M vs First 3M')+'</div>':'<span class="pf-pending">—</span>';
    const rating=ratingFor(h),ratingCell='<span class="pf126-rating pf126-'+rating.toLowerCase()+'" title="'+html(ratingDescription(h))+'">'+html(rating)+'</span>';
    const codeinfo=''; // Purchase-mapping reviews never suppress original sales.
-   return '<tr><td><div class="pf-product"><div class="pf120-product-line"><span dir="auto" title="'+html(r.name)+'">'+html(r.name)+'</span><button type="button" class="pf120-info" data-pf-info-code="'+html(r.code)+'" aria-label="Sales details for '+html(r.name)+'" aria-haspopup="dialog" title="Sales details">i</button></div><small>Original sales name</small>'+codeinfo+'</div></td><td class="pf126-rating-cell">'+ratingCell+'</td><td>'+total+'</td><td>'+trendCell+'</td><td><span class="pf-trend">Not assessed</span></td><td><span class="pf-pending">Pending model</span></td></tr>';
+   return '<tr><td><div class="pf-product"><div class="pf120-product-line"><span dir="auto" title="'+html(r.name)+'">'+html(r.name)+'</span><button type="button" class="pf120-info" data-pf-info-code="'+html(r.code)+'" aria-label="Sales details for '+html(r.name)+'" aria-haspopup="dialog" title="Sales details">i</button></div><small class="pf127-supplier'+(savedSupplier(h)?'':' pf127-supplier-required')+'" dir="auto" title="'+html(supplierDescription(h))+'">'+html(savedSupplier(h)||'Supplier required')+'</small>'+codeinfo+'</div></td><td class="pf126-rating-cell">'+ratingCell+'</td><td>'+total+'</td><td>'+trendCell+'</td><td><span class="pf-trend">Not assessed</span></td><td><span class="pf-pending">Pending model</span></td></tr>';
  }).join('');
  // The loaded sales catalog is complete; pagination does not query Master codes.
  q('pfEmpty').hidden=rows.length>0;
@@ -173,6 +238,7 @@ function render(){
  q('pfScopeNote').textContent=m==='annual'?'Recorded sales · '+nf(view.sourceRows)+' source rows':'Recorded sales · '+monthLabel(m);
  const g=Number(growth.value);
  q('pfGrowthStatus').textContent=growth.value!==''&&Number.isFinite(g)&&g>=-100&&g<=100?'Draft · '+g.toLocaleString('en-US')+'%':'Enter annual growth between -100% and +100%';
+ supplierControls();
 }
 function months(){
  const previous=month.value||'annual';
@@ -195,6 +261,9 @@ function showForecastInfo(code,trigger){
   const product=view.rows.find(r=>r.code===code),h=view.history.get(code);
   q('pfInfoTitle').textContent=product?product.name:'Sales details';
   add('Original sales name: '+(product?.name||'Unavailable'));
+  add(supplierDescription(h));
+  if(h?.supplier_source_code)add('Supplier source reference: '+h.supplier_source_code+' | copied source revision: '+h.supplier_source_revision);
+  add('The supplier shown is stored in Forecast. Refresh and page reload read this saved copy; Generate imports the current source supplier.');
   if(h){
    add('Historical actuals (staged). Selling unit: '+(h.selling_unit||'Unresolved')+'. Reported months: '+(h.months_covered||0)+'/12. Source rows: '+h.source_rows+'.');
    add(ratingDescription(h));
@@ -215,7 +284,7 @@ function showForecastInfo(code,trigger){
   add('All source products are included, regardless of any purchase-name or unit-mapping review. Product names and monthly net quantities come from the existing sales database, not the BO Assistant Master.');
   add('Trend compares the latest three months with the first three months of the trailing 12-month history. Green means growth above +5%, amber means decline below -5%, grey means stable within ±5%. Missing/uncertain periods or a zero/negative baseline show Insufficient Data. This is historical change, not a forecast.');
   add('Confidence and Final Forecast are pending the forecasting model and approvals. Annual Growth is a draft and is not applied to historical quantities.');
-  add('Select a reporting month to see its recorded sales, or open product details for all monthly quantities. Profitability uses recorded annual profit; supplier and purchasing enrichment are deferred. Master and Reorder Point Generator are unchanged.');
+  add('Select a reporting month to see its recorded sales, or open product details for all monthly quantities. Profitability uses recorded annual profit. Suppliers are saved copies refreshed from BO Master only with Generate; this does not yet compute a Forecast. Purchase-unit conversion and pricing are deferred. Master and Reorder Point Generator are unchanged.');
  }
  if(!dialog.open)dialog.showModal();
 }
@@ -226,5 +295,5 @@ q('pfInfoDialog').addEventListener('close',()=>{const target=pfInfoReturnFocus?.
 months();load();
 // Watch only authentication, never Master rows or revisions. Clear history on logout.
 let lastIdentity=getForecastSession()?.user?.id||'';
-setInterval(()=>{const identity=getForecastSession()?.user?.id||'';if(identity!==lastIdentity){lastIdentity=identity;void load();}},1500);
+setInterval(()=>{const identity=getForecastSession()?.user?.id||'';if(identity!==lastIdentity){lastIdentity=identity;cancelSupplierSync();void load();}else supplierControls();},1500);
 })();

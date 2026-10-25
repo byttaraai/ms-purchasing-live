@@ -31,12 +31,37 @@ source_products.extend([
 ])
 for i,p in enumerate(source_products):
  p['annual_profit_sar']=10000 if i<5 else 3000 if i<15 else 1000 if i<55 else 100 if i<110 else -20
+for i,p in enumerate(source_products):
+ p.update(supplier=('Saved supplier A' if i%2==0 else 'Saved supplier B') if i<122 else None,
+          supplier_status='available' if i<122 else 'unmatched_product',
+          supplier_source_code='SOURCE-'+str(i) if i<122 else None,
+          supplier_source_revision=1,supplier_synced_at='2026-10-25T12:00:00Z')
 source_fixture={'source_mode':'sales_reports','ui_build':125,'first_month':periods[0],'last_month':periods[-1],
  'periods':periods,'source_rows':sum(x['source_rows'] for x in source_products),'rows':source_products}
 mock_source=qa['mock'].replace(
  "else if(path==='purchasing_workspace_revision_v47')",
  "else if(path==='purchasing_forecast_history_preview_v121'){if(args.p_codes.length)throw Error('Source view must not request Master codes');if(window.qaSalesFail)return new Response('{}',{status:503});result=structuredClone(window.qaSalesFixture); }\n else if(path==='purchasing_workspace_revision_v47')")
-mock='<script>window.qaFixture='+json.dumps(fixture)+';window.qaSalesFixture='+json.dumps(source_fixture)+';\n'+mock_source+"\naddEventListener('load',()=>{void msAudit.loadLive()});</script>"
+
+supplier_mock=r"""
+window.qaSupplierSource=Object.fromEntries(qaSalesFixture.rows.map(r=>[r.source_id,{supplier:r.supplier,status:r.supplier_status,code:r.supplier_source_code}]));
+const salesFetch=window.fetch;
+window.fetch=async(url,options)=>{
+ if(String(url).split('/').pop()!=='purchasing_forecast_refresh_suppliers_v127')return salesFetch(url,options);
+ qaCalls.push({path:'purchasing_forecast_refresh_suppliers_v127',p:{}});
+ if(window.qaSupplierDelay)await new Promise(resolve=>{window.qaSupplierRelease=resolve;});
+ if(window.qaSupplierFail)return new Response('{}',{status:503});
+ let changed=0;
+ const rows=qaSalesFixture.rows.map(r=>{
+  const src=qaSupplierSource[r.source_id]||{supplier:null,status:'unmatched_product',code:null};
+  if(r.supplier!==src.supplier||r.supplier_status!==src.status)changed++;
+  const item={source_id:r.source_id,supplier:src.supplier,supplier_status:src.status,supplier_source_code:src.code,supplier_source_revision:2,supplier_synced_at:new Date().toISOString()};
+  Object.assign(r,item);return item;
+ });
+ return new Response(JSON.stringify({ok:true,forecast_computed:false,changed,required:rows.filter(r=>r.supplier_status!=='available').length,rows}),{status:200,headers:{'Content-Type':'application/json'}});
+};
+"""
+
+mock='<script>window.qaFixture='+json.dumps(fixture)+';window.qaSalesFixture='+json.dumps(source_fixture)+';\n'+mock_source+supplier_mock+"\naddEventListener('load',()=>{void msAudit.loadLive()});</script>"
 doc=(ROOT/'index.html').read_text().replace('</head>',mock+'</head>',1)
 temp=ROOT/'forecast-v116-smoke.html'
 temp.write_text(doc)
@@ -163,7 +188,9 @@ try:
    card.locator('#pfProfitDefaults').click()
    card.locator('#pfProfitApply').click()
    check(page.evaluate("JSON.parse(localStorage.getItem('msp_forecast_profit_v126:qa-user')).multipliers.super")==3,str(width)+' preferences stored separately per account')
-   check(card.locator('#pfGenerate').is_disabled(),str(width)+' pending-approval generate gated')
+   page.wait_for_function("() => !document.querySelector('#pfGenerate').disabled")
+   check(card.locator('#pfGenerate').is_enabled(),str(width)+' Generate updates suppliers only; final model remains pending')
+   check(page.evaluate("qaCalls.filter(x=>x.path==='purchasing_forecast_refresh_suppliers_v127').length")==0,str(width)+' opening page never refreshes supplier source')
    check(card.locator('#pfTableBody tr').count()==60,str(width)+' product rows are paginated')
    check(card.locator('#pfNext').is_enabled(),str(width)+' next page enabled')
    card.locator('#pfNext').click()
@@ -171,7 +198,12 @@ try:
    card.locator('#pfSearch').fill('FORECAST-002')
    check(card.locator('#pfTableBody tr').count()==1,str(width)+' search works by product code')
    card.locator('#pfReset').click()
-   check(card.locator('#pfSupplier').is_disabled(),str(width)+' supplier enrichment deferred without Master reads')
+   check(card.locator('#pfSupplier').is_enabled(),str(width)+' saved supplier filter enabled')
+   card.locator('#pfSupplier').select_option('supplier:Saved supplier A')
+   check(card.locator('#pfTableBody tr').count()>0,str(width)+' supplier filter uses saved values')
+   check(all('Saved supplier A' in t for t in card.locator('.pf127-supplier').all_inner_texts()),str(width)+' filtered suppliers consistent')
+   card.locator('#pfSupplier').select_option('required')
+   check(card.locator('#pfTableBody tr').count()==4,str(width)+' missing-source items retained and filterable')
    card.locator('#pfReset').click()
    check(card.locator('#pfProfit').is_enabled(),str(width)+' sales-based profitability filter enabled')
    card.locator('#pfProfit').select_option('super')
@@ -225,6 +257,51 @@ try:
    check(card.locator('#pfTableBody img').count()==0,str(width)+' source names escaped safely')
    card.locator('#pfSearch').fill('Critical A')
    check(card.locator('#pfTableBody tr').count()==0,str(width)+' Master-only products are not included')
+   if width in (1440,390):
+    card.locator('#pfReset').click()
+    card.locator('#pfSearch').fill('FORECAST-002')
+    quantity_before=card.locator('.pf120-quantity').inner_text()
+    rating_before=card.locator('.pf126-rating').inner_text()
+    check(card.locator('.pf127-supplier').inner_text()=='Saved supplier A',str(width)+' supplier displayed below name')
+    page.evaluate("qaSupplierSource['sales:2']={supplier:'Updated Source Supplier',status:'available',code:'SOURCE-2'}")
+    card.locator('#pfRefresh').click()
+    page.wait_for_function("() => !document.querySelector('#pfRefresh').disabled && document.querySelector('#pfTableBody .pf127-supplier')")
+    check(card.locator('.pf127-supplier').inner_text()=='Saved supplier A',str(width)+' refresh does not fetch live supplier changes')
+    page.evaluate('window.qaSupplierDelay=true')
+    card.locator('#pfGenerate').click()
+    check(card.locator('#pfGenerate').is_disabled(),str(width)+' Generate locks during snapshot write')
+    page.evaluate("document.querySelector('#pfGenerate').dispatchEvent(new Event('click'));qaSupplierRelease();window.qaSupplierDelay=false")
+    page.wait_for_function("() => document.querySelector('#pfSupplierSyncStatus').textContent.startsWith('Suppliers saved:')")
+    check(page.evaluate("qaCalls.filter(x=>x.path==='purchasing_forecast_refresh_suppliers_v127').length")==1,str(width)+' repeated click cannot duplicate sync')
+    check(card.locator('.pf127-supplier').inner_text()=='Updated Source Supplier',str(width)+' Generate copies changed supplier')
+    check(card.locator('.pf120-quantity').inner_text()==quantity_before and card.locator('.pf126-rating').inner_text()==rating_before,str(width)+' supplier sync does not change quantities or ratings')
+    check('Pending model' in card.locator('#pfTableBody').inner_text(),str(width)+' Generate never invents forecast results')
+    card.locator('#pfRefresh').click()
+    page.wait_for_function("() => !document.querySelector('#pfRefresh').disabled && document.querySelector('#pfTableBody .pf127-supplier')")
+    check(card.locator('.pf127-supplier').inner_text()=='Updated Source Supplier',str(width)+' saved supplier persists on data reload')
+    page.evaluate("window.qaSupplierFail=true;qaSupplierSource['sales:2'].supplier='Next supplier'")
+    card.locator('#pfGenerate').click()
+    page.wait_for_function("() => document.querySelector('#pfSupplierSyncStatus').textContent.includes('not confirmed')")
+    check(card.locator('.pf127-supplier').inner_text()=='Updated Source Supplier',str(width)+' failed sync retains previous supplier')
+    page.evaluate('window.qaSupplierFail=false')
+    card.locator('#pfGenerate').click()
+    page.wait_for_function("() => document.querySelector('#pfSupplierSyncStatus').textContent.startsWith('Suppliers saved:')")
+    check(card.locator('.pf127-supplier').inner_text()=='Next supplier',str(width)+' retry succeeds')
+    page.evaluate("qaSupplierSource['sales:2']={supplier:null,status:'missing_supplier',code:'SOURCE-2'};qaSupplierSource['sales:unlinked']={supplier:'New supplier for source-only item',status:'available',code:'SOURCE-NEW'}")
+    card.locator('#pfGenerate').click()
+    page.wait_for_function("() => document.querySelector('#pfSupplierSyncStatus').textContent.startsWith('Suppliers saved:')")
+    check(card.locator('.pf127-supplier').inner_text()=='Supplier required',str(width)+' source supplier removal clears stale saved supplier')
+    check(card.locator('.pf120-quantity').inner_text()==quantity_before,str(width)+' missing supplier never hides quantities')
+    card.locator('#pfSearch').fill('Source only item')
+    check(card.locator('.pf127-supplier').inner_text()=='New supplier for source-only item',str(width)+' newly identified supplier is copied')
+    card.locator('#pfReset').click()
+    page.evaluate('window.qaSupplierAudit=msAudit.getState;msAudit.getState=()=>({...qaSupplierAudit(),role:"viewer"})')
+    page.wait_for_function("() => document.querySelector('#pfGenerate').disabled")
+    count=page.evaluate("qaCalls.filter(x=>x.path==='purchasing_forecast_refresh_suppliers_v127').length")
+    page.evaluate("document.querySelector('#pfGenerate').dispatchEvent(new Event('click'))")
+    check(page.evaluate("qaCalls.filter(x=>x.path==='purchasing_forecast_refresh_suppliers_v127').length")==count,str(width)+' read-only user cannot start supplier write')
+    page.evaluate('msAudit.getState=qaSupplierAudit')
+    page.wait_for_function("() => !document.querySelector('#pfGenerate').disabled")
    if width==1440:
     page.evaluate('window.qaOldAudit=msAudit.getState;msAudit.getState=()=>({...qaOldAudit(),master:[]})')
     card.locator('#pfRefresh').click()
@@ -244,6 +321,16 @@ try:
    card.locator('.pf-scroll').evaluate('(e)=>e.scrollTop=0')
    card.screenshot(path=str(ROOT/'tests'/('forecast-v116-'+str(width)+'.png')))
    card.locator('.pf-table-card').screenshot(path=str(ROOT/'tests'/('forecast-source-v125-'+str(width)+'.png')))
+   if width==1440:
+    page.evaluate('window.qaSupplierDelay=true')
+    card.locator('#pfGenerate').click()
+    page.evaluate('window.qaLogoutAudit=msAudit.getState;msAudit.getState=()=>({...qaLogoutAudit(),session:null,role:null})')
+    page.wait_for_function("() => document.querySelector('#pfSourceStatus').textContent.includes('Sign in')")
+    check(card.locator('#pfTableBody tr').count()==0,'logout clears supplier data with sales rows')
+    page.evaluate('qaSupplierRelease();window.qaSupplierDelay=false')
+    page.wait_for_timeout(150)
+    check(card.locator('#pfTableBody tr').count()==0,'late supplier response cannot repopulate logged-out view')
+    check(card.locator('#pfInfoContent').inner_text()=='','logout clears supplier provenance in info dialog')
    ctx.close()
   browser.close()
 finally:

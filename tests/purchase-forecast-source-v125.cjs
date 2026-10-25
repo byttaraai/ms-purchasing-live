@@ -26,6 +26,7 @@ test('Quantity validity preserves zero and negatives but rejects missing/invalid
 test('Trend formula, thresholds, Generate gating and readonly behavior retained',()=>{
  assert(source.includes('((latest-baseline)/baseline*100)'));
  assert(source.includes("trend>5?'pf-trend-up':trend< -5?'pf-trend-down':'pf-trend-stable'"));
- assert(source.includes('id="pfGenerate"')&&source.includes('disabled title="Requires approved'));
+ assert(source.includes('id="pfGenerate"')&&source.includes('forecast_computed!==false'));
+ assert(source.includes('Pending model')); 
  assert(!/\.insert\(|\.update\(|\.delete\(|p_approve/.test(source));
 });
