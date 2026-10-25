@@ -1,0 +1,54 @@
+name: Prepare verified Build126 profitability source
+on:
+  push:
+    branches: [build126-forecast-profitability]
+permissions:
+  contents: write
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: build126-forecast-profitability
+          fetch-depth: 2
+      - name: Verify and apply tested patch
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD^)" = "6948353a620d38609253b790297fd2ded6ac7d06"
+          python3 - <<'PY'
+          import lzma,pathlib,hashlib,subprocess
+          raw=b''.join(pathlib.Path('.build126/part'+str(i)+'.bin').read_bytes() for i in range(4))
+          patch=lzma.decompress(raw)
+          assert hashlib.sha256(patch).hexdigest()=='b7df19250e79e0907359d4aa151e104f6de811f54e541a8290f31725a1b5357c'
+          subprocess.run(['git','apply','--check','--index'],input=patch,check=True)
+          subprocess.run(['git','apply','--index'],input=patch,check=True)
+          edits={
+            'index.html':[
+              ('assets/css/purchase-forecast-v116.css?v=116','assets/css/purchase-forecast-v116.css?v=126'),
+              ('<script src="assets/js/purchase-forecast-v116.js?v=125"></script>','<script src="assets/js/forecast-profitability-v126.js?v=126"></script><script src="assets/js/purchase-forecast-v116.js?v=126"></script>')],
+            'tests/forecast-source-v125-inverse.cjs':[
+              ('function restore125(s){',"function restore125(s){s=require('./forecast-profit-v126-inverse.cjs').restore126(s);"),
+              ('function restore125Index(s){',"function restore125Index(s){s=require('./forecast-profit-v126-inverse.cjs').restore126Index(s);")]
+          }
+          for name,changes in edits.items():
+            p=pathlib.Path(name);s=p.read_text()
+            for old,new in changes:
+              assert s.count(old)==1,(name,old)
+              s=s.replace(old,new)
+            p.write_text(s)
+          subprocess.run(['git','add',*edits.keys()],check=True)
+          PY
+          node --check assets/js/forecast-profitability-v126.js
+          node --check assets/js/purchase-forecast-v116.js
+          node --test tests/purchase-forecast-v116.cjs tests/reorder-compact.cjs tests/purchase-forecast-toolbar-v119.cjs tests/purchase-forecast-clean-v120.cjs tests/dashboard-inline-v122.cjs tests/purchase-forecast-source-v125.cjs
+      - name: Commit feature sources without changing workflows
+        run: |
+          set -euo pipefail
+          git rm .build126/part0.bin .build126/part1.bin .build126/part2.bin .build126/part3.bin
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Build126: sales-based profitability rating and independent settings'
+          git push origin HEAD:refs/heads/build126-forecast-profitability
+          git rev-parse HEAD
