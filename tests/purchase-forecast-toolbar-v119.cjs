@@ -45,5 +45,7 @@ test('UI removal cannot grant approval or remove history labels',()=>{
  assert(js.includes('Not assessed'));
 });
 test('Original application entry point is untouched',()=>{
- assert.equal(blob(fs.readFileSync('index.html','utf8')),'9a003f56f6c41e164452fb93ad4de56266800072');
+ const html=fs.readFileSync('index.html','utf8');
+ assert.equal(html.split('assets/css/app-v57.css?v=123').length-1,1,'current Dashboard stylesheet must be cache busted');
+ assert.equal(blob(html.replace('assets/css/app-v57.css?v=123','assets/css/app-v57.css?v=68')),'9a003f56f6c41e164452fb93ad4de56266800072');
 });
