@@ -18,6 +18,7 @@ def sales_product(code,name,quantities=None,unit='Piece',missing=()):
  months=[{'month':period,'qty':quantities[i],'unit':unit,'source_rows':1,'unit_count':1,'invalid_rows':0,
           'source':[{'file':'synthetic-sales.csv','row':i+3,'qty':quantities[i],'unit':unit}]} for i,period in enumerate(periods) if i not in missing]
  return {'source_id':code,'source_name':name,'source_rows':len(months),'historical_12m':sum(m['qty'] for m in months),'selling_unit':unit,
+         'annual_profit_sar':1200,'profit_invalid_rows':0,
          'first_3m':sum(quantities[i] for i in range(3) if i not in missing),'last_3m':sum(quantities[i] for i in range(9,12) if i not in missing),
          'first_3m_months':sum(i not in missing for i in range(3)),'last_3m_months':sum(i not in missing for i in range(9,12)),
          'first_3m_errors':0,'last_3m_errors':0,'months_covered':len(months),'unit_count':1,'invalid_rows':0,'monthly':months}
@@ -28,6 +29,8 @@ source_products.extend([
  sales_product('sales:partial','Source partial history',missing=(0,1)),
  sales_product('sales:literal','Source <img src=x onerror=alert(1)> & literal name')
 ])
+for i,p in enumerate(source_products):
+ p['annual_profit_sar']=10000 if i<5 else 3000 if i<15 else 1000 if i<55 else 100 if i<110 else -20
 source_fixture={'source_mode':'sales_reports','ui_build':125,'first_month':periods[0],'last_month':periods[-1],
  'periods':periods,'source_rows':sum(x['source_rows'] for x in source_products),'rows':source_products}
 mock_source=qa['mock'].replace(
@@ -68,7 +71,7 @@ try:
    check(card.count()==1,str(width)+' one forecast UI section')
    check(not card.evaluate('(e)=>e.closest(".hidden")!==null'),str(width)+' visible on Dashboard')
    check(page.locator('#ropGenerator').count()==1,str(width)+' original ROP remains')
-   check(card.locator('thead th').count()==5,str(width)+' 5 annual columns')
+   check(card.locator('thead th').count()==6,str(width)+' product + compact rating + four unchanged data columns')
    toolbar=card.locator('.pf-toolbar[data-ui-build="119"]')
    check(toolbar.count()==1,str(width)+' one combined title/control toolbar')
    check(card.locator('.pf-kicker,.pf-state').count()==0,str(width)+' redundant heading and status badge removed')
@@ -87,7 +90,7 @@ try:
    check(all(x['left']>=layout['left']-1 and x['right']<=layout['right']+1 for x in layout['boxes']),str(width)+' all toolbar content fits')
    check(layout['titleSize']==19,str(width)+' compact 19px forecast title')
    check(layout['innerBorder']=='0px',str(width)+' separate controls card removed')
-   if width>=960:
+   if width>=1080:
     head,controls=layout['boxes'][:2]
     check(head['right']<=controls['left'],str(width)+' title and controls share a horizontal row')
     tops=[x['top'] for x in layout['boxes'][2:]]
@@ -132,6 +135,34 @@ try:
    if width>=960:
     table=card.locator('.pf-scroll').evaluate("e=>({client:e.clientWidth,scroll:e.scrollWidth,right:e.getBoundingClientRect().right,last:e.querySelector('th:last-child').getBoundingClientRect().right})")
     check(table['scroll']<=table['client']+1 and table['last']<=table['right']+1,str(width)+' all five columns fit without clipping')
+   widths=card.locator('thead th').evaluate_all("els=>els.map(e=>{const r=e.getBoundingClientRect();return {left:r.left,width:r.width}})")
+   table_width=sum(x['width'] for x in widths)
+   check(abs(widths[1]['width']-74)<2,str(width)+' rating is a compact 74px column')
+   check(abs(widths[2]['left']-widths[0]['left']-table_width*.35)<2,str(width)+' historical quantity column has not moved')
+   check([round(x['width']/table_width*100) for x in widths[2:]]==[20,15,14,16],str(width)+' other column proportions unchanged')
+   card.locator('#pfSettings').click()
+   dialog=card.locator('#pfProfitDialog')
+   check(dialog.is_visible(),str(width)+' dedicated profit settings open')
+   check(card.locator('#pfProfitSuper').input_value()=='3',str(width)+' ROP defaults: Super x3')
+   check('125' not in card.locator('#pfProfitMean').inner_text(),str(width)+' benchmark comes from sales profits')
+   baseline=card.locator('#pfProfitMean').inner_text()
+   card.locator('#pfProfitSuper').fill('1')
+   check(card.locator('#pfProfitApply').is_disabled(),str(width)+' invalid multiplier order blocked')
+   card.locator('#pfProfitCancel').click()
+   card.locator('#pfSettings').click()
+   check(card.locator('#pfProfitSuper').input_value()=='3',str(width)+' Cancel discards settings draft')
+   card.locator('#pfProfitSuper').fill('10')
+   card.locator('#pfProfitApply').click()
+   card.locator('#pfProfit').select_option('super')
+   check(card.locator('#pfTableBody tr').count()==0,str(width)+' Apply reclassifies current view')
+   card.locator('#pfReset').click()
+   card.locator('#pfSettings').click()
+   check(card.locator('#pfProfitMean').inner_text()==baseline,str(width)+' filters do not change positive-profit mean')
+   check(card.locator('#pfProfitSuper').input_value()=='10',str(width)+' Clear filters does not reset applied multipliers')
+   dialog.screenshot(path=str(ROOT/'tests'/('forecast-source-v125-settings-'+str(width)+'.png')))
+   card.locator('#pfProfitDefaults').click()
+   card.locator('#pfProfitApply').click()
+   check(page.evaluate("JSON.parse(localStorage.getItem('msp_forecast_profit_v126:qa-user')).multipliers.super")==3,str(width)+' preferences stored separately per account')
    check(card.locator('#pfGenerate').is_disabled(),str(width)+' pending-approval generate gated')
    check(card.locator('#pfTableBody tr').count()==60,str(width)+' product rows are paginated')
    check(card.locator('#pfNext').is_enabled(),str(width)+' next page enabled')
@@ -142,7 +173,10 @@ try:
    card.locator('#pfReset').click()
    check(card.locator('#pfSupplier').is_disabled(),str(width)+' supplier enrichment deferred without Master reads')
    card.locator('#pfReset').click()
-   check(card.locator('#pfProfit').is_disabled(),str(width)+' profitability enrichment deferred')
+   check(card.locator('#pfProfit').is_enabled(),str(width)+' sales-based profitability filter enabled')
+   card.locator('#pfProfit').select_option('super')
+   check(card.locator('#pfTableBody tr').count()==5,str(width)+' annual Super filter works')
+   card.locator('#pfReset').click()
    card.locator('#pfReset').click()
    options=card.locator('#pfMonth option')
    check(options.count()==13,str(width)+' annual + 12 months options')

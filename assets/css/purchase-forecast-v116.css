@@ -260,3 +260,45 @@
 #purchaseForecast116 .pf-trend-up{color:#14845b;background:rgba(20,132,91,.10);font-weight:750}
 #purchaseForecast116 .pf-trend-down{color:#a66a16;background:rgba(204,144,40,.13);font-weight:750}
 #purchaseForecast116 .pf-trend-stable{color:var(--muted,#68738c);background:var(--bg,#f2f4f8);font-weight:700}
+
+/* Build 126: rating occupies 74px of the original 35% product column only. */
+#purchaseForecast116 .pf-scroll table th:nth-child(1){width:calc(35% - 74px)}
+#purchaseForecast116 .pf-scroll table th:nth-child(2){width:74px;padding-left:4px;padding-right:4px;text-align:center}
+#purchaseForecast116 .pf-scroll table th:nth-child(3){width:20%}
+#purchaseForecast116 .pf-scroll table th:nth-child(4){width:15%}
+#purchaseForecast116 .pf-scroll table th:nth-child(5){width:14%}
+#purchaseForecast116 .pf-scroll table th:nth-child(6){width:16%}
+#purchaseForecast116 .pf-scroll table td.pf126-rating-cell{padding-left:4px;padding-right:4px;text-align:center}
+#purchaseForecast116 .pf126-rating{display:inline-flex;justify-content:center;align-items:center;font-size:10px;line-height:1.3;font-weight:750;padding:4px 5px;border-radius:6px;white-space:nowrap}
+#purchaseForecast116 .pf126-super{color:#0d7a4d;background:#e3f5ea}
+#purchaseForecast116 .pf126-high{color:#15945e;background:#edf8f1}
+#purchaseForecast116 .pf126-medium{color:#2f78c5;background:#edf4fc}
+#purchaseForecast116 .pf126-low{color:#986111;background:#fff5e3}
+#purchaseForecast116 .pf126-loss{color:#c73549;background:#fff0f2}
+#purchaseForecast116 .pf126-review{color:var(--muted,#65718a);background:var(--bg,#f2f4f8)}
+#purchaseForecast116 .pf126-settings{flex:0 0 auto;align-self:flex-end;display:inline-flex;align-items:center;gap:5px}
+#purchaseForecast116 #pfProfitDialog{width:min(560px,calc(100vw - 28px));max-height:85vh;overflow:auto;padding:20px;border:1px solid var(--line,#dce2ec);border-radius:14px;background:var(--surface,#fff);color:var(--text,#172650);margin:auto;box-shadow:0 18px 60px rgba(20,35,65,.18)}
+#purchaseForecast116 #pfProfitDialog::backdrop{background:rgba(20,30,55,.35)}
+#purchaseForecast116 .pf126-explainer{font-size:12px;line-height:1.65;color:var(--muted,#65718a);margin:14px 0}
+#purchaseForecast116 .pf126-benchmark{display:flex;flex-direction:column;gap:4px;padding:12px;background:var(--bg,#f8f9fc);border-radius:9px;font-size:11px;color:var(--muted,#65718a)}
+#purchaseForecast116 .pf126-benchmark strong{font-size:21px;color:var(--text,#172650)}
+#purchaseForecast116 .pf126-setting-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:16px}
+#purchaseForecast116 .pf126-setting-grid label{font-size:11px;font-weight:700;display:flex;flex-direction:column;gap:6px;min-width:0}
+#purchaseForecast116 .pf126-setting-grid input{width:100%}
+#purchaseForecast116 .pf126-setting-grid small{min-height:28px;font-size:10px;font-weight:400;color:var(--muted,#65718a)}
+#purchaseForecast116 .pf126-dialog-actions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;margin-top:18px}
+#purchaseForecast116 .pf126-dialog-actions #pfProfitDefaults{margin-right:auto}
+#purchaseForecast116 .pf126-error{font-size:12px;color:#b54708;line-height:1.4}
+#purchaseForecast116 .pf126-error:empty{display:none}
+#purchaseForecast116 #pfProfitPersistence{font-size:11px;line-height:1.55}
+@media(max-width:1079px){
+ #purchaseForecast116 .pf-toolbar{grid-template-columns:minmax(0,1fr);gap:14px}
+ #purchaseForecast116 .pf-toolbar .pf-controls{justify-content:flex-start}
+}
+@media(max-width:519px){
+ #purchaseForecast116 .pf-toolbar .pf-controls > label:last-child{grid-column:auto}
+ #purchaseForecast116 .pf-toolbar .pf-controls .pf126-settings{min-height:40px;height:40px;justify-content:center;width:100%}
+ #purchaseForecast116 #pfProfitDialog{padding:16px}
+ #purchaseForecast116 .pf126-setting-grid{grid-template-columns:minmax(0,1fr)}
+ #purchaseForecast116 .pf126-setting-grid small{min-height:0}
+}
