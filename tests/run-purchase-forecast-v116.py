@@ -14,7 +14,7 @@ for i in range(85):
  fixture['rows'].append(row);fixture['master'].append(dict(row))
 mock_source=qa['mock'].replace(
  "else if(path==='purchasing_workspace_revision_v47')",
- "else if(path==='purchasing_forecast_history_preview_v118'){result={last_month:'2026-09',data_state:'staged_review_only',rows:args.p_codes.map(c=>({code:c,historical_12m:120,selling_unit:'Piece',last_3m:36,previous_3m:30,matched_rows:12,review_rows:0,months_covered:12,unit_count:1}))};}\n else if(path==='purchasing_workspace_revision_v47')")
+ "else if(path==='purchasing_forecast_history_preview_v121'){result={last_month:'2026-09',data_state:'staged_review_only',rows:args.p_codes.map(c=>({code:c,historical_12m:120,selling_unit:'Piece',last_3m:36,previous_3m:30,first_3m:30,first_3m_months:3,last_3m_months:3,first_3m_review:0,last_3m_review:0,matched_rows:12,review_rows:0,months_covered:12,unit_count:1}))};}\n else if(path==='purchasing_workspace_revision_v47')")
 mock='<script>window.qaFixture='+json.dumps(fixture)+';\n'+mock_source+"\naddEventListener('load',()=>{void msAudit.loadLive()});</script>"
 doc=(ROOT/'index.html').read_text().replace('</head>',mock+'</head>',1)
 temp=ROOT/'forecast-v116-smoke.html'
@@ -139,7 +139,7 @@ try:
    card.locator('#pfSearch').fill('FORECAST-002')
    page.wait_for_function("document.querySelector('#pfTableBody .pf120-quantity')?.textContent === '120'")
    check('120' in card.locator('#pfTableBody').inner_text(),str(width)+' synthetic historical totals are read-only')
-   check('20%' in card.locator('#pfTableBody').inner_text(),str(width)+' observed trend stays unchanged')
+   check('+20%' in card.locator('#pfTableBody').inner_text(),str(width)+' annual first-vs-last trend calculated')
    card.locator('[data-pf-info-code="FORECAST-002"]').click()
    info=card.locator('#pfInfoDialog')
    check(info.is_visible(),str(width)+' product details open')

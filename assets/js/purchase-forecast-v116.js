@@ -24,7 +24,7 @@ root.innerHTML=`
       <button type="button" id="pfReset" class="pf-btn" title="Clear filters">Clear</button>
       <button type="button" id="pfRefresh" class="pf-btn pf120-refresh" aria-label="Refresh sales history" title="Refresh sales history"><span aria-hidden="true">&#8635;</span></button>
     </div>
-    <div class="pf-scroll"><table aria-label="Historical sales and pending forecast table"><thead><tr><th scope="col">Product</th><th scope="col">Historical Sales<span class="pf120-col-note">Actuals &middot; under review</span></th><th scope="col">Trend<span class="pf120-col-note">3M vs prior 3M</span></th><th scope="col">Confidence</th><th scope="col">Final Forecast<span class="pf120-col-note">Base + Growth</span></th></tr></thead><tbody id="pfTableBody"></tbody></table><div id="pfEmpty" class="pf-empty" hidden>No matching products.</div></div>
+    <div class="pf-scroll"><table aria-label="Historical sales and pending forecast table"><thead><tr><th scope="col">Product</th><th scope="col">Historical Sales<span class="pf120-col-note">Actuals &middot; under review</span></th><th scope="col">Trend<span class="pf120-col-note">Last 3M vs First 3M</span></th><th scope="col">Confidence</th><th scope="col">Final Forecast<span class="pf120-col-note">Base + Growth</span></th></tr></thead><tbody id="pfTableBody"></tbody></table><div id="pfEmpty" class="pf-empty" hidden>No matching products.</div></div>
     <div class="pf-footer"><span class="pf-muted" id="pfCount">0 products</span><span class="pf-muted" id="pfScopeNote">Annual overview · 12 future months</span><div class="pf-footer-actions"><button type="button" class="pf-btn" id="pfPrev">Previous</button><button type="button" class="pf-btn" id="pfNext">Next</button></div></div>
   </div>
   <dialog id="pfInfoDialog" aria-labelledby="pfInfoTitle"><div class="pf120-dialog-head"><h4 id="pfInfoTitle">About these figures</h4><button id="pfInfoClose" class="pf-btn" type="button" aria-label="Close forecast information">Close</button></div><div id="pfInfoContent"></div></dialog>`;
@@ -53,9 +53,12 @@ function render(){
    const h=view.history.get(r.code),loaded=h!==undefined,valid=h&&h.matched_rows>0&&h.unit_count===1;
    const n=x=>Number(x).toLocaleString('en-US',{maximumFractionDigits:2});
    const total=valid?'<strong class="pf120-quantity">'+n(h.historical_12m)+'</strong><div class="pf-muted" title="Historical actuals (staged); months with matched sales">'+html(h.selling_unit)+' &middot; '+n(h.months_covered||0)+'/12 mo.</div>':loaded?'<span class="pf-pending">No matched sales</span>':'<span class="pf-pending">Loading history…</span>';
-   const trend=valid&&h.last_3m!==null&&h.previous_3m!==null&&Number(h.previous_3m)!==0?((Number(h.last_3m)-Number(h.previous_3m))/Math.abs(Number(h.previous_3m))*100):null;
-   const direction=trend===null?'—':trend>3?'↑ '+n(trend)+'%':trend< -3?'↓ '+n(trend)+'%':'→ '+n(trend)+'%';
-   const trendCell=valid?'<span class="pf-trend">'+html(direction)+'</span><div class="pf-muted" title="Last 3M vs previous 3M; historical, not a prediction">Observed change</div>':'<span class="pf-pending">—</span>';
+   const covered=valid&&h.first_3m_months===3&&h.last_3m_months===3&&h.first_3m_review===0&&h.last_3m_review===0;
+   const baseline=covered?Number(h.first_3m):NaN,latest=covered?Number(h.last_3m):NaN;
+   const trend=Number.isFinite(baseline)&&baseline>0&&Number.isFinite(latest)?((latest-baseline)/baseline*100):null;
+   const state=trend===null?'':trend>5?'pf-trend-up':trend< -5?'pf-trend-down':'pf-trend-stable';
+   const direction=trend===null?'Insufficient Data':trend>5?'↑ +'+n(trend)+'%':trend< -5?'↓ '+n(trend)+'%':'→ '+(trend>0?'+':'')+n(trend)+'%';
+   const trendCell=valid?'<span class="pf-trend '+state+'">'+html(direction)+'</span><div class="pf-muted" title="Last 3 months vs first 3 months of the trailing 12 months; historical, not a prediction">'+(trend===null?'Missing or non-comparable baseline':'Last 3M vs First 3M')+'</div>':'<span class="pf-pending">—</span>';
    const codeinfo=h&&h.review_rows?'<div class="pf-muted">'+n(h.review_rows)+' rows need review</div>':'';
    return '<tr><td><div class="pf-product"><div class="pf120-product-line"><span dir="auto" title="'+html(r.name)+'">'+html(r.name)+'</span><button type="button" class="pf120-info" data-pf-info-code="'+html(r.code)+'" aria-label="Sales details for '+html(r.name)+'" aria-haspopup="dialog" title="Sales details">i</button></div><small title="'+html(r.code+' · '+(r.supplier||'Supplier not assigned'))+'">'+html(r.code)+' · '+html(r.supplier||'Supplier not assigned')+'</small>'+codeinfo+'</div></td><td>'+total+'</td><td>'+trendCell+'</td><td><span class="pf-trend">Not assessed</span></td><td><span class="pf-pending">Pending model</span></td></tr>';
  }).join('');
@@ -80,7 +83,7 @@ async function loadHistory(codes){
   const audit=window.msAudit,st=audit&&audit.getState&&audit.getState();
   const session=st&&st.session;
   if(!session||!session.access_token)return;
-  const response=await fetch('https://mpxpbbpqnvoinyjmuuvf.supabase.co/rest/v1/rpc/purchasing_forecast_history_preview_v118',{
+  const response=await fetch('https://mpxpbbpqnvoinyjmuuvf.supabase.co/rest/v1/rpc/purchasing_forecast_history_preview_v121',{
    method:'POST',headers:{'apikey':'sb_publishable_4shFOVEi5Ib0I8KRZYzsMA_Sahkf8PB','Authorization':'Bearer '+session.access_token,'Content-Type':'application/json'},
    body:JSON.stringify({p_codes:missing})
   });
@@ -122,13 +125,13 @@ function showForecastInfo(code,trigger){
   if(h){
    add('Historical actuals (staged). Selling unit: '+(h.selling_unit||'Unresolved')+'. Matched months: '+(h.months_covered||0)+'/12. Rows requiring review: '+(h.review_rows||0)+'.');
    add('Original report quantities are retained. No purchase-unit conversion is performed in this preview. Missing months are not assumed to be zero.');
-   add('Latest 3-month total: '+(h.last_3m??'Unavailable')+'. Previous 3-month total: '+(h.previous_3m??'Unavailable')+'. Partial periods can affect this historical comparison.');
+   add('First 3 months: '+(h.first_3m??'Unavailable')+' ('+(h.first_3m_months||0)+'/3). Last 3 months: '+(h.last_3m??'Unavailable')+' ('+(h.last_3m_months||0)+'/3). Incomplete, reviewed or zero/negative baseline means insufficient data.');
   }else add('Sales details are not loaded yet. Use Refresh and try again.');
  }else{
   q('pfInfoTitle').textContent='About these figures';
   add('Historical Sales displays recorded net sales, not a Base Forecast. The source reports are staged and under review; quantities remain in the original selling unit.');
   add('Only matched rows are shown. The month count indicates available matched history; missing months are not assumed to be zero. Open a product info button for its coverage and review details.');
-  add('Trend compares the latest three months with the previous three months. It is an observed change, not a forecast. A partially covered period can affect this comparison.');
+  add('Trend compares the latest three months with the first three months of the trailing 12-month history. Green means growth above +5%, amber means decline below -5%, grey means stable within ±5%. Missing/uncertain periods or a zero/negative baseline show Insufficient Data. This is historical change, not a forecast.');
   add('Confidence and Final Forecast are pending the forecasting model and approvals. Annual Growth is a draft and is not applied to historical quantities.');
   add('Month selection currently reserves the future monthly view; it does not recalculate historical totals. The original Master and Reorder Point Generator are unchanged.');
  }
