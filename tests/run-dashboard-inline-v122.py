@@ -31,8 +31,8 @@ try:
    root=page.locator('[data-panel="daily-tasks"] > .ops-dashboard')
    assert root.count()==1,'Dashboard missing'
    info=root.evaluate('''e=>{
-    const r=s=>{const x=e.querySelector(s),b=x.getBoundingClientRect();return {left:b.left,right:b.right,top:b.top,bottom:b.bottom,y:(b.top+b.bottom)/2,width:b.width,height:b.height}};
-    return {container:r(':scope'),heading:r('.dashboard-heading > div:first-child'),inventory:r('#inventoryFreshnessCard'),actions:r('.dashboard-heading-actions'),
+    const r=s=>{const x=s==='root'?e:e.querySelector(s),b=x.getBoundingClientRect();return {left:b.left,right:b.right,top:b.top,bottom:b.bottom,y:(b.top+b.bottom)/2,width:b.width,height:b.height}};
+    return {container:r('root'),heading:r('.dashboard-heading > div:first-child'),inventory:r('#inventoryFreshnessCard'),actions:r('.dashboard-heading-actions'),
     status:r('#inventoryFreshnessStatus'),age:r('#inventoryFreshnessAge'),
     scroll:document.documentElement.scrollWidth,viewport:innerWidth,innerScroll:e.scrollWidth,innerWidth:e.clientWidth,
     infoId:!!e.querySelector('#inventoryFreshnessText'),cardCount:e.querySelectorAll('#inventoryFreshnessCard').length,
