@@ -302,3 +302,10 @@
  #purchaseForecast116 .pf126-setting-grid{grid-template-columns:minmax(0,1fr)}
  #purchaseForecast116 .pf126-setting-grid small{min-height:0}
 }
+
+/* Build 127: saved supplier subtitle and on-demand sync result only. */
+#purchaseForecast116 .pf127-supplier{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#purchaseForecast116 .pf127-supplier-required{color:#936615}
+#purchaseForecast116 .pf127-sync-status{margin:0 0 10px;font-size:11px;color:var(--muted,#65718a)}
+#purchaseForecast116 .pf127-sync-status[hidden]{display:none}
+#purchaseForecast116 .pf127-sync-error{color:#936615}

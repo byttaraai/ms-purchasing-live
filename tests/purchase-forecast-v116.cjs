@@ -4,6 +4,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const html=fs.readFileSync('index.html','utf8');
 require('./purchase-forecast-profit-v126.cjs');
+require('./purchase-forecast-supplier-v127.cjs');
 const js=fs.readFileSync('assets/js/purchase-forecast-v116.js','utf8');
 const css=fs.readFileSync('assets/css/purchase-forecast-v116.css','utf8');
 const {as102}=require('./reorder-preview-v103.cjs');
@@ -11,8 +12,8 @@ const crypto=require('node:crypto');
 const gitsha=(s)=>{const b=Buffer.from(s);return crypto.createHash('sha1').update('blob '+b.length+'\0').update(b).digest('hex');};
 test('Build 116 preserves original pre-Reorder app exact blob',()=>assert.equal(gitsha(as102(html)),'d32029f93ea63f9f8537d342de59cabaef89649e'));
 test('Only scoped forecast stylesheet and script are installed once',()=>{
-  assert.equal(html.split('assets/css/purchase-forecast-v116.css?v=126').length-1,1);
-  assert.equal(html.split('assets/js/purchase-forecast-v116.js?v=126').length-1,1);
+  assert.equal(html.split('assets/css/purchase-forecast-v116.css?v=127').length-1,1);
+  assert.equal(html.split('assets/js/purchase-forecast-v116.js?v=127').length-1,1);
   assert(!css.includes('!important'));assert(!/@import\b/.test(css));
   const selectors=css.match(/(^|})\s*([^{}]+)\{/gm)||[];
   assert(selectors.length>10);
