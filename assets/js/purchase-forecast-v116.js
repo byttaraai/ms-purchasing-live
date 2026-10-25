@@ -8,6 +8,7 @@ root.innerHTML=`
   <div class="pf-toolbar" data-ui-build="119">
     <div class="pf-head"><div><h3>Purchase Forecast <small id="pfYear" class="pf-muted"></small></h3><span id="pfSourceStatus" class="pf-muted" role="status">Loading sales reports…</span></div></div>
     <div class="pf-controls" role="group" aria-label="Purchase forecast controls">
+      <button id="pfSettings" class="pf-btn pf126-settings" type="button" aria-haspopup="dialog" title="Profitability settings"><span aria-hidden="true">&#9881;</span> Settings</button>
       <label>Monthly Sales <button id="pfMonthUpload" class="pf-btn" type="button">Update Month ▴</button></label>
       <label class="pf-growth-control">Annual Growth % <span class="pf-growth-field"><input id="pfGrowth" type="number" min="-100" max="100" step=".1" value="0" aria-label="Annual growth percentage" aria-describedby="pfGrowthStatus"><span class="pf-muted" id="pfGrowthStatus" role="status" title="Draft percentage; not saved or applied">Draft · 0%</span></span></label>
       <label>Forecast <button id="pfGenerate" class="pf-btn pf-btn-primary" type="button" disabled title="Requires approved monthly history, mapping rules and a validated annual model">Generate Forecast</button></label>
@@ -19,14 +20,30 @@ root.innerHTML=`
       <div class="pf120-heading"><strong id="pfTableTitle">Forecast Overview</strong><button id="pfInfo" class="pf120-info" type="button" aria-label="About forecast data" aria-haspopup="dialog" title="About these figures">i</button></div>
       <label class="pf-filter-label"><input id="pfSearch" placeholder="Search sales product" aria-label="Search forecast products" title="Original product name in the sales reports"></label>
       <label class="pf-filter-label"><select id="pfSupplier" aria-label="Filter by supplier" disabled title="Supplier details are a later step; sales do not depend on Master"><option value="">All suppliers</option></select></label>
-      <label class="pf-filter-label"><select id="pfProfit" aria-label="Filter by profitability" disabled title="Profitability enrichment is a later step"><option value="">All ratings</option><option value="super">Super</option><option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option><option value="loss">Loss</option><option value="unclassified">Unclassified</option></select></label>
+      <label class="pf-filter-label"><select id="pfProfit" aria-label="Filter by profitability" title="Annual recorded-profit rating"><option value="">All ratings</option><option value="super">Super</option><option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option><option value="loss">Loss</option><option value="review">Needs review</option></select></label>
       <label class="pf-filter-label"><select id="pfMonth" aria-label="Forecast month" title="Recorded sales period, not a forecast month"><option value="annual">Full Year</option></select></label>
       <button type="button" id="pfReset" class="pf-btn" title="Clear filters">Clear</button>
       <button type="button" id="pfRefresh" class="pf-btn pf120-refresh" aria-label="Refresh sales history" title="Refresh sales history"><span aria-hidden="true">&#8635;</span></button>
     </div>
-    <div class="pf-scroll"><table aria-label="Historical sales and pending forecast table"><thead><tr><th scope="col">Product</th><th scope="col">Historical Sales<span class="pf120-col-note">Actuals &middot; under review</span></th><th scope="col">Trend<span class="pf120-col-note">Last 3M vs First 3M</span></th><th scope="col">Confidence</th><th scope="col">Final Forecast<span class="pf120-col-note">Base + Growth</span></th></tr></thead><tbody id="pfTableBody"></tbody></table><div id="pfEmpty" class="pf-empty" hidden>No matching products.</div></div>
+    <div class="pf-scroll"><table aria-label="Historical sales and pending forecast table"><thead><tr><th scope="col">Product</th><th scope="col" class="pf126-rating-col" title="Profitability from recorded annual profit">Rating</th><th scope="col">Historical Sales<span class="pf120-col-note">Actuals &middot; under review</span></th><th scope="col">Trend<span class="pf120-col-note">Last 3M vs First 3M</span></th><th scope="col">Confidence</th><th scope="col">Final Forecast<span class="pf120-col-note">Base + Growth</span></th></tr></thead><tbody id="pfTableBody"></tbody></table><div id="pfEmpty" class="pf-empty" hidden>No matching products.</div></div>
     <div class="pf-footer"><span class="pf-muted" id="pfCount">0 products</span><span class="pf-muted" id="pfScopeNote">Recorded sales · original selling units</span><div class="pf-footer-actions"><button type="button" class="pf-btn" id="pfPrev">Previous</button><button type="button" class="pf-btn" id="pfNext">Next</button></div></div>
   </div>
+  <dialog id="pfProfitDialog" aria-labelledby="pfProfitTitle">
+    <form id="pfProfitForm" novalidate>
+      <div class="pf120-dialog-head"><h4 id="pfProfitTitle">Profitability Settings</h4><button id="pfProfitClose" class="pf-btn" type="button" aria-label="Close profitability settings">Close</button></div>
+      <p class="pf126-explainer">Annual recorded profit per product, in SAR. The benchmark is the mean of positive product profits, not the profit-margin percentage.</p>
+      <div class="pf126-benchmark"><strong id="pfProfitMean">Unavailable</strong><span id="pfProfitPopulation"></span></div>
+      <div class="pf126-setting-grid">
+        <label>Super multiplier<input id="pfProfitSuper" type="number" min="0.000001" max="1000" step="any" required aria-describedby="pfProfitError"><small id="pfThresholdSuper"></small></label>
+        <label>High multiplier<input id="pfProfitHigh" type="number" min="0.000001" max="1000" step="any" required aria-describedby="pfProfitError"><small id="pfThresholdHigh"></small></label>
+        <label>Medium multiplier<input id="pfProfitMedium" type="number" min="0.000001" max="1000" step="any" required aria-describedby="pfProfitError"><small id="pfThresholdMedium"></small></label>
+      </div>
+      <p class="pf126-explainer">Low: positive profit below Medium. Loss: zero or negative profit, matching the Reorder Generator rule. Search and month filters do not change the annual benchmark.</p>
+      <p id="pfProfitError" class="pf126-error" role="alert"></p>
+      <p id="pfProfitPersistence" class="pf-muted">Settings are saved in this browser for your account only. They do not update the BO Assistant or Reorder Generator.</p>
+      <div class="pf126-dialog-actions"><button id="pfProfitDefaults" class="pf-btn" type="button">Reset defaults</button><button id="pfProfitCancel" class="pf-btn" type="button">Cancel</button><button id="pfProfitApply" class="pf-btn pf-btn-primary" type="submit">Apply</button></div>
+    </form>
+  </dialog>
   <dialog id="pfInfoDialog" aria-labelledby="pfInfoTitle"><div class="pf120-dialog-head"><h4 id="pfInfoTitle">About these figures</h4><button id="pfInfoClose" class="pf-btn" type="button" aria-label="Close forecast information">Close</button></div><div id="pfInfoContent"></div></dialog>`;
 const q=id=>root.querySelector('#'+id);
 const html=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -36,6 +53,47 @@ const year=q('pfYear'),month=q('pfMonth'),search=q('pfSearch'),supplier=q('pfSup
 // Build125: identities and monthly quantities come only from the existing sales tables.
 function getForecastSession(){return window.msAudit?.getState?.()?.session||null;}
 function hasQuantity(value){return value!==null&&value!==undefined&&value!==''&&Number.isFinite(Number(value));}
+// Build126: private preview preferences; only multipliers are kept in browser storage.
+const profitModel=window.ForecastProfit126;
+let profitMultipliers={...profitModel.defaults},profitSummary=profitModel.summarize([]),profitIdentity=null;
+function profitStorageKey(){const id=getForecastSession()?.user?.id;return id?'msp_forecast_profit_v126:'+id:null;}
+function restoreProfitSettings(){
+ const identity=getForecastSession()?.user?.id||'';
+ if(identity===profitIdentity)return;
+ profitIdentity=identity;profitMultipliers={...profitModel.defaults};
+ try{const value=JSON.parse(localStorage.getItem(profitStorageKey())||'null');if(value?.version===126)profitMultipliers=profitModel.validate(value.multipliers);}catch(_){}
+ if(q('pfProfitDialog').open)q('pfProfitDialog').close();
+ q('pfProfitMean').textContent='Unavailable';q('pfProfitPopulation').textContent='';
+}
+function refreshProfitSummary(){profitSummary=profitModel.summarize([...view.history.values()]);}
+function ratingFor(h){return profitModel.classify(h,profitSummary,profitMultipliers);}
+function profitMoney(value){return profitModel.finite(value)?Number(value).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+' SAR':'Unavailable';}
+function ratingDescription(h){
+ const label=ratingFor(h),p=profitModel.annualProfit(h);
+ if(p===null)return 'Profit data is missing or invalid; sales quantities remain available.';
+ return label+' | Recorded annual profit: '+profitMoney(p)+' | Positive-profit mean: '+profitMoney(profitSummary.mean)+' | '+monthLabel(view.firstMonth)+' - '+monthLabel(view.lastMonth)+(h.months_covered<12?' | '+h.months_covered+'/12 months reported; no missing profit estimated.':'');
+}
+function profitDraft(){return {super:q('pfProfitSuper').value,high:q('pfProfitHigh').value,medium:q('pfProfitMedium').value};}
+function fillProfitInputs(m){for(const k of ['super','high','medium'])q('pfProfit'+k[0].toUpperCase()+k.slice(1)).value=String(m[k]);}
+function profitSettingsPreview(){
+ q('pfProfitMean').textContent=profitMoney(profitSummary.mean);
+ q('pfProfitPopulation').textContent=profitSummary.positiveCount+' positive-profit products / '+profitSummary.total+' sales products'+(profitSummary.missing?' | '+profitSummary.missing+' need profit review':'');
+ try{const m=profitModel.validate(profitDraft());q('pfProfitError').textContent='';q('pfProfitApply').disabled=false;
+  for(const k of ['super','high','medium'])q('pfThreshold'+k[0].toUpperCase()+k.slice(1)).textContent=profitSummary.mean===null?'No positive-profit benchmark':'At least '+profitMoney(profitSummary.mean*m[k]);
+ }catch(error){q('pfProfitError').textContent=error.message;q('pfProfitApply').disabled=true;for(const k of ['Super','High','Medium'])q('pfThreshold'+k).textContent='';}
+}
+q('pfSettings').addEventListener('click',()=>{restoreProfitSettings();fillProfitInputs(profitMultipliers);profitSettingsPreview();q('pfProfitPersistence').textContent='Settings are saved in this browser for your account only. They do not update the BO Assistant or Reorder Generator.';q('pfProfitDialog').showModal();});
+for(const id of ['pfProfitClose','pfProfitCancel'])q(id).addEventListener('click',()=>q('pfProfitDialog').close());
+q('pfProfitDialog').addEventListener('close',()=>q('pfSettings').focus({preventScroll:true}));
+for(const id of ['pfProfitSuper','pfProfitHigh','pfProfitMedium'])q(id).addEventListener('input',profitSettingsPreview);
+q('pfProfitDefaults').addEventListener('click',()=>{fillProfitInputs(profitModel.defaults);profitSettingsPreview();});
+q('pfProfitForm').addEventListener('submit',event=>{
+ event.preventDefault();let m;try{m=profitModel.validate(profitDraft());}catch(error){q('pfProfitError').textContent=error.message;return;}
+ profitMultipliers=m;let saved=false;
+ try{const key=profitStorageKey();if(key){localStorage.setItem(key,JSON.stringify({version:126,multipliers:m}));saved=true;}}catch(_){}
+ view.page=0;render();q('pfSettings').title=saved?'Profitability settings saved in this browser':'Profitability settings applied for this session only';
+ if(saved)q('pfProfitDialog').close();else q('pfProfitPersistence').textContent='Applied for this session only. Browser storage is unavailable; these preferences may reset on reload.';
+});
 function monthLabel(value){
  if(!/^\d{4}-\d{2}$/.test(String(value)))return String(value||'');
  const [y,m]=value.split('-').map(Number);
@@ -45,6 +103,7 @@ async function load(){
  const session=getForecastSession(),request=++view.serial;
  view.controller?.abort();view.controller=null;
  view.rows=[];view.history.clear();view.page=0;view.error=null;
+ restoreProfitSettings();refreshProfitSummary();
  view.periods=[];view.firstMonth=null;view.lastMonth=null;view.sourceRows=0;
  if(!session?.access_token){view.loading=false;months();render();q('pfSourceStatus').textContent='Sign in to load sales reports';return;}
  view.controller=new AbortController();const controller=view.controller;
@@ -67,12 +126,13 @@ async function load(){
   }
   view.rows=data.rows.map(h=>({code:h.source_id,name:h.source_name}));
   for(const h of data.rows)view.history.set(h.source_id,h);
+  refreshProfitSummary();
   view.periods=data.periods;view.firstMonth=data.first_month;view.lastMonth=data.last_month;view.sourceRows=Number(data.source_rows)||0;
   months();q('pfSourceStatus').textContent=nf(view.rows.length)+' sales products \u00b7 '+monthLabel(view.firstMonth)+' - '+monthLabel(view.lastMonth);
  }catch(error){
   if(request!==view.serial)return;
   view.rows=[];view.history.clear();view.error=error.name==='AbortError'?'Sales request timed out. Use Refresh to retry.':String(error.message||error);
-  q('pfSourceStatus').textContent=view.error;
+  refreshProfitSummary();q('pfSourceStatus').textContent=view.error;
  }finally{
   clearTimeout(timeout);
   if(request===view.serial){view.loading=false;view.controller=null;q('pfRefresh').disabled=false;render();}
@@ -80,7 +140,7 @@ async function load(){
 }
 function filtered(){
  const term=search.value.trim().toLocaleLowerCase(),period=month.value;
- return view.rows.filter(r=>(!term||r.name.toLocaleLowerCase().includes(term))&&(period==='annual'||view.history.get(r.code)?.monthly.some(m=>m.month===period)));
+ return view.rows.filter(r=>(!term||r.name.toLocaleLowerCase().includes(term))&&(!profit.value||ratingFor(view.history.get(r.code)).toLowerCase()===profit.value)&&(period==='annual'||view.history.get(r.code)?.monthly.some(m=>m.month===period)));
 }
 function render(){
  const rows=filtered(),total=Math.max(1,Math.ceil(rows.length/view.size));view.page=Math.min(view.page,total-1);
@@ -99,8 +159,9 @@ function render(){
    const state=trend===null?'':trend>5?'pf-trend-up':trend< -5?'pf-trend-down':'pf-trend-stable';
    const direction=trend===null?'Insufficient Data':trend>5?'↑ +'+n(trend)+'%':trend< -5?'↓ '+n(trend)+'%':'→ '+(trend>0?'+':'')+n(trend)+'%';
    const trendCell=valid?'<span class="pf-trend '+state+'">'+html(direction)+'</span><div class="pf-muted" title="Last 3 months vs first 3 months of the trailing 12 months; historical, not a prediction">'+(trend===null?'Missing or non-comparable baseline':'Last 3M vs First 3M')+'</div>':'<span class="pf-pending">—</span>';
+   const rating=ratingFor(h),ratingCell='<span class="pf126-rating pf126-'+rating.toLowerCase()+'" title="'+html(ratingDescription(h))+'">'+html(rating)+'</span>';
    const codeinfo=''; // Purchase-mapping reviews never suppress original sales.
-   return '<tr><td><div class="pf-product"><div class="pf120-product-line"><span dir="auto" title="'+html(r.name)+'">'+html(r.name)+'</span><button type="button" class="pf120-info" data-pf-info-code="'+html(r.code)+'" aria-label="Sales details for '+html(r.name)+'" aria-haspopup="dialog" title="Sales details">i</button></div><small>Original sales name</small>'+codeinfo+'</div></td><td>'+total+'</td><td>'+trendCell+'</td><td><span class="pf-trend">Not assessed</span></td><td><span class="pf-pending">Pending model</span></td></tr>';
+   return '<tr><td><div class="pf-product"><div class="pf120-product-line"><span dir="auto" title="'+html(r.name)+'">'+html(r.name)+'</span><button type="button" class="pf120-info" data-pf-info-code="'+html(r.code)+'" aria-label="Sales details for '+html(r.name)+'" aria-haspopup="dialog" title="Sales details">i</button></div><small>Original sales name</small>'+codeinfo+'</div></td><td class="pf126-rating-cell">'+ratingCell+'</td><td>'+total+'</td><td>'+trendCell+'</td><td><span class="pf-trend">Not assessed</span></td><td><span class="pf-pending">Pending model</span></td></tr>';
  }).join('');
  // The loaded sales catalog is complete; pagination does not query Master codes.
  q('pfEmpty').hidden=rows.length>0;
@@ -136,6 +197,7 @@ function showForecastInfo(code,trigger){
   add('Original sales name: '+(product?.name||'Unavailable'));
   if(h){
    add('Historical actuals (staged). Selling unit: '+(h.selling_unit||'Unresolved')+'. Reported months: '+(h.months_covered||0)+'/12. Source rows: '+h.source_rows+'.');
+   add(ratingDescription(h));
    add('These quantities are read directly from the existing monthly sales reports. No purchase-unit conversion is applied. A missing month means not reported, not zero sales.');
    add('First 3 months: '+(h.first_3m??'Unavailable')+' ('+(h.first_3m_months||0)+'/3). Last 3 months: '+(h.last_3m??'Unavailable')+' ('+(h.last_3m_months||0)+'/3).');
    const heading=document.createElement('h4');heading.textContent='Monthly net sales';content.appendChild(heading);
@@ -153,7 +215,7 @@ function showForecastInfo(code,trigger){
   add('All source products are included, regardless of any purchase-name or unit-mapping review. Product names and monthly net quantities come from the existing sales database, not the BO Assistant Master.');
   add('Trend compares the latest three months with the first three months of the trailing 12-month history. Green means growth above +5%, amber means decline below -5%, grey means stable within ±5%. Missing/uncertain periods or a zero/negative baseline show Insufficient Data. This is historical change, not a forecast.');
   add('Confidence and Final Forecast are pending the forecasting model and approvals. Annual Growth is a draft and is not applied to historical quantities.');
-  add('Select a reporting month to see its recorded sales, or open product details for all monthly quantities. Supplier, profitability and purchasing enrichment are deferred. Master and Reorder Point Generator are unchanged.');
+  add('Select a reporting month to see its recorded sales, or open product details for all monthly quantities. Profitability uses recorded annual profit; supplier and purchasing enrichment are deferred. Master and Reorder Point Generator are unchanged.');
  }
  if(!dialog.open)dialog.showModal();
 }
