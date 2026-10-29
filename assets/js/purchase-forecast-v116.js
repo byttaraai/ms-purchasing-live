@@ -26,7 +26,7 @@ root.innerHTML=`
       <button type="button" id="pfReset" class="pf-btn" title="Clear filters">Clear</button>
       <button type="button" id="pfRefresh" class="pf-btn pf120-refresh" aria-label="Refresh sales history" title="Refresh sales history"><span aria-hidden="true">&#8635;</span></button>
     </div>
-    <div class="pf-scroll"><table aria-label="Historical sales and pending forecast table"><thead><tr><th scope="col">Product</th><th scope="col" class="pf126-rating-col" title="Profitability from recorded annual profit">Rating</th><th scope="col">Historical Sales<span class="pf120-col-note">Actuals &middot; under review</span></th><th scope="col">Trend<span class="pf120-col-note">Last 3M vs First 3M</span></th><th scope="col">Confidence</th><th scope="col">Final Forecast<span class="pf120-col-note">Base + Growth</span></th></tr></thead><tbody id="pfTableBody"></tbody></table><div id="pfEmpty" class="pf-empty" hidden>No matching products.</div></div>
+    <div class="pf-scroll"><table aria-label="Historical sales and pending forecast table"><thead><tr><th scope="col">Product</th><th scope="col" class="pf126-rating-col" title="Profitability from recorded annual profit">Rating</th><th scope="col">Historical Sales<span class="pf120-col-note">Actuals &middot; under review</span></th><th scope="col" class="pf128-level-col">Sales Level<span class="pf120-col-note">Compared with annual median</span></th><th scope="col">Trend<span class="pf120-col-note">Last 3M vs First 3M</span></th><th scope="col">Confidence</th><th scope="col">Final Forecast<span class="pf120-col-note">Base + Growth</span></th></tr></thead><tbody id="pfTableBody"></tbody></table><div id="pfEmpty" class="pf-empty" hidden>No matching products.</div></div>
     <div class="pf-footer"><span class="pf-muted" id="pfCount">0 products</span><span class="pf-muted" id="pfScopeNote">Recorded sales · original selling units</span><div class="pf-footer-actions"><button type="button" class="pf-btn" id="pfPrev">Previous</button><button type="button" class="pf-btn" id="pfNext">Next</button></div></div>
   </div>
   <dialog id="pfProfitDialog" aria-labelledby="pfProfitTitle">
@@ -207,6 +207,37 @@ function filtered(){
  const term=search.value.trim().toLocaleLowerCase(),period=month.value;
  return view.rows.filter(r=>(!term||r.name.toLocaleLowerCase().includes(term))&&supplierMatches(view.history.get(r.code))&&(!profit.value||ratingFor(view.history.get(r.code)).toLowerCase()===profit.value)&&(period==='annual'||view.history.get(r.code)?.monthly.some(m=>m.month===period)));
 }
+// Build128: comparisons stay anchored to the complete 12-month source window.
+function salesLevel(h){return window.ForecastSalesLevel128.calculate(h,view.periods);}
+function levelNumber(value){return Number(value).toLocaleString('en-US',{maximumFractionDigits:2});}
+function levelPercent(comparison){
+ if(comparison.percent===null)return '\u2014';
+ const p=comparison.percent,rounded=Number(p.toFixed(1));
+ return (comparison.state==='up'?'\u2191 ':comparison.state==='down'?'\u2193 ':'\u2192 ')+(rounded>0?'+':'')+rounded.toLocaleString('en-US',{maximumFractionDigits:1})+'%';
+}
+function salesLevelCell(h,row){
+ const level=salesLevel(h),number=level.typical===null?'\u2014':levelNumber(level.typical);
+ const note=level.typical===null?(level.status==='insufficient'?level.reported+'/12 months':'Check data'):level.unit;
+ const first=level.firstComparison,last=level.lastComparison;
+ const hint=level.reason+' First 6 months: '+monthLabel(view.periods[0])+' - '+monthLabel(view.periods[5])+'. Last 6 months: '+monthLabel(view.periods[6])+' - '+monthLabel(view.periods[11])+'.';
+ return '<button type="button" class="pf128-level" data-pf-info-code="'+html(row.code)+'" aria-label="Sales level details for '+html(row.name)+'" aria-haspopup="dialog" title="'+html(hint)+'">'+
+  '<span class="pf128-metric"><span class="pf128-label">Typical / mo.</span><strong class="pf128-typical">'+html(number)+'</strong><span class="pf128-unit" title="'+html(note)+'">'+html(note)+'</span></span>'+
+  '<span class="pf128-metric"><span class="pf128-label">First 6 mo.</span><strong class="pf128-change pf128-'+first.state+'">'+html(levelPercent(first))+'</strong></span>'+
+  '<span class="pf128-metric"><span class="pf128-label">Last 6 mo.</span><strong class="pf128-change pf128-'+last.state+'">'+html(levelPercent(last))+'</strong></span></button>';
+}
+function addSalesLevelInfo(h,content,add){
+ const level=salesLevel(h),heading=document.createElement('h4');heading.textContent='Sales Level';content.appendChild(heading);
+ add('Typical monthly sales = median of the 12 monthly net quantities. First / Last 6 months = median of each half compared with that same annual median, not growth between halves or a future forecast.');
+ add('Percent = (half-year median / annual median - 1) x 100. Green: above +5%; amber: below -5%; grey: within +/-5%.');
+ add(level.reason);
+ if(level.typical!==null){
+  add('Annual monthly median: '+levelNumber(level.typical)+' '+level.unit+'.');
+  add('First 6 months ('+monthLabel(view.periods[0])+' - '+monthLabel(view.periods[5])+'): '+levelNumber(level.first)+' '+level.unit+' / month; '+levelPercent(level.firstComparison)+' vs annual median.');
+  add('Last 6 months ('+monthLabel(view.periods[6])+' - '+monthLabel(view.periods[11])+'): '+levelNumber(level.last)+' '+level.unit+' / month; '+levelPercent(level.lastComparison)+' vs annual median.');
+  if(level.negativeMonths)add(level.negativeMonths+' month(s) include negative net sales after returns. Values are preserved, not clamped.');
+ }
+ add('The annual comparison does not change with search, supplier, rating or individual-month filters. Monthly source quantities follow below.');
+}
 function render(){
  const rows=filtered(),total=Math.max(1,Math.ceil(rows.length/view.size));view.page=Math.min(view.page,total-1);
  const filteredRows=rows.slice(view.page*view.size,(view.page+1)*view.size);
@@ -226,7 +257,7 @@ function render(){
    const trendCell=valid?'<span class="pf-trend '+state+'">'+html(direction)+'</span><div class="pf-muted" title="Last 3 months vs first 3 months of the trailing 12 months; historical, not a prediction">'+(trend===null?'Missing or non-comparable baseline':'Last 3M vs First 3M')+'</div>':'<span class="pf-pending">—</span>';
    const rating=ratingFor(h),ratingCell='<span class="pf126-rating pf126-'+rating.toLowerCase()+'" title="'+html(ratingDescription(h))+'">'+html(rating)+'</span>';
    const codeinfo=''; // Purchase-mapping reviews never suppress original sales.
-   return '<tr><td><div class="pf-product"><div class="pf120-product-line"><span dir="auto" title="'+html(r.name)+'">'+html(r.name)+'</span><button type="button" class="pf120-info" data-pf-info-code="'+html(r.code)+'" aria-label="Sales details for '+html(r.name)+'" aria-haspopup="dialog" title="Sales details">i</button></div><small class="pf127-supplier'+(savedSupplier(h)?'':' pf127-supplier-required')+'" dir="auto" title="'+html(supplierDescription(h))+'">'+html(savedSupplier(h)||'Supplier required')+'</small>'+codeinfo+'</div></td><td class="pf126-rating-cell">'+ratingCell+'</td><td>'+total+'</td><td>'+trendCell+'</td><td><span class="pf-trend">Not assessed</span></td><td><span class="pf-pending">Pending model</span></td></tr>';
+   return '<tr><td><div class="pf-product"><div class="pf120-product-line"><span dir="auto" title="'+html(r.name)+'">'+html(r.name)+'</span><button type="button" class="pf120-info" data-pf-info-code="'+html(r.code)+'" aria-label="Sales details for '+html(r.name)+'" aria-haspopup="dialog" title="Sales details">i</button></div><small class="pf127-supplier'+(savedSupplier(h)?'':' pf127-supplier-required')+'" dir="auto" title="'+html(supplierDescription(h))+'">'+html(savedSupplier(h)||'Supplier required')+'</small>'+codeinfo+'</div></td><td class="pf126-rating-cell">'+ratingCell+'</td><td>'+total+'</td><td class="pf128-level-cell">'+salesLevelCell(h,r)+'</td><td>'+trendCell+'</td><td><span class="pf-trend">Not assessed</span></td><td><span class="pf-pending">Pending model</span></td></tr>';
  }).join('');
  // The loaded sales catalog is complete; pagination does not query Master codes.
  q('pfEmpty').hidden=rows.length>0;
@@ -267,6 +298,7 @@ function showForecastInfo(code,trigger){
   if(h){
    add('Historical actuals (staged). Selling unit: '+(h.selling_unit||'Unresolved')+'. Reported months: '+(h.months_covered||0)+'/12. Source rows: '+h.source_rows+'.');
    add(ratingDescription(h));
+   addSalesLevelInfo(h,content,add);
    add('These quantities are read directly from the existing monthly sales reports. No purchase-unit conversion is applied. A missing month means not reported, not zero sales.');
    add('First 3 months: '+(h.first_3m??'Unavailable')+' ('+(h.first_3m_months||0)+'/3). Last 3 months: '+(h.last_3m??'Unavailable')+' ('+(h.last_3m_months||0)+'/3).');
    const heading=document.createElement('h4');heading.textContent='Monthly net sales';content.appendChild(heading);
@@ -283,6 +315,7 @@ function showForecastInfo(code,trigger){
   add('Historical Sales displays recorded net sales, not a Base Forecast. The source reports are staged and under review; quantities remain in the original selling unit.');
   add('All source products are included, regardless of any purchase-name or unit-mapping review. Product names and monthly net quantities come from the existing sales database, not the BO Assistant Master.');
   add('Trend compares the latest three months with the first three months of the trailing 12-month history. Green means growth above +5%, amber means decline below -5%, grey means stable within ±5%. Missing/uncertain periods or a zero/negative baseline show Insufficient Data. This is historical change, not a forecast.');
+  add('Sales Level shows the annual monthly median and each six-month median relative to it. It requires 12 reported months with consistent selling units; missing months are never zero. It remains annual when filtering a month.');
   add('Confidence and Final Forecast are pending the forecasting model and approvals. Annual Growth is a draft and is not applied to historical quantities.');
   add('Select a reporting month to see its recorded sales, or open product details for all monthly quantities. Profitability uses recorded annual profit. Suppliers are saved copies refreshed from BO Master only with Generate; this does not yet compute a Forecast. Purchase-unit conversion and pricing are deferred. Master and Reorder Point Generator are unchanged.');
  }
