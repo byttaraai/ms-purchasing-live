@@ -1,39 +1,30 @@
-name: Prepare verified Build128 sales level
+name: Polish verified Build128 compact labels
 on:
   push:
     branches: [build128-forecast-sales-level]
-    paths: ['.build128/**', '.github/workflows/build128-materialize.yml']
+    paths: ['.github/workflows/build128-materialize.yml']
 permissions:
   contents: write
 jobs:
-  prepare:
+  polish:
     runs-on: ubuntu-latest
     timeout-minutes: 3
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           ref: build128-forecast-sales-level
-          fetch-depth: 2
-      - name: Verify and apply tested source patch
+      - name: Apply verified compact-label polish
         run: |
           set -euo pipefail
-          test "$(git rev-parse HEAD^)" = "c67e94ce957c68a01234b534612d5053021ec256"
-          python3 - <<'PY'
-          import pathlib,lzma,hashlib,subprocess
-          raw=b''.join(pathlib.Path('.build128/part'+str(i)+'.bin').read_bytes() for i in range(4))
-          patch=lzma.decompress(raw)
-          assert hashlib.sha256(patch).hexdigest()=='5bb165669466fcc40c6fd16d4a9dd1e8843d1d31b780bf6f61535c3bafed3215'
-          subprocess.run(['git','apply','--check','--index'],input=patch,check=True)
-          subprocess.run(['git','apply','--index'],input=patch,check=True)
-          PY
-          node --check assets/js/purchase-forecast-v116.js
-          node --check assets/js/forecast-sales-level-v128.js
-          node --test tests/purchase-forecast-v116.cjs tests/reorder-compact.cjs tests/purchase-forecast-toolbar-v119.cjs tests/purchase-forecast-clean-v120.cjs tests/dashboard-inline-v122.cjs tests/purchase-forecast-source-v125.cjs
-      - name: Commit feature files on feature branch only
-        run: |
-          set -euo pipefail
-          git rm .build128/part0.bin .build128/part1.bin .build128/part2.bin .build128/part3.bin
+          test "$(git hash-object assets/css/purchase-forecast-v116.css)" = "7ce3863d29da7aef99b341196037dfe547b583a1"
+          cat >> assets/css/purchase-forecast-v116.css <<'CSS'
+          #purchaseForecast116 .pf-scroll table th:nth-child(6),#purchaseForecast116 .pf-scroll table td:nth-child(6){padding-left:6px;padding-right:6px}
+          #purchaseForecast116 .pf-scroll table th:nth-child(6){white-space:nowrap;font-size:10px}
+          #purchaseForecast116 .pf-scroll table td:nth-child(6) .pf-trend{padding:4px 5px;font-size:10px;overflow-wrap:normal}
+          CSS
+          node --test tests/purchase-forecast-v116.cjs
+          git add assets/css/purchase-forecast-v116.css
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git commit -m 'Build 128: Add annual monthly median and two half-year comparisons beside Historical Sales'
+          git commit -m 'Build128: keep adjacent confidence labels readable on narrow desktop'
           git push origin HEAD:refs/heads/build128-forecast-sales-level
