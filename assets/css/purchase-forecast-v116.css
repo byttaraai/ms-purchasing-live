@@ -309,3 +309,29 @@
 #purchaseForecast116 .pf127-sync-status{margin:0 0 10px;font-size:11px;color:var(--muted,#65718a)}
 #purchaseForecast116 .pf127-sync-status[hidden]{display:none}
 #purchaseForecast116 .pf127-sync-error{color:#936615}
+
+/* Build 128: monthly median / first-half / last-half comparison beside actual sales. */
+#purchaseForecast116 .pf-scroll table{min-width:900px}
+#purchaseForecast116 .pf-scroll table th:nth-child(1){width:calc(28% - 74px)}
+#purchaseForecast116 .pf-scroll table th:nth-child(2){width:74px}
+#purchaseForecast116 .pf-scroll table th:nth-child(3){width:16%}
+#purchaseForecast116 .pf-scroll table th:nth-child(4){width:25%}
+#purchaseForecast116 .pf-scroll table th:nth-child(5){width:12%}
+#purchaseForecast116 .pf-scroll table th:nth-child(6){width:8%}
+#purchaseForecast116 .pf-scroll table th:nth-child(7){width:11%}
+#purchaseForecast116 .pf-scroll table td.pf128-level-cell{padding:6px 4px}
+#purchaseForecast116 .pf128-level{display:grid;grid-template-columns:1.1fr 1fr 1fr;align-items:start;gap:5px;width:100%;margin:0;padding:7px 4px;border:1px solid transparent;border-radius:8px;background:transparent;color:inherit;font:inherit;text-align:center;cursor:pointer;direction:ltr}
+#purchaseForecast116 .pf128-level:hover{background:var(--bg,#f5f7fb);border-color:var(--line,#dce2ec)}
+#purchaseForecast116 .pf128-level:focus-visible{outline:2px solid #6945db;outline-offset:1px}
+#purchaseForecast116 .pf128-metric{display:flex;flex-direction:column;gap:5px;min-width:0}
+#purchaseForecast116 .pf128-metric+.pf128-metric{border-left:1px solid var(--line,#e2e8f2);padding-left:4px}
+#purchaseForecast116 .pf128-label{font-size:9px;font-weight:500;color:var(--muted,#65718a);white-space:nowrap}
+#purchaseForecast116 .pf128-typical{font-size:15px;line-height:1.2;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+#purchaseForecast116 .pf128-change{font-size:11px;line-height:1.65;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+#purchaseForecast116 .pf128-up{color:#14845b}
+#purchaseForecast116 .pf128-down{color:#a66a16}
+#purchaseForecast116 .pf128-stable,#purchaseForecast116 .pf128-unavailable{color:var(--muted,#68738c)}
+#purchaseForecast116 .pf128-unit{font-size:9px;color:var(--muted,#65718a);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#purchaseForecast116 .pf-scroll table th:nth-child(6),#purchaseForecast116 .pf-scroll table td:nth-child(6){padding-left:6px;padding-right:6px}
+#purchaseForecast116 .pf-scroll table th:nth-child(6){white-space:nowrap;font-size:10px}
+#purchaseForecast116 .pf-scroll table td:nth-child(6) .pf-trend{padding:4px 5px;font-size:10px;overflow-wrap:normal}
