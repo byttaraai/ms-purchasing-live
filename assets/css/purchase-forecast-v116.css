@@ -332,3 +332,6 @@
 #purchaseForecast116 .pf128-down{color:#a66a16}
 #purchaseForecast116 .pf128-stable,#purchaseForecast116 .pf128-unavailable{color:var(--muted,#68738c)}
 #purchaseForecast116 .pf128-unit{font-size:9px;color:var(--muted,#65718a);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#purchaseForecast116 .pf-scroll table th:nth-child(6),#purchaseForecast116 .pf-scroll table td:nth-child(6){padding-left:6px;padding-right:6px}
+#purchaseForecast116 .pf-scroll table th:nth-child(6){white-space:nowrap;font-size:10px}
+#purchaseForecast116 .pf-scroll table td:nth-child(6) .pf-trend{padding:4px 5px;font-size:10px;overflow-wrap:normal}
