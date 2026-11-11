@@ -2,6 +2,7 @@
 const assert=require('node:assert/strict');
 function swap(s,now,before,label){assert.equal(s.split(now).length-1,1,'Unique Build129 '+label);return s.replace(now,before);}
 function restore129Index(s){
+ s=require('./aging-task-blocking-v130-inverse.cjs').restore130Index(s);
  if(!s.includes('const missingUnits=lines.filter(l=>!C.text(l.raw_unit))'))return s;
  // Revert only approved Build129 Inventory importer edits for frozen legacy hashes.
  const start=s.indexOf('function parseQuantity(s){'),end=s.indexOf('\nfunction parseCSV(',start);

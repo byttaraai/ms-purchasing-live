@@ -1108,8 +1108,10 @@ function buildPriorityTasks(model){
   const rows=model.under10Rows.slice().sort((a,b)=>taskProfitabilityWeight(b.profitability_class)-taskProfitabilityWeight(a.profitability_class)||a.stock_ratio-b.stock_ratio),slice=rows.slice(0,5),codes=slice.map(r=>r.product_code),impact=estimateScoreGain(model,codes);
   add({task_key:'review|under10',task_type:'Critical Review',focus:'shortage_low',codes,target_count:codes.length,title:'Review '+codes.length+' product'+(codes.length===1?'':'s')+' below 10%',description:'Decide whether to order, adjust the business need, or document a legitimate external exception.',score_impact:impact,priority:p++});
  }
- if(model.counts.action30){
-  const rows=model.action30.map(([code])=>state.rows.find(r=>r.product_code===code)).filter(Boolean).sort((a,b)=>taskProfitabilityWeight(b.profitability_class)-taskProfitabilityWeight(a.profitability_class)||shortageAge(b.product_code)-shortageAge(a.product_code)).slice(0,5);
+ // Build130: retain shortage history, but only current actionable rows can enter an aging task.
+ const agedTaskRows=model.action30.map(([code])=>state.rows.find(r=>r.product_code===code)).filter(r=>r&&r.blocking_review===false&&shortageNeedsOrder(r)&&!isScoreExcluded(r.product_code)).sort((a,b)=>taskProfitabilityWeight(b.profitability_class)-taskProfitabilityWeight(a.profitability_class)||shortageAge(b.product_code)-shortageAge(a.product_code)).slice(0,5);
+ if(agedTaskRows.length){
+  const rows=agedTaskRows;
   const codes=rows.map(r=>r.product_code),impact=estimateScoreGain(model,codes);
   add({task_key:'review|30day-decision',task_type:'30+ Day Decision',focus:'aging30',codes,target_count:codes.length,title:'Decide '+codes.length+' shortage cycle'+(codes.length===1?'':'s')+' over 30 days',description:'These shortages have exceeded 30 days and require a clear decision: order/recovery action or a controlled justification.',score_impact:impact,priority:p++});
  }
