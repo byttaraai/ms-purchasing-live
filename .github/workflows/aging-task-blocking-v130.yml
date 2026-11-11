@@ -1,0 +1,16 @@
+name: Verify aging task blocking Build130
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  aging-eligibility:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Current eligibility and exact application inverse
+        run: node --test tests/aging-task-blocking-v130.cjs
