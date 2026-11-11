@@ -1,0 +1,59 @@
+name: Apply reviewed aging eligibility fix Build130
+on:
+  push:
+    branches: [fix/inventory-aged-blockers-v130]
+    paths: [.github/workflows/apply-aging-fix-v130.yml]
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: fix/inventory-aged-blockers-v130
+      - name: Apply exact reviewed replacements
+        run: |
+          node <<'NODE'
+          const fs=require('node:fs'),assert=require('node:assert/strict'),crypto=require('node:crypto');
+          const {before,after,restore130Index}=require('./tests/aging-task-blocking-v130-inverse.cjs');
+          const s=fs.readFileSync('index.html','utf8'),b=Buffer.from(s);
+          assert.equal(crypto.createHash('sha1').update('blob '+b.length+'\0').update(b).digest('hex'),'534885bee52315f740c5723bc64645299f9ad762','Expected untouched Build129 baseline');
+          assert.equal(s.split(before).length-1,1,'Unique reviewed aging task block');
+          const patched=s.replace(before,after);assert.equal(restore130Index(patched),s);
+          fs.writeFileSync('index.html',patched);
+          const path='tests/inventory-missing-unit-v129-inverse.cjs',inverse=fs.readFileSync(path,'utf8');
+          const marker='function restore129Index(s){';assert.equal(inverse.split(marker).length-1,1);
+          fs.writeFileSync(path,inverse.replace(marker,marker+"\n s=require('./aging-task-blocking-v130-inverse.cjs').restore130Index(s);"));
+          fs.writeFileSync('.github/workflows/aging-task-blocking-v130.yml',`name: Verify aging task blocking Build130
+          on:
+            pull_request:
+              branches: [main]
+            push:
+              branches: [main]
+          permissions:
+            contents: read
+          jobs:
+            aging-eligibility:
+              runs-on: ubuntu-latest
+              timeout-minutes: 5
+              steps:
+                - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+                - name: Current eligibility and exact application inverse
+                  run: node --test tests/aging-task-blocking-v130.cjs
+          `);
+          fs.unlinkSync('.github/workflows/apply-aging-fix-v130.yml');
+          NODE
+      - name: Verify before committing
+        run: |
+          node --test tests/aging-task-blocking-v130.cjs
+          node --test tests/inventory-missing-unit-v129.cjs
+          node tests/workspace-v47.cjs .
+      - name: Commit only the verified patch to the fix branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html tests/inventory-missing-unit-v129-inverse.cjs .github/workflows/aging-task-blocking-v130.yml .github/workflows/apply-aging-fix-v130.yml
+          git commit -m 'Build130: exclude current data blockers from aging tasks without touching shortage history'
+          git push origin HEAD:fix/inventory-aged-blockers-v130
