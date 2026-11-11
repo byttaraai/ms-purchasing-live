@@ -1,0 +1,20 @@
+name: Verify inventory missing-unit review Build129
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  inventory-unit-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Inventory importer and safety contract
+        run: node --test tests/inventory-missing-unit-v129.cjs
+      - name: Browser validation on desktop and mobile
+        run: |
+          python3 -m pip install --disable-pip-version-check 'playwright==1.57.0' 'pyee==13.0.1' 'greenlet==3.5.1'
+          python3 tests/run-inventory-missing-unit-v129.py
