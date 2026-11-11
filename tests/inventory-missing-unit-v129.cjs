@@ -6,6 +6,14 @@ const end=html.indexOf('</script>',begin);
 assert(begin>=8&&end>begin);
 const ctx={};vm.runInNewContext(html.slice(begin,end),ctx);
 const C=ctx.PurchasingCore,plain=x=>JSON.parse(JSON.stringify(x));
+test('undoing approved importer changes restores exactly the Build128 HTML blob',()=>{
+ const crypto=require('node:crypto'),{restore129Index}=require('./inventory-missing-unit-v129-inverse.cjs');
+ const restored=restore129Index(html);
+ const b=Buffer.from(restored);
+ const sha=crypto.createHash('sha1').update('blob '+b.length+'\0').update(b).digest('hex');
+ assert.equal(sha,'c9ab3bb3ff987c2ca7e8b3b7ddcf64437049c140');
+});
+
 test('unitless numeric stock is parsed without guessed unit',()=>{
  for(const [input,qty] of [['12',12],['3',3],['0',0],['-2',-2],['3.5',3.5],['١٢',12],['1,000',1000]]){
   assert.deepEqual(plain(C.parseQuantity(input)),{raw_quantity:qty,raw_unit:null});
