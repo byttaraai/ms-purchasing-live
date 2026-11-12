@@ -19,7 +19,8 @@ setup=r"""() => {
  const cycles=Object.fromEntries(fixture.rows.map(r=>[r.product_code,{cycleId:'test-'+r.product_code,active:true,startDate:'2026-10-13',lastSeen:'2026-11-12',history:[],justification:null}]));
  s.shortageCycles=structuredClone(cycles);WORKSPACE_RUNTIME.serverShortageReady=true;WORKSPACE_RUNTIME.authority=null;
  window.qa={saves:0,syncs:0,reads:0,fixture};
- rpc=async(name,body)=>{
+ http=async(path,{body}={})=>{
+  const name=String(path).split('/').pop();
   if(name==='purchasing_workspace_revision_v47')return{master_revision:fixture.master_revision,upload_id:fixture.upload.id};
   if(name==='purchasing_dashboard_v5'){qa.reads++;return structuredClone(fixture);}
   if(name==='purchasing_workspace_state_v58'){
@@ -58,7 +59,7 @@ try:
    page.locator('#validateInventory').click()
    page.wait_for_function("!document.querySelector('#validateInventory').disabled")
    msg=page.locator('#inventoryValidation').inner_text()
-   assert page.locator('#applyInventory').is_enabled(),(zone,msg)
+   assert page.locator('#applyInventory').is_enabled(),(zone,msg,errors)
    assert 'SERVER_SCORE_MISMATCH' not in msg,(zone,msg)
    assert page.evaluate('qa.saves')==0
    assert page.evaluate('scoreAsOf()')=='2026-11-12'
