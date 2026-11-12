@@ -1,0 +1,20 @@
+name: Verify server calendar Build131
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  server-calendar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Server day, DST, strict score guards and midnight retries
+        run: node --test tests/score-calendar-v131.cjs
+      - name: Inventory validate and apply with isolated synthetic RPCs
+        run: |
+          python3 -m pip install --disable-pip-version-check 'playwright==1.57.0' 'pyee==13.0.1' 'greenlet==3.5.1'
+          python3 tests/run-score-calendar-v131.py
