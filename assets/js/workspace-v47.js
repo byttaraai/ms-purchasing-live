@@ -2,8 +2,27 @@
 'use strict';
 const WORKSPACE_RUNTIME = {
   version: 'reactive_v1', pending: false, promise: null, sandbox: false,
-  derived: null, day: null, seq: 0, decisionsDirty: false, serverShortageReady: false, authority: null
+  derived: null, day: null, seq: 0, decisionsDirty: false, serverShortageReady: false, authority: null, clockDay: null
 };
+// Build131: one server evaluation day; host dates only trigger refreshes.
+function workspaceBusinessDay(d=new Date()) {
+  const parts=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Riyadh',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(d);
+  const fields=Object.fromEntries(parts.map(p=>[p.type,p.value]));
+  return fields.year+'-'+fields.month+'-'+fields.day;
+}
+function workspaceScoreDay() {
+  if(state.mode!=='live')return localDateString();
+  const day=WORKSPACE_RUNTIME.authority?.evaluated_on;
+  // Old/offline fixtures have no authority date. Production supplies evaluated_on.
+  if(day==null)return workspaceBusinessDay();
+  const date=new Date(day+'T00:00:00Z');
+  if(typeof day!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(day)||!Number.isFinite(date.getTime())||date.toISOString().slice(0,10)!==day)throw Error('Invalid server evaluation date');
+  return day;
+}
+function workspaceDayChanged() {
+  // Pin calculations to the server, but do not pin the midnight refresh detector.
+  return WORKSPACE_RUNTIME.day!==scoreAsOf()||WORKSPACE_RUNTIME.clockDay!==workspaceBusinessDay();
+}
 function workspaceDataset(d) {
   const rows=(d.rows||[]).map(r=>({...r}));
   const fields=['stock_qty','reorder_point','stock_ratio','min_order_qty','max_order_qty','factor','raw_quantity','purchase_price','total_value','raw_total_buy','raw_unit_price'];
@@ -35,6 +54,7 @@ function combinedTaskImpact(model,tasks) {
 function verifyServerAuthority(result,data){
   const a=data?.authority;
   if(!a||a.authority_version!=='server_v58')throw Error('Server authority acknowledgement is missing.');
+  if(a.evaluated_on!=null&&a.evaluated_on!==result.day)throw Error('SOURCE_DAY_CHANGED');
   const clientScore=Math.round(result.model.score),serverScore=Number(a.score);
   if(!Number.isFinite(serverScore)||clientScore!==serverScore)throw Error('SERVER_SCORE_MISMATCH');
   const open=new Map((data.tasks||[]).filter(t=>t.status==='open').map(t=>[t.task_key,t]));
@@ -91,7 +111,7 @@ async function loadLive() {
         if(authority.source&&(Number(authority.source.master_revision)!==Number(raw.master_revision)||authority.source.upload_id!==raw.upload?.id)){
           if(conflicts++<3){WORKSPACE_RUNTIME.pending=true;continue;}throw Error('SOURCE_REVISION_CHANGED');
         }
-        state.shortageCycles=authority.cycles||{};WORKSPACE_RUNTIME.serverShortageReady=true;WORKSPACE_RUNTIME.authority=authority;saveShortageStore();
+        state.shortageCycles=authority.cycles||{};WORKSPACE_RUNTIME.serverShortageReady=true;WORKSPACE_RUNTIME.authority=authority;WORKSPACE_RUNTIME.clockDay=workspaceBusinessDay();saveShortageStore();
         const result=deriveWorkspace(raw);
         if(Number(authority.score)!==Math.round(result.model.score))throw Error('SERVER_SCORE_MISMATCH');
         result.cycles=structuredClone(authority.cycles||state.shortageCycles);
@@ -106,7 +126,11 @@ async function loadLive() {
           throw e;
         }
         if(data.source&&(data.source.master_revision!==result.dataset.revision||data.source.upload_id!==result.dataset.upload?.id))throw Error('Source acknowledgement does not match the calculation.');
-        verifyServerAuthority(result,data);
+        try {verifyServerAuthority(result,data);}
+        catch(e){
+          if(e.message==='SOURCE_DAY_CHANGED'&&conflicts++<3){WORKSPACE_RUNTIME.pending=true;continue;}
+          throw e;
+        }
         result.cycles=structuredClone(data.cycles||state.shortageCycles);WORKSPACE_RUNTIME.authority=data.authority;
         if(state.session?.user?.id!==owner||state.mode!=='live')return;
         if(WORKSPACE_RUNTIME.pending)continue;
@@ -135,7 +159,7 @@ async function pollWorkspaceRevision() {
   if(!workspaceVisible()||document.hidden||workspaceEditOpen()||WORKSPACE_RUNTIME.promise)return;
   try {
     const v=await rpc('purchasing_workspace_revision_v47');
-    if(v.master_revision!==state.revision||v.upload_id!==state.upload?.id||WORKSPACE_RUNTIME.day!==scoreAsOf()||WORKSPACE_RUNTIME.decisionsDirty){
+    if(v.master_revision!==state.revision||v.upload_id!==state.upload?.id||workspaceDayChanged()||WORKSPACE_RUNTIME.decisionsDirty){
       await loadLive();
     }
   } catch(e){showError('Could not check the latest data: '+e.message);}
@@ -192,7 +216,7 @@ async function refreshSupplierTaskPopup(taskKey,selectedCodes){
   if(state.mode!=='live')return;
   try{
     const v=await rpc('purchasing_workspace_revision_v47');
-    const changed=v.master_revision!==state.revision||v.upload_id!==state.upload?.id||WORKSPACE_RUNTIME.day!==scoreAsOf()||WORKSPACE_RUNTIME.decisionsDirty;
+    const changed=v.master_revision!==state.revision||v.upload_id!==state.upload?.id||workspaceDayChanged()||WORKSPACE_RUNTIME.decisionsDirty;
     if(!changed)return;
     const d=$('supplierTaskDialog'),liveSelection=d?.open?new Set([...d.querySelectorAll('.supplier-task-check')].filter(x=>x.checked).map(x=>x.dataset.code)):selectedCodes;
     await loadLive();

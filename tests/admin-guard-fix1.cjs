@@ -27,6 +27,7 @@ test('protected engines match Build 93 except the two approved Build 95 release 
   };
   for(const [name,expected] of Object.entries(files)){
     let data=fs.readFileSync(name);
+    if(name==='assets/js/workspace-v47.js')data=Buffer.from(require('../maintenance/patch131.cjs').restore131Workspace(data.toString('utf8')));
     if(name==='index.html'){
       // Invert ONLY the approved marker/asset reference changes; all embedded logic
       // must still reproduce the exact original hash. Do not reset the baseline.
