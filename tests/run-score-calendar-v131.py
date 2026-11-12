@@ -4,7 +4,7 @@ No production credentials or database writes; unexpected network is blocked.
 from pathlib import Path
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
-from playwright.sync_api import sync_playwright
+from playwright.sync_api import sync_playwright, expect
 import threading, shutil
 root=Path(__file__).resolve().parents[1]
 class Quiet(SimpleHTTPRequestHandler):
@@ -53,28 +53,29 @@ try:
    page.route('**/*',lambda route:route.continue_() if route.request.url.startswith(f'http://127.0.0.1:{server.server_port}/') else route.abort())
    page.clock.set_fixed_time('2026-11-11T21:30:00Z')
    page.goto(f'http://127.0.0.1:{server.server_port}/index.html',wait_until='load')
-   page.wait_for_function('!!window.msAudit');page.evaluate(setup)
+   assert page.evaluate('() => !!window.msAudit')
+   page.evaluate(setup)
    page.locator('#inventoryFile').set_input_files({'name':'synthetic-calendar.csv','mimeType':'text/csv','buffer':csv.encode()})
    page.locator('#inventoryDate').fill('2026-11-12');page.locator('#inventoryComplete').check(force=True)
    page.locator('#validateInventory').click()
-   page.wait_for_function("!document.querySelector('#validateInventory').disabled")
+   expect(page.locator('#validateInventory')).to_be_enabled(timeout=30000)
    msg=page.locator('#inventoryValidation').inner_text()
    assert page.locator('#applyInventory').is_enabled(),(zone,msg,errors)
    assert 'SERVER_SCORE_MISMATCH' not in msg,(zone,msg)
-   assert page.evaluate('qa.saves')==0
-   assert page.evaluate('scoreAsOf()')=='2026-11-12'
-   assert page.evaluate("shortageAge('qa-stock')")==30
+   assert page.evaluate('() => qa.saves')==0
+   assert page.evaluate('() => scoreAsOf()')=='2026-11-12'
+   assert page.evaluate("() => shortageAge('qa-stock')")==30
    page.locator('#applyInventory').click()
-   page.wait_for_function("document.querySelector('#inventoryModal').classList.contains('hidden')")
-   assert page.evaluate('qa.saves')==1
-   assert page.evaluate('qa.syncs')>=2
+   expect(page.locator('#inventoryModal')).to_be_hidden(timeout=30000)
+   assert page.evaluate('() => qa.saves')==1
+   assert page.evaluate('() => qa.syncs')>=2
    assert page.locator('#globalError').is_hidden()
-   page.evaluate('openInventoryModal()')
+   page.evaluate('() => openInventoryModal()')
    page.locator('#inventoryDate').fill('2026-11-13');page.locator('#validateInventory').click()
-   page.wait_for_function("!document.querySelector('#validateInventory').disabled")
+   expect(page.locator('#validateInventory')).to_be_enabled(timeout=30000)
    assert 'cannot be in the future' in page.locator('#inventoryValidation').inner_text()
    assert page.locator('#applyInventory').is_disabled()
-   assert page.evaluate('qa.saves')==1
+   assert page.evaluate('() => qa.saves')==1
    assert not errors,(zone,errors)
    print('PASS calendar validation/apply/future-date browser',zone,width,flush=True)
    context.close()
