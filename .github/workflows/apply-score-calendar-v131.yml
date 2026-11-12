@@ -1,0 +1,29 @@
+name: Apply reviewed calendar repair Build131
+on:
+  push:
+    branches: [fix/score-calendar-v131]
+    paths: [.github/workflows/apply-score-calendar-v131.yml]
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: fix/score-calendar-v131
+      - name: Apply exact source-verified repair
+        run: node maintenance/patch131.cjs
+      - name: Verify calendars, prior inventory repair and frozen formulas
+        run: |
+          node --check assets/js/workspace-v47.js
+          node --test tests/score-calendar-v131.cjs tests/aging-task-blocking-v130.cjs tests/inventory-missing-unit-v129.cjs tests/freshness-v97.cjs tests/status-colors-v98.cjs tests/negative-stock-v99.cjs tests/popup-drafts-v95.cjs tests/profit-range-task02.cjs tests/admin-guard-fix1.cjs tests/overstock-v69.cjs
+          node tests/workspace-v47.cjs .
+      - name: Commit only verified application and inverse-test changes
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html assets/js/workspace-v47.js tests/aging-task-blocking-v130-inverse.cjs tests/admin-guard-fix1.cjs tests/status-colors-v98.cjs tests/freshness-v97.cjs tests/negative-stock-v99.cjs tests/popup-drafts-v95.cjs tests/profit-range-task02.cjs tests/overstock-v69.cjs
+          git commit -m 'Build131: anchor score calculations and inventory validation to server business day'
+          git push origin HEAD:fix/score-calendar-v131
