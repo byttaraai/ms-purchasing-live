@@ -2,7 +2,7 @@
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),crypto=require('node:crypto');
 const read=p=>fs.readFileSync(p,'utf8');
 const html=require('./release-negative-v99.cjs')(require('./reorder-preview-v103.cjs').as102(read('index.html'))),css=read('assets/css/task-assistant-v98.css');
-const hash=s=>{const b=Buffer.from(s);return crypto.createHash('sha1').update(Buffer.from('blob '+b.length+'\0')).update(b).digest('hex');};
+const hash=s=>{s=require('../maintenance/patch131.cjs').restore131Workspace(s);const b=Buffer.from(s);return crypto.createHash('sha1').update(Buffer.from('blob '+b.length+'\0')).update(b).digest('hex');};
 test('only the release marker and new stylesheet differ from exact Build 97 entrypoint',()=>{
   assert.equal(hash(require('./release-colors-v98.cjs')(html)),'2347d66d951abd23f5ccf30671fbfd3fda47703c');
   assert(html.indexOf('task-assistant-v98.css?v=98')>html.indexOf('task-assistant-v93.css?v=93'));

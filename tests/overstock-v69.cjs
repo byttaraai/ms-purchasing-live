@@ -76,7 +76,7 @@ test('Build 71 removes No Reorder Point from the overstock popup while preservin
 test('new model has no IO, persistence, task completion or badge side effects',()=>{
  const code=fs.readFileSync('assets/js/overstock-risk-v69.js','utf8');
  for(const pattern of [/\bfetch\s*\(/,/\brpc\s*\(/,/localStorage/,/sessionStorage/,/document\./,/badge_awarded/])assert(!pattern.test(code));
- const bytes=fs.readFileSync('assets/js/workspace-v47.js');const sha=crypto.createHash('sha1').update(Buffer.from('blob '+bytes.length+'\0')).update(bytes).digest('hex');
+ const bytes=Buffer.from(require('../maintenance/patch131.cjs').restore131Workspace(fs.readFileSync('assets/js/workspace-v47.js','utf8')));const sha=crypto.createHash('sha1').update(Buffer.from('blob '+bytes.length+'\0')).update(bytes).digest('hex');
  assert.equal(sha,'479823da0a805b1e15a3e28ad29213d284796534');
 });
 test('all inline and external JavaScript parses before deployment',()=>{

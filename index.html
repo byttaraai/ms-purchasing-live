@@ -752,7 +752,7 @@ async function readXlsxRows(buffer){
  }
  return rows;
 }
-</script><script src="assets/js/overstock-risk-v69.js?v=71"></script><script src="assets/js/overstock-ui-v69.js?v=77"></script><script src="assets/js/workspace-v47.js?v=59"></script><script src="assets/js/supplier-quest-model-v81.js?v=81"></script><script src="assets/js/supplier-task-v82.js?v=82"></script><script src="assets/js/supplier-layout-v83.js?v=83"></script><script src="assets/js/supplier-polish-v84.js?v=84"></script><script src="assets/js/supplier-toolbar-v85.js?v=85"></script><script src="assets/js/task-assistant-v86.js?v=86"></script><script src="assets/js/task-assistant-v87.js?v=87"></script><script src="assets/js/task-assistant-v88.js?v=88"></script><script src="assets/js/task-assistant-v91.js?v=91"></script><script src="assets/js/task-assistant-v92.js?v=92"></script><script src="assets/js/task-assistant-v99.js?v=99"></script><script>'use strict';
+</script><script src="assets/js/overstock-risk-v69.js?v=71"></script><script src="assets/js/overstock-ui-v69.js?v=77"></script><script src="assets/js/workspace-v47.js?v=131"></script><script src="assets/js/supplier-quest-model-v81.js?v=81"></script><script src="assets/js/supplier-task-v82.js?v=82"></script><script src="assets/js/supplier-layout-v83.js?v=83"></script><script src="assets/js/supplier-polish-v84.js?v=84"></script><script src="assets/js/supplier-toolbar-v85.js?v=85"></script><script src="assets/js/task-assistant-v86.js?v=86"></script><script src="assets/js/task-assistant-v87.js?v=87"></script><script src="assets/js/task-assistant-v88.js?v=88"></script><script src="assets/js/task-assistant-v91.js?v=91"></script><script src="assets/js/task-assistant-v92.js?v=92"></script><script src="assets/js/task-assistant-v99.js?v=99"></script><script>'use strict';
 const C=PurchasingCore;
 const CONFIG={url:'https://mpxpbbpqnvoinyjmuuvf.supabase.co',key:'sb_publishable_4shFOVEi5Ib0I8KRZYzsMA_Sahkf8PB'};
 const $=id=>document.getElementById(id);
@@ -958,9 +958,9 @@ const LEVELS=[
  {n:12,min:95,points:38000,name:'BOs Master',badge:'BOs Master'}
 ];
 function localDateString(d=new Date()){const x=new Date(d.getTime()-d.getTimezoneOffset()*60000);return x.toISOString().slice(0,10);}
-function daysBetween(a,b){const x=new Date(a+'T12:00:00'),y=new Date(b+'T12:00:00');return Math.max(0,Math.floor((y-x)/86400000));}
+function daysBetween(a,b){const x=new Date(a+'T12:00:00Z'),y=new Date(b+'T12:00:00Z');return Math.max(0,Math.floor((y-x)/86400000));}
 function addDays(date,days){const d=new Date(date+'T12:00:00');d.setDate(d.getDate()+days);return localDateString(d);}
-function scoreAsOf(){return localDateString();}
+function scoreAsOf(){return workspaceScoreDay();}
 function inventoryFreshnessFor(u,nowMs=Date.now()){if(!u)return{fresh:false,status:'missing',label:'No inventory loaded',ageHours:Infinity};if(u.status&&u.status!=='completed')return{fresh:false,status:'invalid',label:'Inventory upload is not completed',ageHours:Infinity};if(!(u.is_complete&&u.excludes_zero))return{fresh:false,status:'partial',label:'A full inventory snapshot is required',ageHours:Infinity};let t=u.uploaded_at?Date.parse(u.uploaded_at):NaN;if(!Number.isFinite(t)&&u.snapshot_date)t=Date.parse(u.snapshot_date+'T12:00:00Z');if(!Number.isFinite(t))return{fresh:false,status:'undated',label:'Inventory refresh time is unavailable',ageHours:Infinity};const age=Math.max(0,(nowMs-t)/3600000),fresh=age<48;return{fresh,status:fresh?'fresh':'stale',label:fresh?'Inventory is current':'Inventory refresh is 48+ hours old',ageHours:age,upload:u};}
 function inventoryFreshness(nowMs=Date.now()){return inventoryFreshnessFor(state.upload,nowMs);}
 function purchaseActionsLocked(){return state.mode==='live'&&!inventoryFreshness().fresh;}
@@ -1345,7 +1345,7 @@ async function applyMaster(){const p=state.pendingMaster;if(!p)return;const btn=
 async function refreshMasterBeforeInventoryValidation(){
  if(state.mode!=='live')return false;
  const v=await rpc('purchasing_workspace_revision_v47');
- if(v.master_revision===state.revision)return false;
+ if(v.master_revision===state.revision&&!workspaceDayChanged())return false;
  await loadLive();
  return true;
 }
@@ -1353,7 +1353,7 @@ async function validateInventory(){state.pendingInventory=null;$('applyInventory
  try{
   const file=$('inventoryFile').files[0];if(!file)throw Error('Choose the inventory file first.');
   const refreshed=await refreshMasterBeforeInventoryValidation();
-  const f=await readFile(file),lines=C.parseInventory(f.records),date=$('inventoryDate').value;if(!/^\d{4}-\d{2}-\d{2}$/.test(date))throw Error('Enter the inventory as-of date, not just the upload date.');if(date>localDateString())throw Error('Inventory as-of date cannot be in the future.');
+  const f=await readFile(file),lines=C.parseInventory(f.records),date=$('inventoryDate').value;if(!/^\d{4}-\d{2}-\d{2}$/.test(date))throw Error('Enter the inventory as-of date, not just the upload date.');if(date>scoreAsOf())throw Error('Inventory as-of date cannot be in the future.');
   const complete=$('inventoryComplete').checked,upload={id:uuid(),snapshot_date:date,scope_key:'all_products',is_complete:complete,excludes_zero:complete,status:'completed',file_name:file.name,uploaded_at:new Date().toISOString()};
   const preview=C.makeSnapshot(state.master,lines,upload,state.aliases),codes=new Set(state.master.map(m=>m.product_code)),matched=lines.filter(l=>codes.has(l.product_code)).length,missing=state.master.filter(m=>!lines.some(l=>l.product_code===m.product_code)).length,converted=preview.filter(r=>r.conversion_role==='option').length,review=preview.filter(r=>r.needs_review).length,negative=preview.filter(r=>Number(r.raw_quantity)<0).length;
   const missingUnits=lines.filter(l=>!C.text(l.raw_unit));
@@ -1395,7 +1395,7 @@ async function applyInventory(){const p=state.pendingInventory;if(!p)return;cons
 }
 function openInventoryModal(){
  const modal=$('inventoryModal');if(!modal)return;
- if(!$('inventoryDate').value){const d=new Date(),local=new Date(d.getTime()-d.getTimezoneOffset()*60000);$('inventoryDate').value=local.toISOString().slice(0,10);}
+ if(!$('inventoryDate').value)$('inventoryDate').value=state.mode==='live'?workspaceBusinessDay():localDateString();
  modal.classList.remove('hidden');document.body.classList.add('modal-open');setTimeout(()=>$('inventoryFile')?.focus(),0);
 }
 function closeInventoryModal(){const modal=$('inventoryModal');if(!modal)return;modal.classList.add('hidden');document.body.classList.remove('modal-open');}

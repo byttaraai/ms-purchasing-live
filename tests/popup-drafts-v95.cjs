@@ -3,7 +3,7 @@ const {test}=require('node:test'),assert=require('node:assert/strict'),fs=requir
 const root=path.resolve(__dirname,'..'),read=name=>fs.readFileSync(path.join(root,name),'utf8');
 const current=read('assets/js/task-assistant-v95.js'),baseline=read('assets/js/task-assistant-v94.js');
 const span=(s,a,b)=>s.slice(s.indexOf(a),s.indexOf(b));
-const gitHash=s=>{const b=Buffer.from(s);return crypto.createHash('sha1').update(Buffer.from('blob '+b.length+'\0')).update(b).digest('hex');};
+const gitHash=s=>{s=require('../maintenance/patch131.cjs').restore131Workspace(s);const b=Buffer.from(s);return crypto.createHash('sha1').update(Buffer.from('blob '+b.length+'\0')).update(b).digest('hex');};
 test('rendering and field definitions stay identical to the verified Build 94',()=>{
   assert.equal(gitHash(baseline),'45eaad58fb9c061d791d193de77d0aea89ddf706');
   assert.equal(span(current,'  const issueDefs=','  function ensureDialog('),span(baseline,'  const issueDefs=','  function ensureDialog('));

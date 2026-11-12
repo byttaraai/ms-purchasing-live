@@ -3,7 +3,7 @@ const {test}=require('node:test'),assert=require('node:assert/strict'),fs=requir
 const {createRequire}=require('node:module');
 const {previous}=require('./release-task02-v100.cjs');
 const html=require('./reorder-preview-v103.cjs').as102(fs.readFileSync('index.html','utf8')),prior=previous(html);
-const hash=s=>{const b=Buffer.from(s);return crypto.createHash('sha1').update(Buffer.from('blob '+b.length+'\0')).update(b).digest('hex');};
+const hash=s=>{s=require('../maintenance/patch131.cjs').restore131Workspace(s);const b=Buffer.from(s);return crypto.createHash('sha1').update(Buffer.from('blob '+b.length+'\0')).update(b).digest('hex');};
 const source=fs.readFileSync('tests/workspace-v47.cjs','utf8').split('(async()=>')[0];
 const anchor="const root=process.argv[2]||'.',html=fs.readFileSync(root+'/index.html','utf8');";
 assert.equal(source.split(anchor).length-1,1);

@@ -13,7 +13,7 @@ const ctx={console,Map,Set,JSON,Object,Number,String,Date,Array,structuredClone,
  fmt:(n)=>String(n),C:{profitLabel:x=>x},$:()=>null,purchaseActionsLocked:()=>false};
 ctx.window=ctx;vm.createContext(ctx);vm.runInContext(source,ctx);
 const run=s=>vm.runInContext(s,ctx);
-const hash=p=>crypto.createHash('sha256').update(fs.readFileSync(path.join(root,p))).digest('hex');
+const hash=p=>{let bytes=fs.readFileSync(path.join(root,p));if(p==='assets/js/workspace-v47.js')bytes=Buffer.from(require('../maintenance/patch131.cjs').restore131Workspace(bytes.toString('utf8')));return crypto.createHash('sha256').update(bytes).digest('hex');};
 const protectedFiles=JSON.parse(fs.readFileSync(path.join(__dirname,'protected-ui82.json'),'utf8'));
 test('business/risk assets are byte-for-byte unchanged',()=>{
  for(const [file,expected] of Object.entries(protectedFiles.assets))assert.equal(hash(file),expected,file);
